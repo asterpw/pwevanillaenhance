@@ -1,0 +1,73 @@
+.emotes-dialog {
+    width: 370px;   
+	padding: 0px;
+}
+
+.emotes-dialog img {
+	padding: 2px;   
+    cursor: pointer;
+}
+
+.emotes-dialog > img:hover {
+    background-color: rgba(0,0,0,0.1);
+    border-radius: 2px;
+}
+
+.emote-category {
+    background-color: rgba(0,0,0,0.1);
+    white-space: nowrap;
+    line-height: 0;
+    padding: 5px 5px 0px 5px;
+    border-bottom: 1px solid #999999;
+    /*width: 100%;*/
+}
+
+.emote-category img {
+	padding: 5px;   
+    border: 1px solid transparent;
+}
+
+.emote-category .selected {
+    background-color: #FFFFFF;
+    border: 1px solid #999999;
+    border-bottom: hidden;
+    margin-bottom: -1px;
+    padding-bottom: 7px;
+}
+
+.emotes-div {
+	padding: 5px;
+    margin: 0px;
+}
+
+
+.pwi-emotes .icon-emote {
+    background: url('http://asterpw.github.io/pwicons/emotes/tiger-1.gif') no-repeat left;
+    background-size: contain;
+    width: 6px;
+    height: 14px;
+    vertical-align: text-top;
+    margin-left: -6px;
+}
+
+.color-picker {
+	width: 210px;   
+}
+
+.evo-palette, .evo-color span {
+	color: #666666;
+    margin-top: 5px;
+}
+
+.evo-more a {
+    margin: 0px 0 0 0px;
+    display: inline-block !important;
+    padding: 2px !important;
+    text-decoration: underline !important;
+    font-size: 12px;
+}
+
+.icon-font-color {
+	box-shadow: 0 -5px 0 0 #FFFFFF inset; 
+    margin: 0px -5px !important; 
+}
