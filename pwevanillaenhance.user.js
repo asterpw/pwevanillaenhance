@@ -125,7 +125,6 @@ var getCookie = function() {
 		var cookieData = document.cookie.split(";");
 		for (var i = 0; i < cookieData.length; i++) {
 			var cookieItem = cookieData[i].trim().split("=");
-			console.log(cookieItem);
 			if (cookieItem[0].indexOf("pweEnhance.") == 0) {
 				console.log("FOUND ITEM");
 				pweEnhanceSettings[cookieItem[0].split(".")[1]] = cookieItem[1];
@@ -139,7 +138,7 @@ var getCookie = function() {
 $(document).ready(function() {
 	getCookie();
 	loadCSS("http://evoluteur.github.com/colorpicker/css/evol.colorpicker.css");
-	loadCSS("https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.css");
+	loadCSS("https://asterpw.github.com/pwevanillaenhance/pwevanillaenhance.user.css");
 	$(".editor-action-emoji").after(makePWPanel());
 	$(".pwi-emotes").after(makeFontColorPicker());
 	$.getScript("http://evoluteur.github.com/colorpicker/js/evol.colorpicker.min.js", function() {
