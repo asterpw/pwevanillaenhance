@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name       PWE Vanilla Forums Enhancement
-// @namespace  http://asterpw.github.io/pwevanillaenhance
+// @namespace  http://github.com/asterpw/pwevanillaenhance
 // @downloadURL https://asterpw.github.io/pwevanillaenhance/pwevanillaenhance.user.js
 // @updateURL https://asterpw.github.io/pwevanillaenhance/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
