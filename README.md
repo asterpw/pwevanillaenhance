@@ -3,7 +3,7 @@ PWE Vanilla Forums Enhancement - Adds useful tools to the pwe vanilla forums
 <h1> Installation</h1>
 <p>How you install user scripts depends on which browser you use. Typically, you will need to install a browser extension. The list below is not an exhaustive list.</p>
 <p>Once you have the extension installed you can activate the user script by clicking the following link:
-<p><a href='https://asterpw.github.io/pwevanillaenhance/pwevanillaenhance.user.js'>https://asterpw.github.io/pwevanillaenhance/pwevanillaenhance.user.js</a>
+<p><a href='https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js'>https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js</a>
 <h2>Google Chrome, Chromium, and related</h2>
 <ul>
 	<li><a href="https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo">Tampermonkey</a></li>
