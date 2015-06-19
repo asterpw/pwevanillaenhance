@@ -126,9 +126,7 @@ var getCookie = function() {
 		for (var i = 0; i < cookieData.length; i++) {
 			var cookieItem = cookieData[i].trim().split("=");
 			if (cookieItem[0].indexOf("pweEnhance.") == 0) {
-				console.log("FOUND ITEM");
 				pweEnhanceSettings[cookieItem[0].split(".")[1]] = cookieItem[1];
-				console.log(pweEnhanceSettings);
 			}
 		}
 	}
@@ -143,6 +141,11 @@ $(document).ready(function() {
 	$(".pwi-emotes").after(makeFontColorPicker());
 	$.getScript("http://evoluteur.github.com/colorpicker/js/evol.colorpicker.min.js", function() {
 		initColorPicker()
+	});
+	$(document).on( "EditCommentFormLoaded", function(event, container) {
+		console.log(container);
+		container.find(".editor-action-emoji").after(makeFontColorPicker()).after(makePWPanel());
+		initColorPicker();
 	});
 });
 
