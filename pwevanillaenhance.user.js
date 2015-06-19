@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name       PWE Vanilla Forums Enhancement
 // @namespace  http://github.com/asterpw/pwevanillaenhance
-// @downloadURL https://asterpw.github.io/pwevanillaenhance/pwevanillaenhance.user.js
-// @updateURL https://asterpw.github.io/pwevanillaenhance/pwevanillaenhance.user.js
+// @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
+// @updateURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
 // @version    0.1
 // @description  Adds useful tools to the pwe vanilla forums
@@ -139,7 +139,7 @@ var getCookie = function() {
 $(document).ready(function() {
 	getCookie();
 	loadCSS("http://evoluteur.github.com/colorpicker/css/evol.colorpicker.css");
-	loadCSS("https://asterpw.github.io/pwevanillaenhance/pwevanillaenhance.user.css");
+	loadCSS("https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.css");
 	$(".editor-action-emoji").after(makePWPanel());
 	$(".pwi-emotes").after(makeFontColorPicker());
 	$.getScript("http://evoluteur.github.com/colorpicker/js/evol.colorpicker.min.js", function() {
