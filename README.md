@@ -28,5 +28,3 @@ PWE Vanilla Forums Enhancement - Adds useful tools to the pwe vanilla forums
 <ul>
 	<li><a href="http://sourceforge.net/projects/trixiewpf45/">Trixie</a></li>
 </ul>
-
-	</div>
