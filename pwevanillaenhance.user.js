@@ -14,6 +14,7 @@
 var pweEnhanceSettings = {
 	"defaultFontColor": "#FFFFFF",
 	"pwiEmoteCategory": "tiger",
+    "autoAddColor": "false",
 	"version": "0.2"
 };
 
@@ -23,7 +24,6 @@ var makePWPanel = function() {
 	var emotetypes = ["normal", "tiger", "pig", "bear",  "monkey", "fish", "fox", "mouse"]; 
 	var defaultCategory = pweEnhanceSettings['pwiEmoteCategory'];
 	var categoryDiv = $('<div class="emote-category"></div>');
-	console.log($('.icon-emote').css('background-image'));
 
 	for (var type=0; type < emotetypes.length; type++) {
 		var typeImg = $('<img width="32" height="32"/>');
@@ -53,7 +53,8 @@ var makePWPanel = function() {
 	var pwEmoteClick = function () {
 		var position = $(this).closest(".FormWrapper").find('.BodyBox').insertAtCaret("[img]"+$(this).attr('src')+"[/img]");
 		return false;
-	}
+	};
+    
 	for (var i = 1; i <= 50; i++) {
 		var img = $('<img width="32" height="32" class="pwemote'+i+'"/>');
 		img.attr('src', pw + defaultCategory + "-" + i + ".gif");
@@ -71,25 +72,44 @@ var makePWPanel = function() {
 	});
 	button.find('.icon-emote').css('background-image', "url('"+pw+defaultCategory+"-1.gif')");
 	return button.append(container);
-}
+};
+
+var autoAddFontColor = function(textArea, color) {
+	var startTag = '[color="'+color+'"]';
+	var endTag = '[/color]';
+	if (!textArea.val().startsWith(startTag)) {
+		textArea.val(startTag + textArea.val() + endTag);
+	}
+};
 
 var makeFontColorPicker = function() {
-	var container = $('<div class="color-picker editor-insert-dialog Flyout MenuItems"></div>');
+	var container = $('<div class="editor-insert-dialog Flyout MenuItems font-color-picker-dialog"><div class="color-picker"></div></div>');
 	var button = $('<div class="editor-dropdown font-color-picker"><span class="editor-action icon" title="Font Color"><span class="icon icon-font-color">A</span><span class="icon icon-caret-down"></span></span></div>');
+	container.append('<input type="checkbox" class="autocolor"></input><span class="label">Auto color when submitting</span>');
+	container.find('.autocolor').click(function(){
+		if($(this).is(":checked")) 
+			pweEnhanceSettings["autoAddColor"] = 'true';
+		else
+			pweEnhanceSettings["autoAddColor"] = 'false';
+		update();
+	});
+	if (pweEnhanceSettings["autoAddColor"] == 'true') 
+		container.find('.autocolor').prop('checked', true);
 	return button.append(container);
 };
 
 var setFontColor = function(picker, color) {
-		picker.closest(".FormWrapper").find('.BodyBox').surroundSelectedText('[color="'+color+'"]', '[/color]', 'select');
-		picker.closest(".FormWrapper").find(".icon-font-color").css("box-shadow", "0 -5px 0 0 "+color+" inset");
-		pweEnhanceSettings["defaultFontColor"] = color;
+	picker.closest(".FormWrapper").find('.BodyBox').surroundSelectedText('[color="'+color+'"]', '[/color]', 'select');
+	picker.closest(".FormWrapper").find(".icon-font-color").css("box-shadow", "0 -5px 0 0 "+color+" inset");
+	pweEnhanceSettings["defaultFontColor"] = color;
 		
-		update();
-}
+	update();
+};
 
 var initColorPicker = function(container) {
 	picker = container.find('.color-picker');
 	picker.colorpicker({"color": pweEnhanceSettings["defaultFontColor"]});
+	//picker.find('td').each(function(){$(this).attr('style', $(this).attr('style')+ ' !important')});
 	container.find(".icon-font-color").css("box-shadow", "0 -5px 0 0 "+pweEnhanceSettings["defaultFontColor"]+" inset");
 	picker.on("change.color", function(event, color){
 		setFontColor($(this), color);
@@ -97,7 +117,18 @@ var initColorPicker = function(container) {
 	container.find('.icon-font-color').click( function(event) {
 		setFontColor($(event.target).closest('.font-color-picker').find('.color-picker'), $(event.target).closest('.font-color-picker').find('.color-picker').colorpicker("val"));
 	});
-}
+};
+    
+
+var initSubmitButton = function(container) {
+	container.find("input.CommentButton").submit(function(){
+		if (pweEnhanceSettings["autoAddColor"] == 'true') {
+			var form = $(this).closest(".FormWrapper");
+			var color = form.find(".color_picker").colorpicker("val");
+			autoAddColor(form.find(".BodyBox"), color);
+		}
+	});
+};
 
  loadCSS = function(href) {
      var cssLink = $("<link rel='stylesheet' type='text/css' href='"+href+"'>");
@@ -110,8 +141,8 @@ var initColorPicker = function(container) {
  
  var update = function() {
 	setCookie();
-}
- 
+};
+
  var setCookie = function(){
 	var exdate=new Date();
 	exdate.setDate(exdate.getDate() + 40); // 40 day expiration
@@ -119,7 +150,7 @@ var initColorPicker = function(container) {
 	for (var i in pweEnhanceSettings) {
 		document.cookie = "pweEnhance."+i+"="+pweEnhanceSettings[i]+cookieSuffix;
 	}
-}
+};
 
 var getCookie = function() {
 	if (document.cookie) {
@@ -131,7 +162,7 @@ var getCookie = function() {
 			}
 		}
 	}
-}
+};
 
 
 $(document).ready(function() {
@@ -145,9 +176,9 @@ $(document).ready(function() {
 		initColorPicker($('.font-color-picker'))
 	});
 	$(document).on( "EditCommentFormLoaded", function(event, container) {
-		console.log(container);
 		container.find(".editor-action-emoji").after(makeFontColorPicker()).after(makePWPanel());
 		initColorPicker(container);
+        initSubmitButton(container);
 	});
 });
 
