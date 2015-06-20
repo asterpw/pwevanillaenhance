@@ -23,7 +23,7 @@ var makePWPanel = function() {
 	var emotetypes = ["normal", "tiger", "pig", "bear",  "monkey", "fish", "fox", "mouse"]; 
 	var defaultCategory = pweEnhanceSettings['pwiEmoteCategory'];
 	var categoryDiv = $('<div class="emote-category"></div>');
-	console.log($('.icon-emote').css('background-image'));
+	//console.log($('.icon-emote').css('background-image'));
 
 	for (var type=0; type < emotetypes.length; type++) {
 		var typeImg = $('<img width="32" height="32"/>');
@@ -141,11 +141,11 @@ $(document).ready(function() {
 	$(".editor-action-emoji").after(makeFontColorPicker());
 	$(".editor-action-emoji").after(makePWPanel());
 	
-	$.getScript("http://evoluteur.github.com/colorpicker/js/evol.colorpicker.min.js", function() {
+	$.getScript("https://cdn.rawgit.com/Goodlookinguy/colorpicker/master/js/evol.colorpicker.js", function() {
 		initColorPicker($('.font-color-picker'))
 	});
 	$(document).on( "EditCommentFormLoaded", function(event, container) {
-		console.log(container);
+		//console.log(container);
 		container.find(".editor-action-emoji").after(makeFontColorPicker()).after(makePWPanel());
 		initColorPicker(container);
 	});
