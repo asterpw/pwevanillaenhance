@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.2
+// @version    0.3
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
 // @copyright  2015, Asterelle - Sanctuary
@@ -15,7 +15,7 @@ var pweEnhanceSettings = {
 	"defaultFontColor": "#FFFFFF",
 	"pwiEmoteCategory": "tiger",
     "autoAddColor": "false",
-	"version": "0.2"
+	"version": "0.3"
 };
 
 var makePWPanel = function() {
@@ -74,13 +74,6 @@ var makePWPanel = function() {
 	return button.append(container);
 };
 
-var autoAddFontColor = function(textArea, color) {
-	var startTag = '[color="'+color+'"]';
-	var endTag = '[/color]';
-	if (!textArea.val().startsWith(startTag)) {
-		textArea.val(startTag + textArea.val() + endTag);
-	}
-};
 
 var makeFontColorPicker = function() {
 	var container = $('<div class="editor-insert-dialog Flyout MenuItems font-color-picker-dialog"><div class="color-picker"></div></div>');
@@ -109,7 +102,6 @@ var setFontColor = function(picker, color) {
 var initColorPicker = function(container) {
 	picker = container.find('.color-picker');
 	picker.colorpicker({"color": pweEnhanceSettings["defaultFontColor"]});
-	//picker.find('td').each(function(){$(this).attr('style', $(this).attr('style')+ ' !important')});
 	container.find(".icon-font-color").css("box-shadow", "0 -5px 0 0 "+pweEnhanceSettings["defaultFontColor"]+" inset");
 	picker.on("change.color", function(event, color){
 		setFontColor($(this), color);
@@ -118,14 +110,21 @@ var initColorPicker = function(container) {
 		setFontColor($(event.target).closest('.font-color-picker').find('.color-picker'), $(event.target).closest('.font-color-picker').find('.color-picker').colorpicker("val"));
 	});
 };
-    
+
+var autoAddFontColor = function(textArea, color) {
+	var startTag = '[color="'+color+'"]';
+	var endTag = '[/color]';
+	if (!textArea.val().startsWith(startTag)) {
+		textArea.val(startTag + textArea.val() + endTag);
+	}
+};    
 
 var initSubmitButton = function(container) {
-	container.find("input.CommentButton").submit(function(){
+	container.find("input.CommentButton").click(function(){
 		if (pweEnhanceSettings["autoAddColor"] == 'true') {
 			var form = $(this).closest(".FormWrapper");
-			var color = form.find(".color_picker").colorpicker("val");
-			autoAddColor(form.find(".BodyBox"), color);
+			var color = form.find(".color-picker").colorpicker("val");
+			autoAddFontColor(form.find(".BodyBox"), color);
 		}
 	});
 };
@@ -164,16 +163,18 @@ var getCookie = function() {
 	}
 };
 
+loadCSS("https://cdn.rawgit.com/Goodlookinguy/colorpicker/master/css/evol.colorpicker.css");
+loadCSS("https://asterpw.github.com/pwevanillaenhance/pwevanillaenhance.user.css");
 
 $(document).ready(function() {
 	getCookie();
-	loadCSS("http://evoluteur.github.com/colorpicker/css/evol.colorpicker.css");
-	loadCSS("https://asterpw.github.com/pwevanillaenhance/pwevanillaenhance.user.css");
+
 	$(".editor-action-emoji").after(makeFontColorPicker());
 	$(".editor-action-emoji").after(makePWPanel());
 	
-	$.getScript("http://evoluteur.github.com/colorpicker/js/evol.colorpicker.min.js", function() {
+	$.getScript("https://cdn.rawgit.com/Goodlookinguy/colorpicker/master/js/evol.colorpicker.js", function() {
 		initColorPicker($('.font-color-picker'))
+		initSubmitButton($('.FormWrapper'));
 	});
 	$(document).on( "EditCommentFormLoaded", function(event, container) {
 		container.find(".editor-action-emoji").after(makeFontColorPicker()).after(makePWPanel());
