@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.3
+// @version    0.3.1
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
 // @copyright  2015, Asterelle - Sanctuary
@@ -15,7 +15,7 @@ var pweEnhanceSettings = {
 	"defaultFontColor": "#FFFFFF",
 	"pwiEmoteCategory": "tiger",
     "autoAddColor": "false",
-	"version": "0.3"
+	"version": "0.3.1"
 };
 
 var makePWPanel = function() {
@@ -164,7 +164,7 @@ var getCookie = function() {
 };
 
 loadCSS("https://cdn.rawgit.com/Goodlookinguy/colorpicker/master/css/evol.colorpicker.css");
-loadCSS("https://asterpw.github.com/pwevanillaenhance/pwevanillaenhance.user.css");
+loadCSS("https://cdn.rawgit.com/asterpw/pwevanillaenhance/master/pwevanillaenhance.user.css");
 
 $(document).ready(function() {
 	getCookie();
