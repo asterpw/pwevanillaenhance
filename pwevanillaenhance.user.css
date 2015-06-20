@@ -50,10 +50,24 @@
     margin-left: -6px;
 }
 
-.color-picker {
-	width: 210px;   
+.font-color-picker-dialog {
+	width: 204px;   
 }
 
+.font-color-picker-dialog input.autocolor {
+    vertical-align: bottom;
+}
+
+.font-color-picker-dialog .label {
+	margin: 3px 0px;
+    color: #666666;
+    display: inline-block;
+}
+
+
+.color-picker .evo-pop {
+	padding: 0px;   
+}
 .evo-palette, .evo-color span {
 	color: #666666;
     margin-top: 5px;
