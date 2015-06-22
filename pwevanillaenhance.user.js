@@ -172,7 +172,7 @@ $(document).ready(function() {
 	$(".editor-action-emoji").after(makeFontColorPicker());
 	$(".editor-action-emoji").after(makePWPanel());
 	
-	$.getScript("https://cdn.rawgit.com/Goodlookinguy/colorpicker/master/js/evol.colorpicker.js", function() {
+	$.getScript("https://cdn.rawgit.com/Goodlookinguy/colorpicker/2acd4b8/js/evol.colorpicker.js", function() {
 		initColorPicker($('.font-color-picker'))
 		initSubmitButton($('.FormWrapper'));
 	});
