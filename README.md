@@ -1,5 +1,16 @@
 # pwevanillaenhance
 PWE Vanilla Forums Enhancement - Adds useful tools to the pwe vanilla forums
+<h1>Features</h1>
+<b>Font Color Picker</b>
+This really should have already been a part of the forums shouldn't it?<br>
+<img src="http://i.imgur.com/kwivfJo.png"><p>
+<b>Theme Manager</b>
+Let's you manage various improvements to the forums users have made without needing any other browser extensions.<br>
+<img src="http://i.imgur.com/tuKsLA9.png"><p>
+<b>PWI Emotes</b>
+The best emotes.<br>
+<img src="http://i.imgur.com/EMfoL4u.png"><p>
+
 <h1> Installation</h1>
 <p>How you install user scripts depends on which browser you use. Typically, you will need to install a browser extension. The list below is not an exhaustive list.</p>
 <p>Once you have the extension installed you can activate the user script by clicking the following link:
