@@ -1,3 +1,71 @@
+.full-spectrum {
+	min-width: 418px;   
+}
+
+.full-spectrum.sp-palette-only {
+	min-width: 223px;
+    
+}
+
+.sp-palette-container {
+	width: 200px;   
+}
+
+
+.enhance-options .Flyout {
+	width: 300px;
+    color: black;
+    padding: 5px;
+}
+
+.enhance-options .SpOptions::before {
+	color: #66CCFF;
+}
+
+.enhance-options .MeButton .label {
+    position: absolute;
+    margin-top: 2px;
+    margin-left: 5px;
+    background-color: #66CCFF;
+ 	border-radius: 10px;
+    color: black;
+    padding: 0px 10px;
+    width: inherit;
+    display: inline-block;
+	overflow: hidden;
+	white-space: nowrap;
+    font-size: 12px;
+    opacity: 0.0;
+}
+
+.enhance-options:hover .MeButton .label {
+    animation: slide 0.5s ease-in-out;
+    opacity: 1.0;
+}
+
+.enhance-options:hover .SpOptions::before {
+	animation: spin 3s infinite linear;
+}
+
+@keyframes slide {
+    from {margin-left: 30px; opacity: 0.0}
+    to {margin-left: 5px; opacity: 1.0}
+}
+
+@-moz-keyframes spin {
+    from { -moz-transform: rotate(0deg); }
+    to { -moz-transform: rotate(1080deg); }
+}
+@-webkit-keyframes spin {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(1080deg); }
+}
+@keyframes spin {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(1080deg);}
+}
+
+
 .emotes-dialog {
     width: 370px;   
 	padding: 0px;
@@ -51,7 +119,7 @@
 }
 
 .font-color-picker-dialog {
-	width: 204px;   
+	width: auto !important;   
 }
 
 .font-color-picker-dialog input.autocolor {
@@ -64,21 +132,9 @@
     display: inline-block;
 }
 
-
-.color-picker .evo-pop {
-	padding: 0px;   
-}
-.evo-palette, .evo-color span {
-	color: #666666;
-    margin-top: 5px;
-}
-
-.evo-more a {
-    margin: 0px 0 0 0px;
-    display: inline-block !important;
-    padding: 2px !important;
-    text-decoration: underline !important;
-    font-size: 12px;
+.font-color-picker > .icon {
+	padding: 0px 7px;   
+    height: 22px;
 }
 
 .icon-font-color {
