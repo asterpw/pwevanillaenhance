@@ -339,8 +339,8 @@ var getCookie = function() {
 	}
 };
 
-loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://cdn.rawgit.com/asterpw/pwevanillaenhance/master/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/spectrum/master/spectrum.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/master/pwevanillaenhance.user.css");
 getCookie();
 applyThemes();
 
@@ -350,7 +350,7 @@ $(document).ready(function() {
 	$(".editor-action-emoji").after(makeFontColorPicker());
 	$(".editor-action-emoji").after(makePWPanel());
 	makeEnhancePreferencesMenu();
-	$.getScript("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.js", function() {
+	$.getScript("https://rawgit.com/asterpw/spectrum/master/spectrum.js", function() {
 	//$.getScript("http://bgrins.github.com/spectrum/spectrum.js", function() {
 		initColorPicker($('.font-color-picker'))
 		initSubmitButton($('.FormWrapper'));
