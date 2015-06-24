@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.4.2
+// @version    0.4.3
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
 // @copyright  2015, Asterelle - Sanctuary
@@ -42,7 +42,7 @@ var pweEnhanceSettings = {
 			enabled: false
 		}
 	},
-	version: "0.4.2"
+	version: "0.4.3"
 };
 
 var Theme = function(name, url, description, screenshot) {
@@ -248,7 +248,7 @@ var makeHeroEmotes = function() {
 var makePWPanel = function() {
 	var container = $('<div class="emotes-dialog editor-insert-dialog Flyout MenuItems"></div>');
 	var pw = 'http://asterpw.github.io/pwicons/emotes/';
-	var emotetypes = ["normal", "tiger", "pig", "bear",  "monkey", "fish", "fox", "mouse"]; 
+	var emotetypes = ["normal", "tiger", "pig", "bear",  "monkey", "fish", "fox", "mouse", "egg"]; 
 	var defaultCategory = pweEnhanceSettings.pwiEmotes.category;
 	var categoryDiv = $('<div class="emote-category"></div>');
 
@@ -432,7 +432,7 @@ var getCookie = function() {
 };
 
 loadCSS("https://rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/cf1293dd34770178af32e53f6b76ad213cebfb2e/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/92d35896081db3a9aecfaeb194c4a76089de04f2/pwevanillaenhance.user.css");
 getCookie();
 applyThemes();
 
