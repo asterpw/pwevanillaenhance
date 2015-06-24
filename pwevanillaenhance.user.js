@@ -427,7 +427,7 @@ var getCookie = function() {
 };
 
 loadCSS("https://rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/master/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/cf1293dd34770178af32e53f6b76ad213cebfb2e/pwevanillaenhance.user.css");
 getCookie();
 applyThemes();
 
