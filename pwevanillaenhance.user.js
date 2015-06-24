@@ -54,19 +54,19 @@ var Theme = function(name, url, description, screenshot) {
 
 var themes = [
 	new Theme("Global Fixes",
-		"https://cdn.rawgit.com/Goodlookinguy/pwvnrg/master/global.fixes.css",
+		"https://rawgit.com/Goodlookinguy/pwvnrg/master/global.fixes.css",
 		"General fixes and usability"),
 	new Theme("Grayscale",
-		"https://cdn.rawgit.com/Goodlookinguy/pwvnrg/master/grayscale.css",
+		"https://rawgit.com/Goodlookinguy/pwvnrg/master/grayscale.css",
 		"Makes the forum look nicer"),
 	new Theme("Colorful Addon",
-		"https://cdn.rawgit.com/Goodlookinguy/pwvnrg/master/addon.colorful.css",
+		"https://rawgit.com/Goodlookinguy/pwvnrg/master/addon.colorful.css",
 		"Adds a dash of color to navigation"),
 	new Theme("Fluid Width",
-		"https://cdn.rawgit.com/Goodlookinguy/pwvnrg/master/addon.fluid-width.css",
+		"https://rawgit.com/Goodlookinguy/pwvnrg/master/addon.fluid-width.css",
 		"Makes better use of the screen"),
 	new Theme("Compact",
-		"https://cdn.rawgit.com/Goodlookinguy/pwvnrg/master/addon.compact.css",
+		"https://rawgit.com/Goodlookinguy/pwvnrg/master/addon.compact.css",
 		"For those that like minimalism")
 ];
 
