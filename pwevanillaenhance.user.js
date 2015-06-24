@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.4
+// @version    0.4.1
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
 // @copyright  2015, Asterelle - Sanctuary
@@ -21,6 +21,10 @@ var pweEnhanceSettings = {
 		enabled: true,
 		category: "tiger"
 	},
+	herocatEmotes: {
+		enabled: true,
+		category: "herocat"
+	},
 	themes: {
 		"Global Fixes": {
 			enabled: false
@@ -35,7 +39,7 @@ var pweEnhanceSettings = {
 			enabled: false
 		},
 	},
-	version: "0.4"
+	version: "0.4.1"
 };
 
 var Theme = function(name, url, description, screenshot) {
@@ -106,6 +110,7 @@ var Feature = function(name, selector, description, screenshot) {
 
 var features = [
 	new Feature("pwiEmotes", ".pwi-emotes", "Show PWI emotes in editor"),
+	new Feature("herocatEmotes", ".herocatEmotes", "Show Herocat (Champions Online) emotes in editor"),
 	new Feature("fontColorPicker", ".font-color-picker", "Show font color picker in editor")
 ];
 
@@ -151,6 +156,88 @@ var makeEnhancePreferencesMenu = function() {
 	$('.MeMenu').append(preferencesControl);
 };
 
+var makeEmotePanel = function(className, path, categories, emotes, imgWidth, imgHeight) {
+	var container = $('<div class="emotes-dialog editor-insert-dialog Flyout MenuItems"></div>');
+	var defaultCategory = pweEnhanceSettings[className].category;
+	if (categories.length > 1) {
+		var categoryDiv = $('<div class="emote-category"></div>');
+		for (var type=0; type < categories.length; type++) {
+			var typeImg = $('<img width="'+imgWidth+'" height="'+imgHeight+'"/>');
+			typeImg.attr('src', path + categories[type] + "-1.gif");
+			typeImg.attr('title', categories[type]);
+			if (categories[type] == defaultCategory) typeImg.addClass('selected');
+			typeImg.click(function(){
+				$(".emote-category .selected").removeClass("selected");
+				$(this).addClass("selected");
+				$('.icon-emote').css('background-image', "url('"+path+this.title+"-1.gif')");
+				pweEnhanceSettings[className].category = this.title;
+				for (var i = 1; i <= 50; i++) {
+					var img = $("."+className+i);
+					img.attr('src', path + this.title + "-" + i + ".gif");
+					img.attr('title', this.title + "-" + i);
+				}
+				update();
+				return false;
+			});
+			categoryDiv.append(typeImg);
+		}
+		container.append(categoryDiv);
+	}
+	
+	emotesdiv = $('<div class="emotes-div"></div>');
+	var emoteCount = 0;
+
+	var emoteClick = function () {
+		var position = $(this).closest(".FormWrapper").find('.BodyBox').insertAtCaret("[img]"+$(this).attr('src')+"[/img]");
+		return false;
+	};
+    
+	for (var i = 0; i < emotes.length; i++) {
+
+		for (var j = 0; j < emotes[i].length; j++) {
+			emoteCount++;
+			var img = $('<img width="'+imgWidth+'" height="'+imgHeight+'" class="'+defaultCategory+(emoteCount)+'"/>');
+			img.attr('src', path + emotes[i][j]);
+			img.attr('title', defaultCategory+(emoteCount));
+			img.click(emoteClick);
+			img.appendTo(emotesdiv);
+		}
+		emotesdiv.append($("<br>"));
+	}
+	container.append(emotesdiv);
+	var button = $('<div class="editor-dropdown '+className+'"><span class="editor-action icon" title="Emotes"><span class="icon icon-emote"></span><span class="icon icon-caret-down"></span></span></div>');
+	button.find('.editor-action .icon-emote').click(function(){
+		//$(".editor-dropdown").removeClass("editor-dropdown-open");
+		$(this).parent().parent().toggleClass("editor-dropdown-open").siblings().removeClass("editor-dropdown-open");
+	});
+	button.find('.icon-emote').css('background-image', "url('"+path+emotes[0][0]+"')");
+	if (!pweEnhanceSettings[className].enabled)
+		button.hide();
+	return button.append(container);
+};
+
+
+
+var makeHeroEmotes = function() {
+	var emotes = new Array(4);
+	for (var i = 0; i < 4; i++) {
+		emotes[i] = new Array(6);
+		for (var j = 0; j < 6; j++) {
+			emotes[i][j] = 'herocat-'+(i*6+j+1)+'.gif';
+		}
+	}
+
+	var emotes = [["hfnxG66.gif", "xetj2As.gif", "BIQ2kH9.gif", "zBIeJi5.gif", "vMVtCOc.gif", "pyYfVdt.gif"],
+		["xMHLXms.gif", "JXvlt0E.gif", "gvbnePB.gif", "VTiX7E9.gif", "0AJ5u1j.gif", "dWwreGR.gif"],
+		["JwYeLqg.gif", "LRXv5XJ.gif", "TF1Q54p.gif", "Ws4CzXK.gif", "AMSEJhZ.gif", "oBHuX7U.gif"],
+		["RtcjLDn.gif", "lLgP7Ld.gif", "taePNbZ.gif", "2WCf0cq.gif", "HLK29cV.gif", "lRQebLq.gif"]];
+	return makeEmotePanel('herocatEmotes', 
+		'http://i.imgur.com/',
+		['herocat'],
+		emotes,
+		50, 
+		50);
+}
 
 var makePWPanel = function() {
 	var container = $('<div class="emotes-dialog editor-insert-dialog Flyout MenuItems"></div>');
@@ -167,7 +254,7 @@ var makePWPanel = function() {
 		typeImg.click(function(){
 			$(".emote-category .selected").removeClass("selected");
 			$(this).addClass("selected");
-			$('.icon-emote').css('background-image', "url('"+pw+this.title+"-1.gif')");
+			$('.pwi-emotes .icon-emote').css('background-image', "url('"+pw+this.title+"-1.gif')");
 			pweEnhanceSettings.pwiEmotes.category = this.title;
 			for (var i = 1; i <= 50; i++) {
 				var img = $(".pwemote"+i);
@@ -192,7 +279,7 @@ var makePWPanel = function() {
 	for (var i = 1; i <= 50; i++) {
 		var img = $('<img width="32" height="32" class="pwemote'+i+'"/>');
 		img.attr('src', pw + defaultCategory + "-" + i + ".gif");
-		img.attr('title', defaultCategory +" -" + i);
+		img.attr('title', defaultCategory +"-" + i);
 		img.click(pwEmoteClick);
 		img.appendTo(emotesdiv);
 		emoteCount++;
@@ -349,6 +436,7 @@ $(document).ready(function() {
 
 	$(".editor-action-emoji").after(makeFontColorPicker());
 	$(".editor-action-emoji").after(makePWPanel());
+	$(".editor-action-emoji").after(makeHeroEmotes());
 	makeEnhancePreferencesMenu();
 	$.getScript("https://rawgit.com/asterpw/spectrum/master/spectrum.js", function() {
 	//$.getScript("http://bgrins.github.com/spectrum/spectrum.js", function() {
@@ -356,7 +444,7 @@ $(document).ready(function() {
 		initSubmitButton($('.FormWrapper'));
 	});
 	$(document).on( "EditCommentFormLoaded", function(event, container) {
-		container.find(".editor-action-emoji").after(makeFontColorPicker()).after(makePWPanel());
+		container.find(".editor-action-emoji").after(makeFontColorPicker()).after(makePWPanel()).after(makeHeroEmotes());
 		initColorPicker(container);
         initSubmitButton(container);
 	});

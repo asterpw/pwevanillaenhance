@@ -67,8 +67,9 @@
 
 
 .emotes-dialog {
-    width: 370px;   
-	padding: 0px;
+  width: auto;
+  padding: 0px;
+  white-space: nowrap;
 }
 
 .emotes-dialog img {
@@ -108,9 +109,15 @@
     margin: 0px;
 }
 
+.emotes-div img:hover {
+    background-color: #EEEEEE;   
+}
 
 .pwi-emotes .icon-emote {
     background: url('http://asterpw.github.io/pwicons/emotes/tiger-1.gif') no-repeat left;
+}
+
+.editor-dropdown .editor-action .icon-emote {
     background-size: contain;
     width: 6px;
     height: 14px;
