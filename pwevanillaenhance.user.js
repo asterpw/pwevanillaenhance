@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.4.1
+// @version    0.4.2
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
 // @copyright  2015, Asterelle - Sanctuary
@@ -38,8 +38,11 @@ var pweEnhanceSettings = {
 		"Fluid Width": {
 			enabled: false
 		},
+		"Compact": {
+			enabled: false
+		}
 	},
-	version: "0.4.1"
+	version: "0.4.2"
 };
 
 var Theme = function(name, url, description, screenshot) {
@@ -61,7 +64,10 @@ var themes = [
 		"Adds a dash of color to navigation"),
 	new Theme("Fluid Width",
 		"https://cdn.rawgit.com/Goodlookinguy/pwvnrg/master/addon.fluid-width.css",
-		"Makes better use of the screen")
+		"Makes better use of the screen"),
+	new Theme("Compact",
+		"https://cdn.rawgit.com/Goodlookinguy/pwvnrg/master/addon.compact.css",
+		"For those that like minimalism")
 ];
 
 var applyThemes = function() {
@@ -418,9 +424,8 @@ var getCookie = function() {
 			var cookieItem = cookieData[i].trim().split("=");
 			if (cookieItem[0] == "pweEnhancementSettings") {
 				cookieSettings = JSON.parse(cookieItem[1]);
-				for (setting in cookieSettings) {
-					pweEnhanceSettings[setting] = cookieSettings[setting];
-				}
+				//merge the cookie data into the settings
+				$.extend(true, pweEnhanceSettings, cookieSettings);
 			}
 		}
 	}
