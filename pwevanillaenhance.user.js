@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.4.3
+// @version    0.5
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
 // @copyright  2015, Asterelle - Sanctuary
@@ -22,85 +22,70 @@ var pweEnhanceSettings = {
 		category: "tiger"
 	},
 	herocatEmotes: {
-		enabled: true,
+		enabled: false,
 		category: "herocat"
 	},
-	themes: {
-		"Global Fixes": {
-			enabled: false
-		},
-		"Grayscale": {
-			enabled: false
-		},
-		"Colorful Addon": {
-			enabled: false
-		},
-		"Fluid Width": {
-			enabled: false
-		},
-		"Compact": {
-			enabled: false
-		}
+	themes: { //autoadded from remote
 	},
-	version: "0.4.3"
+	lastThemeUpdateTime: 0,
+	version: "0.5"
 };
 
-var Theme = function(name, url, description, screenshot) {
-	this.name = name;
-	this.url = url;
-	this.description = description;
-	this.screenshot = screenshot;
-}
-
-var themes = [
-	new Theme("Global Fixes",
-		"https://rawgit.com/Goodlookinguy/pwvnrg/master/global.fixes.css",
-		"General fixes and usability"),
-	new Theme("Grayscale",
-		"https://rawgit.com/Goodlookinguy/pwvnrg/master/grayscale.css",
-		"Makes the forum look nicer"),
-	new Theme("Colorful Addon",
-		"https://rawgit.com/Goodlookinguy/pwvnrg/master/addon.colorful.css",
-		"Adds a dash of color to navigation"),
-	new Theme("Fluid Width",
-		"https://rawgit.com/Goodlookinguy/pwvnrg/master/addon.fluid-width.css",
-		"Makes better use of the screen"),
-	new Theme("Compact",
-		"https://rawgit.com/Goodlookinguy/pwvnrg/master/addon.compact.css",
-		"For those that like minimalism")
-];
 
 var applyThemes = function() {
-	for (var i = 0; i < themes.length; i++) { 
-		themes[i].setEnabled(pweEnhanceSettings.themes[themes[i].name].enabled);
+	keys = Object.keys(pweEnhanceSettings.themes);
+	keys.sort(function(a,b){return pweEnhanceSettings.themes[a].order - pweEnhanceSettings.themes[b].order;});	
+	for (var i = 0; i < keys.length; i++) { 
+		var name = keys[i];
+		enabled = 'enabled' in pweEnhanceSettings.themes[name] ? pweEnhanceSettings.themes[name].enabled : false; 
+		setThemeEnabled(name, enabled);
 	}
-}
+};
 
-Theme.prototype.setEnabled = function(enabled) {
-	pweEnhanceSettings.themes[this.name].enabled = enabled;
-	if (enabled) {
-		if ($("head link[href='"+this.url+"']").length == 0)
-			loadCSS(this.url)
+var handleThemes = function() {
+	var currentTime = new Date().getTime();
+	if (currentTime - pweEnhanceSettings.lastThemeUpdateTime > 4*3600*1000) {
+		$.getJSON("https://rawgit.com/Goodlookinguy/pwvnrg/master/files.json", function(json){
+			$.extend(true, pweEnhanceSettings, json);
+			applyThemes();
+			pweEnhanceSettings.lastThemeUpdateTime = new Date().getTime();
+			update();
+			makeEnhancePreferencesMenu();
+		});
 	} else {
-		$("head link[href='"+this.url+"']").remove();
+		applyThemes();
 	}
-}
+};
+
+var setThemeEnabled = function(name, enabled) {
+	var theme = pweEnhanceSettings.themes[name];
+	theme.enabled = enabled;
+	url = theme.baseurl + theme['branch-commit'] + "/" + theme.file;
+	if (enabled) {
+		if ($("head link[href='"+url+"']").length == 0)
+			loadCSS(url);
+	} else {
+		$("head link[href='"+url+"']").remove();
+	}
+};
 
 var makeThemeMenu = function() {
 	var menu = $("<div><h1>Themes</h1></div>");
-	
-	for (var i = 0; i < themes.length; i++) { 
+	keys = Object.keys(pweEnhanceSettings.themes);
+	keys.sort(function(a,b){return pweEnhanceSettings.themes[a].order - pweEnhanceSettings.themes[b].order;});	
+	for (var i = 0; i < keys.length; i++) { 
+		var name = keys[i];
 		var themeContainer = $("<div class='theme'></div>");
-		var checked = pweEnhanceSettings.themes[themes[i].name].enabled ? 'checked' : '';
+		var checked = pweEnhanceSettings.themes[name].enabled ? 'checked' : '';
 		themeContainer.append('<input type="checkbox" class="option" '+checked+'></input><span class="label">'
-			+ '<span class="name">' + themes[i].name + '</span>: '
-			+ themes[i].description+'</span>');
-		$('.option', themeContainer).click( (function(theme) {
+			+ '<span class="name">' + name + '</span>: '
+			+ pweEnhanceSettings.themes[name].description+'</span>');
+		$('.option', themeContainer).click( (function(name) {
 				return function(){
-					theme.setEnabled($(this).is(":checked"));
+					setThemeEnabled(name, $(this).is(":checked"));
 					update();
 				}
-			})(themes[i])
+			})(name)
 		);
 		menu.append(themeContainer);
 	}
@@ -149,6 +134,7 @@ var makeFeatureMenu = function() {
 };
 
 var makeEnhancePreferencesMenu = function() {
+	$('.enhance-options').remove()
 	var preferencesControl = $("<span class='ToggleFlyout enhance-options'></span>");
 	var preferencesButton = $('<a href="#" class="MeButton FlyoutButton" title="Enhance Options"><span class="Sprite Sprite16 SpOptions"></span><span class="label">Enhance Options</span></a>');
 	preferencesControl.append(preferencesButton).append($('<span class="Arrow SpFlyoutHandle"></span>'));
@@ -225,14 +211,13 @@ var makeEmotePanel = function(className, path, categories, emotes, imgWidth, img
 
 
 var makeHeroEmotes = function() {
-	var emotes = new Array(4);
+	/*var emotes = new Array(4);
 	for (var i = 0; i < 4; i++) {
 		emotes[i] = new Array(6);
 		for (var j = 0; j < 6; j++) {
 			emotes[i][j] = 'herocat-'+(i*6+j+1)+'.gif';
 		}
-	}
-
+	}*/
 	var emotes = [["hfnxG66.gif", "xetj2As.gif", "BIQ2kH9.gif", "zBIeJi5.gif", "vMVtCOc.gif", "pyYfVdt.gif"],
 		["xMHLXms.gif", "JXvlt0E.gif", "gvbnePB.gif", "VTiX7E9.gif", "0AJ5u1j.gif", "dWwreGR.gif"],
 		["JwYeLqg.gif", "LRXv5XJ.gif", "TF1Q54p.gif", "Ws4CzXK.gif", "AMSEJhZ.gif", "oBHuX7U.gif"],
@@ -425,7 +410,11 @@ var getCookie = function() {
 			if (cookieItem[0] == "pweEnhancementSettings") {
 				cookieSettings = JSON.parse(cookieItem[1]);
 				//merge the cookie data into the settings
-				$.extend(true, pweEnhanceSettings, cookieSettings);
+				if (cookieSettings.version >= "0.5") {
+					$.extend(true, pweEnhanceSettings, cookieSettings);
+				} else if (cookieSettings.version >= "0.4"){
+					$.extend(true, pweEnhanceSettings.fontColorPicker, cookieSettings.fontColorPicker);
+				}
 			}
 		}
 	}
@@ -434,8 +423,7 @@ var getCookie = function() {
 loadCSS("https://rawgit.com/asterpw/spectrum/master/spectrum.css");
 loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/92d35896081db3a9aecfaeb194c4a76089de04f2/pwevanillaenhance.user.css");
 getCookie();
-applyThemes();
-
+handleThemes();
 
 $(document).ready(function() {
 
