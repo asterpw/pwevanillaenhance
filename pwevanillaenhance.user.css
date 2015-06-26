@@ -18,7 +18,7 @@
     position: absolute;
     top: 150px;
     left: 40%;
-    z-index: 100;
+    z-index: 999;
 	box-shadow: 5px 5px 20px #000000;
     font-weight: bold;                                           
 }
