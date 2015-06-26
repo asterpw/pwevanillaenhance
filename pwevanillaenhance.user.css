@@ -12,15 +12,76 @@
 }
 
 
-.enhance-options .Flyout {
-	width: 300px;
+.whatsNewDialog {
+ 	width: 400px;
+    float: right;
+    position: absolute;
+    top: 150px;
+    left: 40%;
+    z-index: 100;
+	box-shadow: 5px 5px 20px #000000;
+    font-weight: bold;                                           
+}
+
+.whatsNewDialog .title {
+     background: #66CCFF;
+    font-weight: bold;
+    color: black;
+    padding: 10px;
+    font-size: 15px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    
+}
+
+.whatsNewDialog .close {
+    cursor: pointer;
+    float: right;
+    width: 19px;
+    padding: 0;
+    height: 19px;
+    text-align: center;
+    background-color: white;
+    border-radius: 3px;
+}
+
+.whatsNewDialog .change {
+    background: #FFFFFF;
+    color: #666666;
+    padding: 10px;
+    border: 2px solid #66CCFF;
+}
+
+.enhance-options .Flyout::after {
+	border-bottom-color: #66CCFF;
+}
+
+.enhance-options .Flyout .title {
+    background: #66CCFF;
     color: black;
     padding: 5px;
+    font-weight: bold;
+    font-size: 15px;
+    padding: 10px;
 }
+
+
+.enhance-options .Flyout {
+	width: 330px;
+    color: black;
+    padding: 0px;
+}
+
 
 .enhance-options .SpOptions::before {
 	color: #66CCFF;
 }
+
+.enhance-options .Flyout .menu-content {
+    padding: 5px 10px;
+}
+
+
 
 .enhance-options .MeButton .label {
     position: absolute;
@@ -96,18 +157,23 @@
     border: 1px solid transparent;
 }
 
-.emote-category .selected {
+.fwEmotes .emote-category img {
+	padding-left: 8px;
+    padding-right: 8px;
+}
+.emote-category img.selected {
     background-color: #FFFFFF;
     border: 1px solid #999999;
     border-bottom: hidden;
     margin-bottom: -1px;
-    padding-bottom: 7px;
+    padding-bottom: 5px;
 }
 
 .emotes-div {
 	padding: 5px;
     margin: 0px;
 }
+
 
 .emotes-div img:hover {
     background-color: #EEEEEE;   
@@ -119,10 +185,12 @@
 
 .editor-dropdown .editor-action .icon-emote {
     background-size: contain;
-    width: 6px;
-    height: 14px;
+    width: 20px;
+    height: 20px;
     vertical-align: text-top;
     margin-left: -6px;
+    padding: 0px;
+    border: 0;
 }
 
 .font-color-picker-dialog {
