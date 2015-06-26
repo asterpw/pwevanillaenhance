@@ -2,17 +2,18 @@
 // @name       PWE Vanilla Forums Enhancement
 // @namespace  http://github.com/asterpw/pwevanillaenhance
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
-// @updateURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
+// @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.5.1
+// @version    0.5.2
+// @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
 // @copyright  2015, Asterelle - Sanctuary
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.5.1";
-var CHANGELOG = "<div class='change'><div class='change-ver'>v0.5.1</div> - Added Forsaken World Emotes<br> - Added What's New Dialog<div class='change-ver'>v0.5</div> - Added auto-loading of themes from @nrglg</div>";
+var VERSION = "0.5.2";
+var CHANGELOG = "<div class='change'><div class='change-ver'>v0.5.2</div> - Themes load faster now (before page render)<br> - Allow remote themes to be renamed or deleted<div class='change-ver'>v0.5.1</div> - Added Forsaken World Emotes<br> - Added What's New Dialog<div class='change-ver'>v0.5</div> - Added auto-loading of themes from @nrglg</div>";
 
 var pweEnhanceSettings = {
 	fontColorPicker:  {
@@ -41,14 +42,32 @@ var showWhatsNewDialog = function() {
 	var whatsNew = $("<div class='whatsNewDialog' style='display: none;'></div>");
 	whatsNew.append($("<div class='title'>What's new in PWE Vanilla Enhancement v"+VERSION+"<div class='close'>X</div></div>"))
 	whatsNew.append($(CHANGELOG));
-	$(".close", whatsNew).click(function(){$(".whatsNewDialog").fadeOut();  update();});
+	$(".close", whatsNew).click(function(){
+		$(".whatsNewDialog").fadeOut();  
+		pweEnhanceSettings.version = VERSION;
+		update();
+	});
 	$(".MeBoxContainer").append(whatsNew);
-	whatsNew.fadeIn();
+	whatsNew.delay(1000).fadeIn();
+};
+
+var preloadThemes = function() { //loads before jquery
+	keys = Object.keys(pweEnhanceSettings.themes);
+	keys.sort(function(a,b){return pweEnhanceSettings.themes[a].order - pweEnhanceSettings.themes[b].order;});
+	for (var i = 0; i < keys.length; i++) { 
+		var name = keys[i];
+		enabled = 'enabled' in pweEnhanceSettings.themes[name] ? pweEnhanceSettings.themes[name].enabled : false;
+		if (enabled) {
+			var theme = pweEnhanceSettings.themes[name];
+			var url = theme.baseurl + theme['branch-commit'] + "/" + theme.file;
+			loadCSS(url);
+		}
+	}
 };
 
 var applyThemes = function() {
 	keys = Object.keys(pweEnhanceSettings.themes);
-	keys.sort(function(a,b){return pweEnhanceSettings.themes[a].order - pweEnhanceSettings.themes[b].order;});	
+	keys.sort(function(a,b){return pweEnhanceSettings.themes[a].order - pweEnhanceSettings.themes[b].order;});
 	for (var i = 0; i < keys.length; i++) { 
 		var name = keys[i];
 		enabled = 'enabled' in pweEnhanceSettings.themes[name] ? pweEnhanceSettings.themes[name].enabled : false; 
@@ -61,6 +80,11 @@ var handleThemes = function() {
 	if (currentTime - pweEnhanceSettings.lastThemeUpdateTime > 4*3600*1000) {
 		$.getJSON("https://rawgit.com/Goodlookinguy/pwvnrg/master/files.json", function(json){
 			$.extend(true, pweEnhanceSettings, json);
+			for (var i in pweEnhanceSettings.themes) {
+				if (!(i in json.themes))
+					delete pweEnhanceSettings.themes[i];
+			}
+			
 			applyThemes();
 			pweEnhanceSettings.lastThemeUpdateTime = new Date().getTime();
 			update();
@@ -209,7 +233,7 @@ var makeEmotePanel = function(className, path, categories, emotes, imgWidth, img
 			for (var j = 0; j < currentEmotes[i].length; j++) {
 				emoteCount++;
 				var img = $('<img width="'+imgWidth+'" height="'+imgHeight+'" class="'+categories[k]+(emoteCount)+'"/>');
-				//img.attr('src', path + currentEmotes[i][j]);
+				//img.attr('src', path + currentEmotes[i][j]);  don't bother loading images until div is shown
 				img.data('url', path + currentEmotes[i][j])
 				img.attr('title', categories[k]+(emoteCount));
 				img.click(emoteClick);
@@ -221,7 +245,6 @@ var makeEmotePanel = function(className, path, categories, emotes, imgWidth, img
 	}
 	var button = $('<div class="editor-dropdown '+className+'"><span class="editor-action icon" title="Emotes"><span class="icon icon-emote"></span><span class="icon icon-caret-down"></span></span></div>');
 	button.find('.editor-action .icon-emote').click(function(){
-		//$(".editor-dropdown").removeClass("editor-dropdown-open");
 		$(this).parent().parent().toggleClass("editor-dropdown-open").siblings().removeClass("editor-dropdown-open");
 	});
 	button.find('.editor-action').click(function(){
@@ -256,6 +279,7 @@ var makePWIEmotes = function() {
 	}
 	return makeEmotePanel('pwiEmotes', 
 		'http://asterpw.github.io/pwicons/emotes/',
+//		'http://cdn.rawgit.com/asterpw/pwicons/gh-pages/emotes/',
 		categories,
 		emotes,
 		32, 
@@ -270,6 +294,7 @@ var makeFWEmotes = function() {
 	}
 	return makeEmotePanel('fwEmotes', 
 		'http://asterpw.github.io/pwicons/emotes/',
+//		'http://cdn.rawgit.com/asterpw/pwicons/gh-pages/emotes/',
 		categories,
 		emotes,
 		32, 
@@ -297,6 +322,7 @@ var makeFontColorPicker = function() {
 		pweEnhanceSettings.fontColorPicker.autoAddColor = $(this).is(":checked");
 		update();
 	});
+	container.find(".icon-font-color").css("box-shadow", "0 -5px 0 0 "+pweEnhanceSettings.fontColorPicker.selectedColor+" inset");
 	if (pweEnhanceSettings.fontColorPicker.autoAddColor) 
 		container.find('.autoAddColor').prop('checked', true);
 	if (!pweEnhanceSettings.fontColorPicker.enabled)
@@ -349,7 +375,6 @@ var initColorPicker = function(container) {
 			"rgb(12, 52, 61)", "rgb(28, 69, 135)", "rgb(7, 55, 99)", "rgb(32, 18, 77)", "rgb(76, 17, 48)"]
 		]
 	});
-
 	container.find(".icon-font-color").css("box-shadow", "0 -5px 0 0 "+pweEnhanceSettings.fontColorPicker.selectedColor+" inset");
 	container.find('.icon-font-color').click( function(event) {
 		setFontColor($(event.target), '#'+($(event.target).closest('.font-color-picker').find('.color-picker').spectrum("get").toHex()));
@@ -382,10 +407,21 @@ var initSubmitButton = function(container) {
 	});
 };
 
- loadCSS = function(href) {
+/* loadCSS = function(href) {
      var cssLink = $("<link rel='stylesheet' type='text/css' href='"+href+"'>");
      $("head").append(cssLink); 
- };
+ };*/
+loadCSS = function(href) {
+	var head  = document.getElementsByTagName('head')[0];
+	var link  = document.createElement('link');
+	link.rel  = 'stylesheet';
+	link.type = 'text/css';
+	link.href = href;
+	link.media = 'all';
+	head.appendChild(link);
+}
+ 
+
  loadJS = function(src) {
      var jsLink = $("<script type='text/javascript' src='"+src+"'>");
      $("head").append(jsLink); 
@@ -402,6 +438,20 @@ var initSubmitButton = function(container) {
 	document.cookie = "pweEnhancementSettings=" + JSON.stringify(pweEnhanceSettings) + cookieSuffix;
 };
 
+var mergeData = function(to, from) {
+	if (from == null) {
+		return;
+	}
+	var keys = Object.keys(from);
+	for (var i in keys) {
+		if (typeof from[keys[i]] == 'object' && keys[i] in to) 
+			mergeData(to[keys[i]], from[keys[i]]);
+		else
+			to[keys[i]] = from[keys[i]];
+	}
+}
+
+
 var getCookie = function() {
 	if (document.cookie) {
 		var cookieData = document.cookie.split(";");
@@ -410,15 +460,13 @@ var getCookie = function() {
 			if (cookieItem[0] == "pweEnhancementSettings") {
 				cookieSettings = JSON.parse(cookieItem[1]);
 				//merge the cookie data into the settings, but don't overwrite version number
-				if (cookieSettings.version < VERSION) {
-					showWhatsNewDialog();
-				}
 				if (cookieSettings.version >= "0.5") {
-					$.extend(true, pweEnhanceSettings, cookieSettings);
+					//$.extend(true, pweEnhanceSettings, cookieSettings);
+					mergeData(pweEnhanceSettings, cookieSettings);
 				} else if (cookieSettings.version >= "0.4"){
-					$.extend(true, pweEnhanceSettings.fontColorPicker, cookieSettings.fontColorPicker);
+					//$.extend(true, pweEnhanceSettings.fontColorPicker, cookieSettings.fontColorPicker);
+					mergeData(pweEnhanceSettings, cookieSettings);
 				}
-				pweEnhanceSettings.version = VERSION;
 			}
 		}
 	}
@@ -427,16 +475,22 @@ var getCookie = function() {
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
 loadCSS("https://cdn.rawgit.com/asterpw/pwevanillaenhance/669f26ffe652ee58da2f3d21bf0914e4f849cd36/pwevanillaenhance.user.css");
 getCookie();
-handleThemes();
+preloadThemes();
 
-$(document).ready(function() {
 
+var jQueryLoaded = function() {
+//$(document).ready(function() {
+	if (pweEnhanceSettings.version < VERSION) {
+		showWhatsNewDialog();
+	}
+	
+	handleThemes();
 	$(".editor-action-emoji").after(makeFontColorPicker());
 	$(".editor-action-emoji").after(makePWIEmotes());
 	$(".editor-action-emoji").after(makeFWEmotes());
 	$(".editor-action-emoji").after(makeHeroEmotes());
 	makeEnhancePreferencesMenu();
-	$.getScript("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.js", function() {
+	$.getScript("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.js").done(function() {
 	//$.getScript("http://bgrins.github.com/spectrum/spectrum.js", function() {
 		initColorPicker($('.font-color-picker'));
 		initSubmitButton($('.FormWrapper'));
@@ -446,6 +500,12 @@ $(document).ready(function() {
 		initColorPicker(container);
         initSubmitButton(container);
 	});
+//});
+};
+
+document.addEventListener("DOMContentLoaded", function(event) {
+	jQueryLoaded();
 });
+
 
 })();
