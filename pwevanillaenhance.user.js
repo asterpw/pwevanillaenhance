@@ -35,7 +35,8 @@ var pweEnhanceSettings = {
 	},
 	themes: { //autoadded from remote
 	},
-	lastThemeUpdateTime: 0
+	lastThemeUpdateTime: 0,
+	version: 0
 };
 
 var showWhatsNewDialog = function() {
@@ -53,6 +54,8 @@ var showWhatsNewDialog = function() {
 
 var preloadThemes = function() { //loads before jquery
 	keys = Object.keys(pweEnhanceSettings.themes);
+	if (keys.length == 0) 
+		return;
 	keys.sort(function(a,b){return pweEnhanceSettings.themes[a].order - pweEnhanceSettings.themes[b].order;});
 	for (var i = 0; i < keys.length; i++) { 
 		var name = keys[i];
