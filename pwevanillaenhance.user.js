@@ -4,16 +4,17 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.5.3
+// @version    0.5.4
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
+// @grant       none
 // @copyright  2015, Asterelle - Sanctuary
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.5.2";
-var CHANGELOG = "<div class='change'><div class='change-ver'>v0.5.3</div> - Small bug fix that sometimes happened in theme preload<div class='change-ver'>v0.5.2</div> - Themes load faster now (before page render)<br> - Allow remote themes to be renamed or deleted<div class='change-ver'>v0.5.1</div> - Added Forsaken World Emotes<br> - Added What's New Dialog<div class='change-ver'>v0.5</div> - Added auto-loading of themes from @nrglg</div>";
+var VERSION = "0.5.4";
+var CHANGELOG = "<div class='change'><div class='change-ver'>v0.5.4</div> - Fixed Firefox and other preload bugfixes<div class='change-ver'>v0.5.3</div> - Some theme preload bugfixes<div class='change-ver'>v0.5.2</div> - Themes load faster now (before page render)<br> - Allow remote themes to be renamed or deleted<div class='change-ver'>v0.5.1</div> - Added Forsaken World Emotes<br> - Added What's New Dialog<div class='change-ver'>v0.5</div> - Added auto-loading of themes from @nrglg</div>";
 
 var pweEnhanceSettings = {
 	fontColorPicker:  {
@@ -36,7 +37,7 @@ var pweEnhanceSettings = {
 	themes: { //autoadded from remote
 	},
 	lastThemeUpdateTime: 0,
-	version: 0
+	version: "0"
 };
 
 var showWhatsNewDialog = function() {
@@ -63,6 +64,7 @@ var preloadThemes = function() { //loads before jquery
 	});
 	for (var i = 0; i < keys.length; i++) { 
 		var name = keys[i];
+		console.log("Doing theme "+name);
 		enabled = 'enabled' in pweEnhanceSettings.themes[name] ? pweEnhanceSettings.themes[name].enabled : false;
 		if (enabled) {
 			var theme = pweEnhanceSettings.themes[name];
@@ -109,10 +111,16 @@ var setThemeEnabled = function(name, enabled) {
 	if (enabled) {
 		if ($("head link[href='"+url+"']").length == 0)
 			loadCSS(url);
+		else { // do i really need to do this?
+			loadCSS(url);
+			$("head link[href='"+url+"']")[0].remove();
+		}
+			
 	} else {
 		$("head link[href='"+url+"']").remove();
 	}
 };
+
 
 var makeThemeMenu = function() {
 	var menu = $("<div><h1>Themes</h1></div>");
@@ -320,6 +328,17 @@ var generateEmoteArray = function(name, cols, max, start) {
 	return emotes;
 };
 
+/*var makeFontSizePicker = function() {
+	var container = $('<div class="editor-insert-dialog Flyout MenuItems font-color-picker-dialog"><input type="text" class="color-picker"></input></div>');
+	var button = $('<div class="editor-dropdown font-color-picker"><span class="editor-action icon" title="Font Color"><span class="icon icon-font-color">A</span><span class="icon icon-caret-down"></span></span></div>');
+	container.append('<input type="checkbox" class="autoAddColor"></input><span class="label">Auto color when submitting</span>');
+	for (var i = 1; i <= 7; i++) {
+		container.append($("<a class='size"+i+"'><font size='"+i+"'>"+i+"</font></a>"));
+	}
+	return button.append(container);
+};*/
+
+
 
 var makeFontColorPicker = function() {
 	var container = $('<div class="editor-insert-dialog Flyout MenuItems font-color-picker-dialog"><input type="text" class="color-picker"></input></div>');
@@ -474,13 +493,15 @@ var getCookie = function() {
 					//$.extend(true, pweEnhanceSettings.fontColorPicker, cookieSettings.fontColorPicker);
 					mergeData(pweEnhanceSettings, cookieSettings);
 				}
+				if (pweEnhanceSettings.version > VERSION) // shouldnt happen
+					weEnhanceSettings.version = VERSION;
 			}
 		}
 	}
 };
 
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://cdn.rawgit.com/asterpw/pwevanillaenhance/669f26ffe652ee58da2f3d21bf0914e4f849cd36/pwevanillaenhance.user.css");
+loadCSS("https://cdn.rawgit.com/asterpw/pwevanillaenhance/820ffd0167f202105fbfade7889d4de49e61d12d/pwevanillaenhance.user.css");
 getCookie();
 preloadThemes();
 
