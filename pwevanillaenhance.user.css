@@ -67,14 +67,14 @@
 
 
 .enhance-options .Flyout {
-	width: 330px;
+	width: 375px;
     color: black;
     padding: 0px;
 }
 
 
 .enhance-options .SpOptions::before {
-	color: #66CCFF;
+	color: #66CCFF !important;
 }
 
 .enhance-options .Flyout .menu-content {
@@ -128,9 +128,9 @@
 
 
 .emotes-dialog {
-  width: auto;
-  padding: 0px;
-  white-space: nowrap;
+    width: auto !important;
+    padding: 0px !important;
+    white-space: nowrap;
 }
 
 .emotes-dialog img {
