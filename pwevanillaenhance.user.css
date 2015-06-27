@@ -195,7 +195,7 @@
 }
 
 
-.font-size-picker-dialog {
+.font-size-picker-dialog, .font-face-picker-dialog {
 	width: auto !important;
 	padding: 5px 0px !important;
 }
