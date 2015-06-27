@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.5.4.1
+// @version    0.5.4.2
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -64,7 +64,6 @@ var preloadThemes = function() { //loads before jquery
 	});
 	for (var i = 0; i < keys.length; i++) { 
 		var name = keys[i];
-		console.log("Doing theme "+name);
 		enabled = 'enabled' in pweEnhanceSettings.themes[name] ? pweEnhanceSettings.themes[name].enabled : false;
 		if (enabled) {
 			var theme = pweEnhanceSettings.themes[name];
@@ -425,6 +424,8 @@ var autoAddFontColor = function(textArea, color) {
 
 var initSubmitButton = function(container) {
 	container.find("input.CommentButton").click(function(){
+		$(this).closest(".FormWrapper").find(".editor-dropdown-open").removeClass("editor-dropdown-open");
+		
 		if (pweEnhanceSettings.fontColorPicker.autoAddColor) {
 			var form = $(this).closest(".FormWrapper");
 			var color = form.find(".color-picker").spectrum("get");
@@ -486,7 +487,7 @@ var getCookie = function() {
 			if (cookieItem[0] == "pweEnhancementSettings") {
 				cookieSettings = JSON.parse(cookieItem[1]);
 				//merge the cookie data into the settings, but don't overwrite version number
-				if (cookieSettings.version >= "0.5") {
+				if (cookieSettings.version >= "0.5.4") {
 					//$.extend(true, pweEnhanceSettings, cookieSettings);
 					mergeData(pweEnhanceSettings, cookieSettings);
 				} else if (cookieSettings.version >= "0.4"){
