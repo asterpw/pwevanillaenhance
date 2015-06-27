@@ -15,7 +15,7 @@
 (function() {	
 var VERSION = "0.5.6";
 var CHANGELOG = "<div class='content'> \
-	<div class='change-ver'>v0.5.6</div> - Added font picker (needs more work) \
+	<div class='change-ver'>v0.5.6</div> - Added font picker \
 	<div class='change-ver'>v0.5.5</div> - Added font size picker \
 	<div class='change-ver'>v0.5.4</div> - Fixed Firefox and other preload bugfixes \
 	<div class='change-ver'>v0.5.3</div> - Some theme preload bugfixes \
@@ -55,7 +55,7 @@ var pweEnhanceSettings = {
 
 var showWhatsNewDialog = function() {
 	var whatsNew = $("<div class='whatsNewDialog' style='display: none;'></div>");
-	whatsNew.append($("<div class='title'>What's new in PWE Vanilla Enhancement v"+VERSION+"<div class='close'>X</div></div>"));
+	whatsNew.append($("<div class='title'>What's new in PWE Vanilla Enhancement v"+GM_info.script.version+"<div class='close'>X</div></div>"));
 	whatsNew.append($(CHANGELOG));
 	$(".close", whatsNew).click(function(){
 		$(".whatsNewDialog").fadeOut();  
@@ -356,7 +356,9 @@ var makeFontSizePicker = function() {
 };
 
 var makeFontFacePicker = function() {
-	var container = $('<div class="editor-insert-dialog Flyout MenuItems font-face-picker-dialog"></div>');
+	var dialog = $('<div class="editor-insert-dialog Flyout MenuItems font-face-picker-dialog"></div>');
+	var container = $('<div class="container">');
+	dialog.append(container);
 	var button = $('<div class="editor-dropdown font-face-picker"><span class="editor-action icon" title="Font Face"><span class="icon icon-font-face icon-font-button" style="width: 25px !important">Font</span><span class="icon icon-caret-down"></span></span></div>');
 	var fonts = ["Arial", "Arial Black", "Arial Narrow", "Book Antiqua", "Century Gothic", "Comic Sans MS", "Courier New", "Fixedsys", "Franklin Gothic Medium", "Garamond", "Georgia", "Impact", "Lucida Console", "Lucida Sans Unicode", "Microsoft Sans Serif", "Palatino Linotype", "System", "Tahoma", "Times New Roman", "Trebuchet MS", "Verdana"];
 	for (var i = 0; i < fonts.length; i++) {
@@ -366,7 +368,7 @@ var makeFontFacePicker = function() {
 		$('.BodyBox', $(this).closest('.FormWrapper')).surroundSelectedText('[font="'+this.title+'"]', '[/font]', 'select');
 		$(this).closest(".FormWrapper").find(".editor-dropdown-open").removeClass("editor-dropdown-open");
 	});
-	return button.append(container);
+	return button.append(dialog);
 };
 
 var makeFontColorPicker = function() {
@@ -400,9 +402,9 @@ var initColorPicker = function(container) {
 		showInput: true,
 		className: "full-spectrum",
 		showInitial: true,
-		showPalette: true,
 		showSelectionPalette: true,
 		maxSelectionSize: 8,
+		showPaletteOnly: true,
 		togglePaletteOnly: true,
 		togglePaletteMoreText: 'more',
 		togglePaletteLessText: 'less',
@@ -532,7 +534,7 @@ var getCookie = function() {
 };
 
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://cdn.rawgit.com/asterpw/pwevanillaenhance/f8f1be9276318496b5a51006ccbf4bf0d0583307/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/68f3266bc1d984e66dfb087953c895d1794c7f62/pwevanillaenhance.user.css");
 getCookie();
 preloadThemes();
 
