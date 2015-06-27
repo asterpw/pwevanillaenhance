@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.5.4.2
+// @version    0.5.5
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,14 +13,23 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.5.4";
-var CHANGELOG = "<div class='change'><div class='change-ver'>v0.5.4</div> - Fixed Firefox and other preload bugfixes<div class='change-ver'>v0.5.3</div> - Some theme preload bugfixes<div class='change-ver'>v0.5.2</div> - Themes load faster now (before page render)<br> - Allow remote themes to be renamed or deleted<div class='change-ver'>v0.5.1</div> - Added Forsaken World Emotes<br> - Added What's New Dialog<div class='change-ver'>v0.5</div> - Added auto-loading of themes from @nrglg</div>";
+var VERSION = "0.5.5";
+var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.5.5</div> - Added font size picker \
+	<div class='change-ver'>v0.5.4</div> - Fixed Firefox and other preload bugfixes \
+	<div class='change-ver'>v0.5.3</div> - Some theme preload bugfixes \
+	<div class='change-ver'>v0.5.2</div> - Themes load faster now (before page render)<br> - Allow remote themes to be renamed or deleted \
+	<div class='change-ver'>v0.5.1</div> - Added Forsaken World Emotes<br> - Added What's New Dialog \
+	<div class='change-ver'>v0.5</div> - Added auto-loading of themes from @nrglg</div>";
 
 var pweEnhanceSettings = {
 	fontColorPicker:  {
 		enabled: true,
 		selectedColor: "#FFFFFF",
 		autoAddColor: false
+	},
+	fontSizePicker:  {
+		enabled: true,
 	},
 	pwiEmotes: {
 		enabled: true,
@@ -155,7 +164,8 @@ var features = [
 	new Feature("pwiEmotes", ".pwiEmotes", "Show PWI emotes in editor"),
 	new Feature("fwEmotes", ".fwEmotes", "Show Forsaken World emotes in editor"),
 	new Feature("herocatEmotes", ".herocatEmotes", "Show Herocat (Champions Online) emotes in editor"),
-	new Feature("fontColorPicker", ".font-color-picker", "Show font color picker in editor")
+	new Feature("fontColorPicker", ".font-color-picker", "Show font color picker in editor"),
+	new Feature("fontSizePicker", ".font-size-picker", "Show font size picker in editor")
 ];
 
 Feature.prototype.setEnabled = function(enabled) {
@@ -193,7 +203,7 @@ var makeEnhancePreferencesMenu = function() {
 	preferencesControl.append(preferencesButton).append($('<span class="Arrow SpFlyoutHandle"></span>'));
 	
 	var preferencesMenu = $('<div class="Flyout MenuItems" ></div>');
-	preferencesMenu.append($('<div class="title">PWE Vanilla Enhancement v'+pweEnhanceSettings.version+'</div>'));
+	preferencesMenu.append($('<div class="title">PWE Vanilla Enhancement v'+VERSION+'</div>'));
 	var content = $('<div class="menu-content" ></div>');
 	content.append(makeFeatureMenu());
 	content.append(makeThemeMenu());
@@ -327,17 +337,17 @@ var generateEmoteArray = function(name, cols, max, start) {
 	return emotes;
 };
 
-/*var makeFontSizePicker = function() {
-	var container = $('<div class="editor-insert-dialog Flyout MenuItems font-color-picker-dialog"><input type="text" class="color-picker"></input></div>');
-	var button = $('<div class="editor-dropdown font-color-picker"><span class="editor-action icon" title="Font Color"><span class="icon icon-font-color">A</span><span class="icon icon-caret-down"></span></span></div>');
-	container.append('<input type="checkbox" class="autoAddColor"></input><span class="label">Auto color when submitting</span>');
+var makeFontSizePicker = function() {
+	var container = $('<div class="editor-insert-dialog Flyout MenuItems font-size-picker-dialog"></div>');
+	var button = $('<div class="editor-dropdown font-size-picker"><span class="editor-action icon" title="Font Size"><span class="icon icon-font-size">A<span class="small-size">A</span></span><span class="icon icon-caret-down"></span></span></div>');
 	for (var i = 1; i <= 7; i++) {
-		container.append($("<a class='size"+i+"'><font size='"+i+"'>"+i+"</font></a>"));
+		container.append($("<a title='"+i+"' class='size-select' style='font-size: "+(i*3+6)+"px; line-height: 130% !important'>"+i+"</a>"));
 	}
+	$('.size-select', container).click(function(){
+		$('.BodyBox', $(this).closest('.FormWrapper')).surroundSelectedText('[size="'+this.title+'"]', '[/size]', 'select');
+	});
 	return button.append(container);
-};*/
-
-
+};
 
 var makeFontColorPicker = function() {
 	var container = $('<div class="editor-insert-dialog Flyout MenuItems font-color-picker-dialog"><input type="text" class="color-picker"></input></div>');
@@ -502,7 +512,7 @@ var getCookie = function() {
 };
 
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://cdn.rawgit.com/asterpw/pwevanillaenhance/820ffd0167f202105fbfade7889d4de49e61d12d/pwevanillaenhance.user.css");
+loadCSS("https://cdn.rawgit.com/asterpw/pwevanillaenhance/e004035caa23e2d613cfaf944bade145c2e86198/pwevanillaenhance.user.css");
 getCookie();
 preloadThemes();
 
@@ -514,10 +524,10 @@ var jQueryLoaded = function() {
 	}
 	
 	handleThemes();
-	$(".editor-action-emoji").after(makeFontColorPicker());
 	$(".editor-action-emoji").after(makePWIEmotes());
 	$(".editor-action-emoji").after(makeFWEmotes());
 	$(".editor-action-emoji").after(makeHeroEmotes());
+	$(".editor-action-headers").after(makeFontColorPicker()).after(makeFontSizePicker());
 	makeEnhancePreferencesMenu();
 	$.getScript("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.js").done(function() {
 	//$.getScript("http://bgrins.github.com/spectrum/spectrum.js", function() {
@@ -525,7 +535,8 @@ var jQueryLoaded = function() {
 		initSubmitButton($('.FormWrapper'));
 	});
 	$(document).on( "EditCommentFormLoaded", function(event, container) {
-		container.find(".editor-action-emoji").after(makeFontColorPicker()).after(makePWIEmotes()).after(makeFWEmotes()).after(makeHeroEmotes());
+		container.find(".editor-action-emoji").after(makePWIEmotes()).after(makeFWEmotes()).after(makeHeroEmotes());
+		$(".editor-action-headers").after(makeFontColorPicker()).after(makeFontSizePicker());
 		initColorPicker(container);
         initSubmitButton(container);
 	});
