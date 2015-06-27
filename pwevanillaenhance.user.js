@@ -66,6 +66,12 @@ var showWhatsNewDialog = function() {
 	whatsNew.delay(1000).fadeIn();
 };
 
+var buildCSSThemeURL = function(theme)
+{
+    return theme.baseurl + (theme['branch-commit'].length > 0 ?
+                            theme['branch-commit'] + "/" : '') + theme.file;
+};
+
 var preloadThemes = function() { //loads before jquery
 	keys = Object.keys(pweEnhanceSettings.themes);
 	if (keys.length == 0) 
@@ -80,8 +86,7 @@ var preloadThemes = function() { //loads before jquery
 		enabled = 'enabled' in pweEnhanceSettings.themes[name] ? pweEnhanceSettings.themes[name].enabled : false;
 		if (enabled) {
 			var theme = pweEnhanceSettings.themes[name];
-			var url = theme.baseurl + theme['branch-commit'] + "/" + theme.file;
-			loadCSS(url);
+			loadCSS(buildCSSThemeURL(theme));
 		}
 	}
 };
@@ -119,7 +124,7 @@ var handleThemes = function() {
 var setThemeEnabled = function(name, enabled) {
 	var theme = pweEnhanceSettings.themes[name];
 	theme.enabled = enabled;
-	url = theme.baseurl + theme['branch-commit'] + "/" + theme.file;
+	url = buildCSSThemeURL(theme);
 	if (enabled) {
 		if ($("head link[href='"+url+"']").length == 0)
 			loadCSS(url);
