@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.5.6.1
+// @version    0.5.6.2
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -358,7 +358,7 @@ var makeFontSizePicker = function() {
 var makeFontFacePicker = function() {
 	var container = $('<div class="editor-insert-dialog Flyout MenuItems font-face-picker-dialog"></div>');
 	var button = $('<div class="editor-dropdown font-face-picker"><span class="editor-action icon" title="Font Face"><span class="icon icon-font-face icon-font-button" style="width: 25px !important">Font</span><span class="icon icon-caret-down"></span></span></div>');
-	var fonts = ['Georgia', 'Palatino Linotype', 'Times New Roman', 'Arial', 'Arial Black', 'Comic Sans MS', 'Impact', 'Lucide Grade', 'Tahoma', 'Helvetica', 'Verdana', 'Courier New', 'Lucida Console'];
+	var fonts = ["Arial", "Arial Black", "Arial Narrow", "Book Antiqua", "Century Gothic", "Comic Sans MS", "Courier New", "Fixedsys", "Franklin Gothic Medium", "Garamond", "Georgia", "Impact", "Lucida Console", "Lucida Sans Unicode", "Microsoft Sans Serif", "Palatino Linotype", "System", "Tahoma", "Times New Roman", "Trebuchet MS", "Verdana"];
 	for (var i = 0; i < fonts.length; i++) {
 		container.append($("<a title='"+fonts[i]+"' class='face-select' style='font-family: "+fonts[i]+"; font-size: 16px; line-height: 130% !important'>"+fonts[i]+"</a>"));
 	}
