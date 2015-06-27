@@ -202,9 +202,9 @@
 .font-size-picker .icon-font-size {
 	width: 14px;
 	height: 14px;
-	padding: 0px;
-	margin: 0px;
-	border: 0px none;
+	padding: 0px !important;
+	margin: 0px !important;
+	border: 0px none !important;
 }
 
 .font-size-picker span.small-size {
