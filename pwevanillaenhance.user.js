@@ -494,7 +494,7 @@ var getCookie = function() {
 					mergeData(pweEnhanceSettings, cookieSettings);
 				}
 				if (pweEnhanceSettings.version > VERSION) // shouldnt happen
-					weEnhanceSettings.version = VERSION;
+					pweEnhanceSettings.version = VERSION;
 			}
 		}
 	}
