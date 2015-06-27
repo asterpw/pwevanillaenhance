@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.5.6.2
+// @version    0.5.6.5
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -213,7 +213,7 @@ var makeEnhancePreferencesMenu = function() {
 	preferencesControl.append(preferencesButton).append($('<span class="Arrow SpFlyoutHandle"></span>'));
 	
 	var preferencesMenu = $('<div class="Flyout MenuItems" ></div>');
-	preferencesMenu.append($('<div class="title">PWE Vanilla Enhancement v'+VERSION+'</div>'));
+	preferencesMenu.append($('<div class="title">PWE Vanilla Enhancement v'+GM_info.script.version+'</div>'));
 	var content = $('<div class="menu-content" ></div>');
 	content.append(makeFeatureMenu());
 	content.append(makeThemeMenu());
@@ -573,7 +573,7 @@ var getCookie = function() {
 };
 
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/68f3266bc1d984e66dfb087953c895d1794c7f62/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/13485a3693c924a9de4bb7ded563da0344ba3645/pwevanillaenhance.user.css");
 getCookie();
 preloadThemes();
 
