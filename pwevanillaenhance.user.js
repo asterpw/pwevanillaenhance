@@ -13,8 +13,9 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.5.5";
+var VERSION = "0.5.6";
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.5.6</div> - Added font picker (needs more work) \
 	<div class='change-ver'>v0.5.5</div> - Added font size picker \
 	<div class='change-ver'>v0.5.4</div> - Fixed Firefox and other preload bugfixes \
 	<div class='change-ver'>v0.5.3</div> - Some theme preload bugfixes \
@@ -29,6 +30,9 @@ var pweEnhanceSettings = {
 		autoAddColor: false
 	},
 	fontSizePicker:  {
+		enabled: true,
+	},	
+	fontFacePicker:  {
 		enabled: true,
 	},
 	pwiEmotes: {
@@ -51,7 +55,7 @@ var pweEnhanceSettings = {
 
 var showWhatsNewDialog = function() {
 	var whatsNew = $("<div class='whatsNewDialog' style='display: none;'></div>");
-	whatsNew.append($("<div class='title'>What's new in PWE Vanilla Enhancement v"+VERSION+"<div class='close'>X</div></div>"))
+	whatsNew.append($("<div class='title'>What's new in PWE Vanilla Enhancement v"+VERSION+"<div class='close'>X</div></div>"));
 	whatsNew.append($(CHANGELOG));
 	$(".close", whatsNew).click(function(){
 		$(".whatsNewDialog").fadeOut();  
@@ -164,6 +168,7 @@ var features = [
 	new Feature("pwiEmotes", ".pwiEmotes", "Show PWI emotes in editor"),
 	new Feature("fwEmotes", ".fwEmotes", "Show Forsaken World emotes in editor"),
 	new Feature("herocatEmotes", ".herocatEmotes", "Show Herocat (Champions Online) emotes in editor"),
+	new Feature("fontFacePicker", ".font-face-picker", "Show font picker in editor"),
 	new Feature("fontColorPicker", ".font-color-picker", "Show font color picker in editor"),
 	new Feature("fontSizePicker", ".font-size-picker", "Show font size picker in editor")
 ];
@@ -258,7 +263,7 @@ var makeEmotePanel = function(className, path, categories, emotes, imgWidth, img
 				emoteCount++;
 				var img = $('<img width="'+imgWidth+'" height="'+imgHeight+'" class="'+categories[k]+(emoteCount)+'"/>');
 				//img.attr('src', path + currentEmotes[i][j]);  don't bother loading images until div is shown
-				img.data('url', path + currentEmotes[i][j])
+				img.data('url', path + currentEmotes[i][j]);
 				img.attr('title', categories[k]+(emoteCount));
 				img.click(emoteClick);
 				img.appendTo(emotesdiv);
@@ -339,12 +344,27 @@ var generateEmoteArray = function(name, cols, max, start) {
 
 var makeFontSizePicker = function() {
 	var container = $('<div class="editor-insert-dialog Flyout MenuItems font-size-picker-dialog"></div>');
-	var button = $('<div class="editor-dropdown font-size-picker"><span class="editor-action icon" title="Font Size"><span class="icon icon-font-size">A<span class="small-size">A</span></span><span class="icon icon-caret-down"></span></span></div>');
+	var button = $('<div class="editor-dropdown font-size-picker"><span class="editor-action icon" title="Font Size"><span class="icon icon-font-size icon-font-button">A<span class="small-size">A</span></span><span class="icon icon-caret-down"></span></span></div>');
 	for (var i = 1; i <= 7; i++) {
 		container.append($("<a title='"+i+"' class='size-select' style='font-size: "+(i*3+6)+"px; line-height: 130% !important'>"+i+"</a>"));
 	}
 	$('.size-select', container).click(function(){
 		$('.BodyBox', $(this).closest('.FormWrapper')).surroundSelectedText('[size="'+this.title+'"]', '[/size]', 'select');
+		$(this).closest(".FormWrapper").find(".editor-dropdown-open").removeClass("editor-dropdown-open");
+	});
+	return button.append(container);
+};
+
+var makeFontFacePicker = function() {
+	var container = $('<div class="editor-insert-dialog Flyout MenuItems font-face-picker-dialog"></div>');
+	var button = $('<div class="editor-dropdown font-face-picker"><span class="editor-action icon" title="Font Face"><span class="icon icon-font-face icon-font-button" style="width: 25px !important">Font</span><span class="icon icon-caret-down"></span></span></div>');
+	var fonts = ['Georgia', 'Palatino Linotype', 'Times New Roman', 'Arial', 'Arial Black', 'Comic Sans MS', 'Impact', 'Lucide Grade', 'Tahoma', 'Helvetica', 'Verdana', 'Courier New', 'Lucida Console'];
+	for (var i = 0; i < fonts.length; i++) {
+		container.append($("<a title='"+fonts[i]+"' class='face-select' style='font-family: "+fonts[i]+"; font-size: 16px; line-height: 130% !important'>"+fonts[i]+"</a>"));
+	}
+	$('.face-select', container).click(function(){
+		$('.BodyBox', $(this).closest('.FormWrapper')).surroundSelectedText('[font="'+this.title+'"]', '[/font]', 'select');
+		$(this).closest(".FormWrapper").find(".editor-dropdown-open").removeClass("editor-dropdown-open");
 	});
 	return button.append(container);
 };
@@ -456,7 +476,7 @@ loadCSS = function(href) {
 	link.href = href;
 	link.media = 'all';
 	head.appendChild(link);
-}
+};
  
 
  loadJS = function(src) {
@@ -486,7 +506,7 @@ var mergeData = function(to, from) {
 		else
 			to[keys[i]] = from[keys[i]];
 	}
-}
+};
 
 
 var getCookie = function() {
@@ -512,7 +532,7 @@ var getCookie = function() {
 };
 
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://cdn.rawgit.com/asterpw/pwevanillaenhance/e004035caa23e2d613cfaf944bade145c2e86198/pwevanillaenhance.user.css");
+loadCSS("https://cdn.rawgit.com/asterpw/pwevanillaenhance/f8f1be9276318496b5a51006ccbf4bf0d0583307/pwevanillaenhance.user.css");
 getCookie();
 preloadThemes();
 
@@ -527,7 +547,7 @@ var jQueryLoaded = function() {
 	$(".editor-action-emoji").after(makePWIEmotes());
 	$(".editor-action-emoji").after(makeFWEmotes());
 	$(".editor-action-emoji").after(makeHeroEmotes());
-	$(".editor-action-headers").after(makeFontColorPicker()).after(makeFontSizePicker());
+	$(".editor-action-headers").before(makeFontFacePicker()).before(makeFontSizePicker()).before(makeFontColorPicker());
 	makeEnhancePreferencesMenu();
 	$.getScript("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.js").done(function() {
 	//$.getScript("http://bgrins.github.com/spectrum/spectrum.js", function() {
@@ -536,7 +556,7 @@ var jQueryLoaded = function() {
 	});
 	$(document).on( "EditCommentFormLoaded", function(event, container) {
 		container.find(".editor-action-emoji").after(makePWIEmotes()).after(makeFWEmotes()).after(makeHeroEmotes());
-		$(".editor-action-headers").after(makeFontColorPicker()).after(makeFontSizePicker());
+		container.find($(".editor-action-headers").before(makeFontFacePicker()).before(makeFontSizePicker()).before(makeFontColorPicker()));
 		initColorPicker(container);
         initSubmitButton(container);
 	});
