@@ -4,7 +4,6 @@
 
 .full-spectrum.sp-palette-only {
 	min-width: 223px;
-    
 }
 
 .sp-palette-container {
@@ -14,42 +13,44 @@
 
 .whatsNewDialog {
  	width: 400px;
-    float: right;
-    position: absolute;
-    top: 150px;
-    left: 40%;
-    z-index: 999;
+	float: right;
+	position: absolute;
+	top: 150px;
+	left: 40%;
+	z-index: 999;
 	box-shadow: 5px 5px 20px #000000;
-    font-weight: bold;                                           
+	font-weight: bold;
 }
 
 .whatsNewDialog .title {
-     background: #66CCFF;
-    font-weight: bold;
-    color: black;
-    padding: 10px;
-    font-size: 15px;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    
+	 background: #66CCFF;
+	font-weight: bold;
+	color: black;
+	padding: 10px;
+	font-size: 15px;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	
 }
 
 .whatsNewDialog .close {
-    cursor: pointer;
-    float: right;
-    width: 19px;
-    padding: 0;
-    height: 19px;
-    text-align: center;
-    background-color: white;
-    border-radius: 3px;
+	cursor: pointer;
+	float: right;
+	width: 19px;
+	padding: 0;
+	height: 19px;
+	text-align: center;
+	background-color: white;
+	border-radius: 3px;
 }
 
-.whatsNewDialog .change {
-    background: #FFFFFF;
-    color: #666666;
-    padding: 10px;
-    border: 2px solid #66CCFF;
+.whatsNewDialog .content {
+	background: #FFFFFF;
+	color: #666666;
+	padding: 10px;
+	border: 2px solid #66CCFF;
+	max-height: 200px;
+	overflow: auto;
 }
 
 .enhance-options .Flyout::after {
@@ -57,19 +58,19 @@
 }
 
 .enhance-options .Flyout .title {
-    background: #66CCFF;
-    color: black;
-    padding: 5px;
-    font-weight: bold;
-    font-size: 15px;
-    padding: 10px;
+	background: #66CCFF;
+	color: black;
+	padding: 5px;
+	font-weight: bold;
+	font-size: 15px;
+	padding: 10px;
 }
 
 
 .enhance-options .Flyout {
 	width: 375px;
-    color: black;
-    padding: 0px;
+	color: black;
+	padding: 0px;
 }
 
 
@@ -78,30 +79,30 @@
 }
 
 .enhance-options .Flyout .menu-content {
-    padding: 5px 10px;
+	padding: 5px 10px;
 }
 
 
 
 .enhance-options .MeButton .label {
-    position: absolute;
-    margin-top: 2px;
-    margin-left: 5px;
-    background-color: #66CCFF;
+	position: absolute;
+	margin-top: 2px;
+	margin-left: 5px;
+	background-color: #66CCFF;
  	border-radius: 10px;
-    color: black;
-    padding: 0px 10px;
-    width: inherit;
-    display: inline-block;
+	color: black;
+	padding: 0px 10px;
+	width: inherit;
+	display: inline-block;
 	overflow: hidden;
 	white-space: nowrap;
-    font-size: 12px;
-    opacity: 0.0;
+	font-size: 12px;
+	opacity: 0.0;
 }
 
 .enhance-options:hover .MeButton .label {
-    animation: slide 0.5s ease-in-out;
-    opacity: 1.0;
+	animation: slide 0.5s ease-in-out;
+	opacity: 1.0;
 }
 
 .enhance-options:hover .SpOptions::before {
@@ -109,88 +110,108 @@
 }
 
 @keyframes slide {
-    from {margin-left: 30px; opacity: 0.0}
-    to {margin-left: 5px; opacity: 1.0}
+	from {margin-left: 30px; opacity: 0.0}
+	to {margin-left: 5px; opacity: 1.0}
 }
 
 @-moz-keyframes spin {
-    from { -moz-transform: rotate(0deg); }
-    to { -moz-transform: rotate(1080deg); }
+	from { -moz-transform: rotate(0deg); }
+	to { -moz-transform: rotate(1080deg); }
 }
 @-webkit-keyframes spin {
-    from { -webkit-transform: rotate(0deg); }
-    to { -webkit-transform: rotate(1080deg); }
+	from { -webkit-transform: rotate(0deg); }
+	to { -webkit-transform: rotate(1080deg); }
 }
 @keyframes spin {
-    from {transform:rotate(0deg);}
-    to {transform:rotate(1080deg);}
+	from {transform:rotate(0deg);}
+	to {transform:rotate(1080deg);}
 }
 
 
 .emotes-dialog {
-    width: auto !important;
-    padding: 0px !important;
-    white-space: nowrap;
+	width: auto !important;
+	padding: 0px !important;
+	white-space: nowrap;
 }
 
 .emotes-dialog img {
 	padding: 2px;   
-    cursor: pointer;
+	cursor: pointer;
 }
 
 .emotes-dialog > img:hover {
-    background-color: rgba(0,0,0,0.1);
-    border-radius: 2px;
+	background-color: rgba(0,0,0,0.1);
+	border-radius: 2px;
 }
 
 .emote-category {
-    background-color: rgba(0,0,0,0.1);
-    white-space: nowrap;
-    line-height: 0;
-    padding: 5px 5px 0px 5px;
-    border-bottom: 1px solid #999999;
-    /*width: 100%;*/
+	background-color: rgba(0,0,0,0.1);
+	white-space: nowrap;
+	line-height: 0;
+	padding: 5px 5px 0px 5px;
+	border-bottom: 1px solid #999999;
+	/*width: 100%;*/
 }
 
 .emote-category img {
 	padding: 3px;   
-    border: 1px solid transparent;
+	border: 1px solid transparent;
 }
 
 .fwEmotes .emote-category img {
 	padding-left: 8px;
-    padding-right: 8px;
+	padding-right: 8px;
 }
 .emote-category img.selected {
-    background-color: #FFFFFF;
-    border: 1px solid #999999;
-    border-bottom: hidden;
-    margin-bottom: -1px;
-    padding-bottom: 5px;
+	background-color: #FFFFFF;
+	border: 1px solid #999999;
+	border-bottom: hidden;
+	margin-bottom: -1px;
+	padding-bottom: 5px;
 }
 
 .emotes-div {
 	padding: 5px;
-    margin: 0px;
+	margin: 0px;
 }
 
 
 .emotes-div img:hover {
-    background-color: #EEEEEE;   
+	background-color: #EEEEEE;   
 }
 
 .pwi-emotes .icon-emote {
-    background: url('http://asterpw.github.io/pwicons/emotes/tiger-1.gif') no-repeat left;
+	background: url('http://asterpw.github.io/pwicons/emotes/tiger-1.gif') no-repeat left;
 }
 
 .editor-dropdown .editor-action .icon-emote {
-    background-size: contain;
-    width: 20px;
-    height: 20px;
-    vertical-align: text-top;
-    margin-left: -6px;
-    padding: 0px;
-    border: 0;
+	background-size: contain;
+	width: 20px;
+	height: 20px;
+	vertical-align: text-top;
+	margin-left: -6px;
+	padding: 0px;
+	border: 0;
+}
+
+
+.font-size-picker-dialog {
+	width: auto !important;
+}
+
+.font-size-picker .icon-font-size {
+	width: 14px;
+	height: 14px;
+	padding: 0px;
+	margin: 0px;
+	border: 0px none;
+}
+
+.font-size-picker span.small-size {
+	position: relative; 
+	left: 0px; 
+	top: -6px; 
+	font-size: 8px;
 }
 
 .font-color-picker-dialog {
@@ -198,21 +219,21 @@
 }
 
 .font-color-picker-dialog input.autocolor {
-    vertical-align: bottom;
+	vertical-align: bottom;
 }
 
 .font-color-picker-dialog .label {
 	margin: 3px 0px;
-    color: #666666;
-    display: inline-block;
+	color: #666666;
+	display: inline-block;
 }
 
 .font-color-picker > .icon {
 	padding: 0px 7px;   
-    height: 22px;
+	height: 22px;
 }
 
 .icon-font-color {
 	box-shadow: 0 -5px 0 0 #FFFFFF inset; 
-    margin: 0px -5px !important; 
+	margin: 0px -5px !important; 
 }
