@@ -371,6 +371,40 @@ var makeFontFacePicker = function() {
 	return button.append(dialog);
 };
 
+var makeTextFacePicker = function() {
+	var dialog = $('<div class="editor-insert-dialog Flyout MenuItems text-face-dialog"></div>');
+	var container = $('<div class="container">');
+	dialog.append(container);
+	var button = $('<div class="editor-dropdown text-face-picker"><span class="editor-action icon" title="Raise Your Dongers"><span class="icon icon-text-face icon-font-button" style="width: 40px !important">( \u0361\u00b0 \u035c\u0296 \u0361\u00b0)</span><span class="icon icon-caret-down"></span></span></div>');
+	var textfaces = [
+		"Donger:\u30FD\u0F3C\u0E88\u0644\u035C\u0E88\u0F3D\uFF89",
+		"Lenny:( \u0361\u00b0 \u035c\u0296 \u0361\u00b0)", 
+		"Ohh Well:\u00af\\_(\u30c4)_/\u00af",
+		"Gun:\u2584\ufe3b\u0337\u033f\u253b\u033f\u2550\u2501\u4e00",
+		"DONT:\u0ca0_\u0ca0",
+		"Need More:\u0f3c \u3064 \u25d5_\u25d5 \u0f3d\u3064",
+		"Heeeey:(\u261e\uff9f\u30ee\uff9f)\u261e",
+		"Cute:(\u25d5\u203f\u25d5\u273f)",
+		"Table Flip:(\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b",
+		"Double Table:\u253b\u2501\u253b \ufe35\u30fd(`\u0414\u00b4)\uff89\ufe35 \u253b\u2501\u253b",
+		"Shades:(\u2022_\u2022) ( \u2022_\u2022)>\u2310\u25A0-\u25A0 (\u2310\u25A0_\u25A0)",
+		"Strong:\u1566(\u00F2_\u00F3\u02C7)\u1564"
+	];
+	button.find('.editor-action .icon').click(function(){
+		$(this).parent().parent().toggleClass("editor-dropdown-open").siblings().removeClass("editor-dropdown-open");
+	});
+		
+	for (var i = 0; i < textfaces.length; i++) {
+		var textface = textfaces[i].split(":");
+		container.append($("<a title='"+textface[0]+"' class='text-face-select' style='font-size: 16px; line-height: 130% !important'>"+textface[1]+"</a>"));
+	}
+	$('.text-face-select', container).click(function(){
+		$('.BodyBox', $(this).closest('.FormWrapper')).insertAtCaret(this.innerText);
+		$(this).closest(".FormWrapper").find(".editor-dropdown-open").removeClass("editor-dropdown-open");
+	});
+	return button.append(dialog);
+};
+
 var makeFontColorPicker = function() {
 	var container = $('<div class="editor-insert-dialog Flyout MenuItems font-color-picker-dialog"><input type="text" class="color-picker"></input></div>');
 	var button = $('<div class="editor-dropdown font-color-picker"><span class="editor-action icon" title="Font Color"><span class="icon icon-font-color">A</span><span class="icon icon-caret-down"></span></span></div>');
