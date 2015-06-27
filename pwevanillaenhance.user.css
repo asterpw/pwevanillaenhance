@@ -197,6 +197,7 @@
 
 .font-size-picker-dialog {
 	width: auto !important;
+	padding: 5px 0px !important;
 }
 
 .font-size-picker .icon-font-size {
