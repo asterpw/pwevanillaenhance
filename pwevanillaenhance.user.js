@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.6.1
+// @version    0.6.2
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,8 +13,17 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.6.1";
+var VERSION = "0.6.2";  //what we store when we should display what's new dialog
+var getFullVersion = function() { // For version display on the screen;
+	try {
+		return GM_info.script.version;  //causes error if not supported
+	} catch(err) {
+		return VERSION;
+	}
+};
+/*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.6.2</div> - added more faces, fixed ViolentMonkey support on Opera \
 	<div class='change-ver'>v0.6.1</div> - \u0ca0_\u0ca0 picker \
 	<div class='change-ver'>v0.6.0</div> - Important organization changes (needs data reset) \
 	<div class='change-ver'>v0.5.6</div> - Added font picker \
@@ -38,7 +47,7 @@ var pweEnhanceSettings = {
 
 var showWhatsNewDialog = function() {
 	var whatsNew = $("<div class='whatsNewDialog' style='display: none;'></div>");
-	whatsNew.append($("<div class='title'>What's new in PWE Vanilla Enhancement v"+GM_info.script.version+"<div class='close'>X</div></div>"));
+	whatsNew.append($("<div class='title'>What's new in PWE Vanilla Enhancement v"+getFullVersion()+"<div class='close'>X</div></div>"));
 	whatsNew.append($(CHANGELOG));
 	$(".close", whatsNew).click(function(){
 		$(".whatsNewDialog").fadeOut();  
@@ -57,7 +66,7 @@ var buildCSSThemeURL = function(theme)
 
 var preloadThemes = function() { //loads before jquery
 	keys = Object.keys(pweEnhanceSettings.themes);
-	if (keys.length == 0) 
+	if (keys.length === 0) 
 		return;
 	keys.sort(function(a,b){
 		if (a in pweEnhanceSettings.themes && b in pweEnhanceSettings.themes) //some weird bug?
@@ -109,7 +118,7 @@ var setThemeEnabled = function(name, enabled) {
 	theme.enabled = enabled;
 	url = buildCSSThemeURL(theme);
 	if (enabled) {
-		if ($("head link[href='"+url+"']").length == 0)
+		if ($("head link[href='"+url+"']").length === 0)
 			loadCSS(url);
 		else { // do i really need to do this?
 			loadCSS(url);
@@ -183,7 +192,7 @@ var makeEnhancePreferencesMenu = function() {
 	preferencesControl.append(preferencesButton).append($('<span class="Arrow SpFlyoutHandle"></span>'));
 	
 	var preferencesMenu = $('<div class="Flyout MenuItems" ></div>');
-	preferencesMenu.append($('<div class="title">PWE Vanilla Enhancement v'+GM_info.script.version+'</div>'));
+	preferencesMenu.append($('<div class="title">PWE Vanilla Enhancement v'+getFullVersion()+'</div>'));
 	var content = $('<div class="menu-content" ></div>');
 	content.append(makeFeatureMenu());
 	content.append(makeThemeMenu());
@@ -361,7 +370,9 @@ var makeTextFaceEmotes = function() {
 		"Lenny:( \u0361\u00b0 \u035c\u0296 \u0361\u00b0)", 
 		"Ohh Well:\u00af\\_(\u30c4)_/\u00af",
 		"Gun:\u2584\ufe3b\u0337\u033f\u253b\u033f\u2550\u2501\u4e00",
-		"DONT:\u0ca0_\u0ca0",
+		"Stare:\u0ca0_\u0ca0",
+		"Fancy Stare:\u0ca0_\u0ca0\u0cca",
+		"Cry:\u0ca5_\u0ca5",
 		"Need More:\u0f3c \u3064 \u25d5_\u25d5 \u0f3d\u3064",
 		"Heeeey:(\u261e\uff9f\u30ee\uff9f)\u261e",
 		"Cute:(\u25d5\u203f\u25d5\u273f)",
