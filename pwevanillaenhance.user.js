@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.6.2
+// @version    0.7.0
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.6.2";  //what we store when we should display what's new dialog
+var VERSION = "0.7.0";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,7 +23,8 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
-	<div class='change-ver'>v0.6.2</div> - added more faces, fixed ViolentMonkey support on Opera \
+	<div class='change-ver'>v0.7.0</div> - added links to the site menu<br> - better preferences organization \
+	<div class='change-ver'>v0.6.2</div> - added more text faces<br>- fixed ViolentMonkey support on Opera \
 	<div class='change-ver'>v0.6.1</div> - \u0ca0_\u0ca0 picker \
 	<div class='change-ver'>v0.6.0</div> - Important organization changes (needs data reset) \
 	<div class='change-ver'>v0.5.6</div> - Added font picker \
@@ -36,6 +37,8 @@ var CHANGELOG = "<div class='content'> \
 
 var pweEnhanceSettings = {
 	editor: {
+	},
+	links: {
 	},
 	emotes: {
 	},
@@ -68,11 +71,11 @@ var preloadThemes = function() { //loads before jquery
 	keys = Object.keys(pweEnhanceSettings.themes);
 	if (keys.length === 0) 
 		return;
-	keys.sort(function(a,b){
-		if (a in pweEnhanceSettings.themes && b in pweEnhanceSettings.themes) //some weird bug?
-			return pweEnhanceSettings.themes[a].order - pweEnhanceSettings.themes[b].order;
-		return 0;
-	});
+	try {
+		keys.sort(function(a,b){
+				return pweEnhanceSettings.themes[a].order - pweEnhanceSettings.themes[b].order;
+		});
+	} catch(err) { /*i don't get why this fails sometimes*/}
 	for (var i = 0; i < keys.length; i++) { 
 		var name = keys[i];
 		enabled = 'enabled' in pweEnhanceSettings.themes[name] ? pweEnhanceSettings.themes[name].enabled : false;
@@ -168,8 +171,13 @@ var mergeData = function(to, from) {
 };
 
 var makeFeatureMenu = function() {
-	var menu = $("<div><h1>Features</h1></div>");
+	var menu = $("<div></div>");
+	var currentFeatureType = null;
 	for (var i = 0; i < features.length; i++) { 
+		if (!(features[i].type == currentFeatureType)) {
+			menu.append($("<h1>"+features[i].header+"</h1>"));
+			currentFeatureType = features[i].type;
+		}
 		var featureContainer = $("<div class='feature'></div>");
 		var checked = features[i].isEnabled() ? 'checked' : '';
 		featureContainer.append('<input type="checkbox" class="option" '+checked+'></input><span class="label">'+features[i].description+'</span>');
@@ -395,7 +403,6 @@ var makeTextFaceEmotes = function() {
 	});
 	/*
 	$('.icon-font-button', button).click(function(){
-		console.log("HUH");
 		$(this).closest(".editor-dropdown").toggleClass("editor-dropdown-open").siblings().removeClass("editor-dropdown-open");
 	});*/
 	return button.append(dialog);
@@ -494,9 +501,29 @@ var initSubmitButton = function(container) {
 	});
 };
 
+var makeShowHideAllCategories = function(container) {
+	this.target = ".SiteMenu li:first-child";  //override positioning
+	this.positionMethod = "after";
+	return $('<li class="'+this.id+'"><a href="http://perfectworld.vanillaforums.com/categories/?ShowAllCategories=false">My Categories</a></li>' +
+		'<li class="'+this.id+'"><a href="http://perfectworld.vanillaforums.com/categories/?ShowAllCategories=true">All Categories</a></li>');
+};
+
+var makeSTOLinks = function(container) {
+	return $('<li class="'+this.id+'"><a href="http://perfectworld.vanillaforums.com/categories/startrekonline">STO</a></li>' +
+		'<li class="'+this.id+'"><a href="http://sto.gamepedia.com/Lore">Lore</a></li>' +
+		'<li class="'+this.id+'"><a href="http://sto.gamepedia.com/Commodities">Commodities</a></li>' 
+		);
+};
+
+var makePWILinks = function(container) {
+	return $('<li class="'+this.id+'"><a href="http://perfectworld.vanillaforums.com/categories/pwi">PWI</a></li>' +
+		'<li class="'+this.id+'"><a href="http://pwdatabse.com">PWDatabase</a></li>' +
+		'<li class="'+this.id+'"><a href="http://mypers.pw/1.8/">PW Calc</a></li>' +
+		'<li class="'+this.id+'"><a href="http://aster.ohmydays.net/pw">Aster</a></li>'
+		);
+};
 
 var Feature = function() {};
-
 Feature.prototype.init = function(defaults) {
 	this.selector = "."+this.id;
 	if (!(this.id in pweEnhanceSettings[this.type]))
@@ -536,6 +563,7 @@ var EditorFeature = function(name, id, description, maker, defaults, screenshot)
 	this.init(defaults);
 };
 EditorFeature.prototype = new Feature;
+EditorFeature.prototype.header = 'Features';
 EditorFeature.prototype.type = 'editor';
 EditorFeature.prototype.target = '.editor-action-headers';
 EditorFeature.prototype.positionMethod = 'before';
@@ -549,9 +577,24 @@ var EmoteFeature = function(name, id, description, maker, defaults, screenshot) 
 	this.init(defaults);
 };
 EmoteFeature.prototype = new Feature;
+EmoteFeature.prototype.header = 'Emotes';
 EmoteFeature.prototype.type = 'emotes';
 EmoteFeature.prototype.target = '.editor-action-emoji';
 EmoteFeature.prototype.positionMethod = 'after';
+
+var LinkFeature = function(name, id, description, maker, defaults, screenshot) {
+	this.name = name;
+	this.id = id;
+	this.description = description;
+	this.maker = maker;
+	this.screenshot = screenshot;
+	this.init(defaults);
+};
+LinkFeature.prototype = new Feature;
+LinkFeature.prototype.type = 'links';
+LinkFeature.prototype.header = 'Links';
+LinkFeature.prototype.target = '.SiteMenu';
+LinkFeature.prototype.positionMethod = 'append';
 
 var features = [
 	new EditorFeature("Font Picker", "fontFacePicker", "Show font picker in editor", makeFontFacePicker),
@@ -561,11 +604,16 @@ var features = [
 	new EmoteFeature("Forsaken World Emotes", "fwEmotes", "Show Forsaken World emotes in editor", makeFWEmotes, {category: "jellyfish"}),
 	new EmoteFeature("Herocat (Champions Online) Emotes", "herocatEmotes", "Show Herocat (Champions Online) emotes in editor", makeHeroEmotes, {category: "herocat", enabled: false}),
 	new EmoteFeature("Text Face Emotes", "textFaceEmotes", "Show Text Face Emotes in editor", makeTextFaceEmotes),
+	new LinkFeature("Show/Hide All Categories", "showHideAllCategories", "Add show/hide all categories links", makeShowHideAllCategories, {enabled: false}),
+	new LinkFeature("Show/Hide STO Links", "stoLinks", "Add STO links", makeSTOLinks, {enabled: false}),
+	new LinkFeature("Show/Hide PWI Links", "pwiLinks", "Add PWI links", makePWILinks, {enabled: false}),
 ];
 
 var installFeatures = function(container) {
 	for (var i = 0; i < features.length; i++) {
-		features[i].install(container);
+		if (container.find(features[i].target)) {
+			features[i].install(container);	
+		}
 	}
 	initSubmitButton(container);
 	if($.spectrum) 
@@ -625,6 +673,7 @@ var jQueryLoaded = function() {
 	}
 	handleThemes();
 	installFeatures($('.FormWrapper'));
+	installFeatures($('.Head'));
 	makeEnhancePreferencesMenu();
 	$.getScript("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.js").done(function() {
 		initColorPicker($('.fontColorPicker'));
