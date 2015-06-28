@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.7.0
+// @version    0.7.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.7.0";  //what we store when we should display what's new dialog
+var VERSION = "0.7.1";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.7.1</div> - made all game links one option \
 	<div class='change-ver'>v0.7.0</div> - added links to the site menu<br> - better preferences organization \
 	<div class='change-ver'>v0.6.2</div> - added more text faces<br>- fixed ViolentMonkey support on Opera \
 	<div class='change-ver'>v0.6.1</div> - \u0ca0_\u0ca0 picker \
@@ -61,8 +62,7 @@ var showWhatsNewDialog = function() {
 	whatsNew.delay(1000).fadeIn();
 };
 
-var buildCSSThemeURL = function(theme)
-{
+var buildCSSThemeURL = function(theme) {
     return theme.baseurl + (theme['branch-commit'].length > 0 ?
                             theme['branch-commit'] + "/" : '') + theme.file;
 };
@@ -71,11 +71,9 @@ var preloadThemes = function() { //loads before jquery
 	keys = Object.keys(pweEnhanceSettings.themes);
 	if (keys.length === 0) 
 		return;
-	try {
-		keys.sort(function(a,b){
-				return pweEnhanceSettings.themes[a].order - pweEnhanceSettings.themes[b].order;
-		});
-	} catch(err) { /*i don't get why this fails sometimes*/}
+	keys.sort(function(a,b){
+			return pweEnhanceSettings.themes[a].order - pweEnhanceSettings.themes[b].order;
+	});
 	for (var i = 0; i < keys.length; i++) { 
 		var name = keys[i];
 		enabled = 'enabled' in pweEnhanceSettings.themes[name] ? pweEnhanceSettings.themes[name].enabled : false;
@@ -157,7 +155,7 @@ var makeThemeMenu = function() {
 	return menu;
 };
 
-var mergeData = function(to, from) {
+var mergeData = function(to, from, allowAddKeys) {
 	if (from == null) {
 		return;
 	}
@@ -165,7 +163,7 @@ var mergeData = function(to, from) {
 	for (var i in keys) {
 		if (typeof from[keys[i]] == 'object' && keys[i] in to) 
 			mergeData(to[keys[i]], from[keys[i]]);
-		else
+		else if (keys[i] in to || allowAddKeys) 
 			to[keys[i]] = from[keys[i]];
 	}
 };
@@ -484,8 +482,7 @@ var autoAddFontColor = function(textArea, color) {
 	
 	var text = textArea.val();
 	if (!text.substring(startpos).startsWith(startTag)) {
-		textArea.val(text.substring(0, startpos) + startTag + text.substring(startpos) + endTag);
-		
+		textArea.val(text.substring(0, startpos) + startTag + text.substring(startpos) + endTag);	
 	}
 };    
 
@@ -502,25 +499,52 @@ var initSubmitButton = function(container) {
 };
 
 var makeShowHideAllCategories = function(container) {
-	this.target = ".SiteMenu li:first-child";  //override positioning
+	this.target = ".MeMenu .link-preferences";  //override positioning
 	this.positionMethod = "after";
 	return $('<li class="'+this.id+'"><a href="http://perfectworld.vanillaforums.com/categories/?ShowAllCategories=false">My Categories</a></li>' +
 		'<li class="'+this.id+'"><a href="http://perfectworld.vanillaforums.com/categories/?ShowAllCategories=true">All Categories</a></li>');
 };
 
-var makeSTOLinks = function(container) {
-	return $('<li class="'+this.id+'"><a href="http://perfectworld.vanillaforums.com/categories/startrekonline">STO</a></li>' +
-		'<li class="'+this.id+'"><a href="http://sto.gamepedia.com/Lore">Lore</a></li>' +
-		'<li class="'+this.id+'"><a href="http://sto.gamepedia.com/Commodities">Commodities</a></li>' 
-		);
+var makeDraftsLink = function(container) {
+	this.target = ".MeMenu .link-preferences";  //override positioning
+	this.positionMethod = "after";
+	return $('<li class="'+this.id+'"><a href="http://perfectworld.vanillaforums.com/drafts">Manage Drafts</a></li>');
 };
 
-var makePWILinks = function(container) {
-	return $('<li class="'+this.id+'"><a href="http://perfectworld.vanillaforums.com/categories/pwi">PWI</a></li>' +
-		'<li class="'+this.id+'"><a href="http://pwdatabse.com">PWDatabase</a></li>' +
-		'<li class="'+this.id+'"><a href="http://mypers.pw/1.8/">PW Calc</a></li>' +
-		'<li class="'+this.id+'"><a href="http://aster.ohmydays.net/pw">Aster</a></li>'
-		);
+var makeGameLinks = function(container) {
+	var links = "";
+	var gamelinks = ["arc-mobile|ARC|http://www.arcgames.com/en/games",
+		"apbreloaded|APB on ARC|http://www.arcgames.com/en/games/APB_Reloaded",
+		"battleoftheimmortals|BOI on ARC|http://www.arcgames.com/en/games/battle-of-the-immortals",
+		"blacklightretribution|BLR on ARC|http://www.arcgames.com/en/games/blacklight-retribution",
+		"championsonline|CO on ARC|http://www.arcgames.com/en/games/champions-online",
+		"elsword|Elsword on ARC|http://www.arcgames.com/en/games/Elsword",
+		"ethersagaodyssey|ESO on ARC|http://www.arcgames.com/en/games/ether-saga-odyssey",
+		"forsakenworld|FW on ARC|http://www.arcgames.com/en/games/forsaken-world",
+		"jadedynasty|JD on ARC|http://www.arcgames.com/en/games/jade-dynasty",
+		"neverwinter|NW on ARC|http://www.arcgames.com/en/games/neverwinter",
+		"prime-world|PW on ARC|http://www.arcgames.com/en/games/Prime_World",
+		"pwi|PWI on ARC|http://www.arcgames.com/en/games/pwi",
+		"pwi|Calc|http://mypers.pw/1.8/",
+		"pwi|PWDB|http://pwdatabse.com",
+		"pwi|Aster Tools|http://aster.ohmydays.net/pw",
+		"raiderz|Raiderz on ARC|http://www.arcgames.com/en/games/raiderz",
+		"royal-quest|RQ on ARC|http://www.arcgames.com/en/games/Royal_Quest",
+		"star-conflict|SC on ARC|http://www.arcgames.com/en/games/Star_Conflict",
+		"startrekonline|STO on ARC|http://www.arcgames.com/en/games/star-trek-online",
+		"stronghold-kingdoms|SK on ARC|http://www.arcgames.com/en/games/Stronghold_Kingdoms",
+		"Swordsman|Swordsman on ARC|http://www.arcgames.com/en/games/swordsman",
+		"waroftheimmortals|WOI on ARC|http://www.arcgames.com/en/games/war-of-the-immortals",
+		"startrekonline|Wiki|http://sto.gamepedia.com/",
+		"startrekonline|Lore|http://sto.gamepedia.com/Lore",
+		"startrekonline|Commodities|http://sto.gamepedia.com/Commodities"];
+		
+	for (var i=0; i < gamelinks.length; i++) {
+		linkdata = gamelinks[i].split("|");
+		if($(".CrumbLabel.Category-"+linkdata[0]).length > 0)
+			links += '<li class="'+this.id+'"><a href="'+linkdata[2]+'">'+linkdata[1]+'</a></li>';
+	}
+	return $(links);
 };
 
 var Feature = function() {};
@@ -529,7 +553,7 @@ Feature.prototype.init = function(defaults) {
 	if (!(this.id in pweEnhanceSettings[this.type]))
 		pweEnhanceSettings[this.type][this.id] = {};
 	pweEnhanceSettings[this.type][this.id].enabled = true;
-	mergeData(pweEnhanceSettings[this.type][this.id], defaults);
+	mergeData(pweEnhanceSettings[this.type][this.id], defaults, true);
 };
 
 Feature.prototype.install = function(context) {
@@ -604,9 +628,9 @@ var features = [
 	new EmoteFeature("Forsaken World Emotes", "fwEmotes", "Show Forsaken World emotes in editor", makeFWEmotes, {category: "jellyfish"}),
 	new EmoteFeature("Herocat (Champions Online) Emotes", "herocatEmotes", "Show Herocat (Champions Online) emotes in editor", makeHeroEmotes, {category: "herocat", enabled: false}),
 	new EmoteFeature("Text Face Emotes", "textFaceEmotes", "Show Text Face Emotes in editor", makeTextFaceEmotes),
-	new LinkFeature("Show/Hide All Categories", "showHideAllCategories", "Add show/hide all categories links", makeShowHideAllCategories, {enabled: false}),
-	new LinkFeature("Show/Hide STO Links", "stoLinks", "Add STO links", makeSTOLinks, {enabled: false}),
-	new LinkFeature("Show/Hide PWI Links", "pwiLinks", "Add PWI links", makePWILinks, {enabled: false}),
+	new LinkFeature("Show/Hide All Categories", "showHideAllCategories", "Add show/hide all categories links to Account Options Menu", makeShowHideAllCategories),
+	new LinkFeature("Show Draft Link", "draftLink", "Add manage drafts link to Account Options Menu", makeDraftsLink),
+	new LinkFeature("Show/Hide Game Links", "gameLinks", "Add Game-specific links", makeGameLinks, {enabled: false}),
 ];
 
 var installFeatures = function(container) {
@@ -653,7 +677,9 @@ var getSettings = function() {
 	if (savedSettingsJSON) {
 		var savedSettings = JSON.parse(savedSettingsJSON);
 		if(savedSettings.version && savedSettings.version >= "0.6") {
-			mergeData(pweEnhanceSettings, savedSettings);
+			mergeData(pweEnhanceSettings, savedSettings, false); // dont merge in discarded features
+			if (savedSettings.themes) // allow cached themes
+				mergeData(pweEnhanceSettings.themes, savedSettings.themes, true); 
 			if (pweEnhanceSettings.version > VERSION) // shouldnt happen
 				pweEnhanceSettings.version = VERSION;
 				
@@ -664,8 +690,11 @@ var getSettings = function() {
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
 loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/03d398374b0b995fde0c956e1f452a731140f8e3/pwevanillaenhance.user.css");
 getSettings();
-preloadThemes();
-
+try{
+	preloadThemes();
+} catch(err) {
+	//sometimes fails, idk why, theme will get loaded after jquery so whatever.
+}
 var jQueryLoaded = function() {
 //$(document).ready(function() {
 	if (pweEnhanceSettings.version < VERSION) {
