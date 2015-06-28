@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.7.1
+// @version    0.7.1.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.7.1";  //what we store when we should display what's new dialog
+var VERSION = "0.7.1.1";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,7 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
-	<div class='change-ver'>v0.7.1</div> - made all game links one option \
+	<div class='change-ver'>v0.7.1</div> - made all game links one option (@eiledon)\
 	<div class='change-ver'>v0.7.0</div> - added links to the site menu<br> - better preferences organization \
 	<div class='change-ver'>v0.6.2</div> - added more text faces<br>- fixed ViolentMonkey support on Opera \
 	<div class='change-ver'>v0.6.1</div> - \u0ca0_\u0ca0 picker \
@@ -537,7 +537,11 @@ var makeGameLinks = function(container) {
 		"waroftheimmortals|WOI on ARC|http://www.arcgames.com/en/games/war-of-the-immortals",
 		"startrekonline|Wiki|http://sto.gamepedia.com/",
 		"startrekonline|Lore|http://sto.gamepedia.com/Lore",
-		"startrekonline|Commodities|http://sto.gamepedia.com/Commodities"];
+		"startrekonline|Commodities|http://sto.gamepedia.com/Commodities",
+		"championsonline|Wiki|http://www.championswiki.com/index.php?title=Main_Page",
+		"championsonline|PDB|http://primusdatabase.com",
+		"championsonline|Reddit|http://www.reddit.com/r/ChampionsOnlineFFA/",
+		"startrekonline|Reddit|http://www.reddit.com/r/sto/"];
 		
 	for (var i=0; i < gamelinks.length; i++) {
 		linkdata = gamelinks[i].split("|");
