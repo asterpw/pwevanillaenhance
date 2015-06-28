@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.5.6.5
+// @version    0.6.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,8 +13,10 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.5.6";
+var VERSION = "0.6.1";
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.6.1</div> - \u0ca0_\u0ca0 picker \
+	<div class='change-ver'>v0.6.0</div> - Important organization changes (needs data reset) \
 	<div class='change-ver'>v0.5.6</div> - Added font picker \
 	<div class='change-ver'>v0.5.5</div> - Added font size picker \
 	<div class='change-ver'>v0.5.4</div> - Fixed Firefox and other preload bugfixes \
@@ -24,28 +26,9 @@ var CHANGELOG = "<div class='content'> \
 	<div class='change-ver'>v0.5</div> - Added auto-loading of themes from @nrglg</div>";
 
 var pweEnhanceSettings = {
-	fontColorPicker:  {
-		enabled: true,
-		selectedColor: "#FFFFFF",
-		autoAddColor: false
+	editor: {
 	},
-	fontSizePicker:  {
-		enabled: true,
-	},	
-	fontFacePicker:  {
-		enabled: true,
-	},
-	pwiEmotes: {
-		enabled: true,
-		category: "tiger"
-	},
-	fwEmotes: {
-		enabled: true,
-		category: "jellyfish"
-	},
-	herocatEmotes: {
-		enabled: false,
-		category: "herocat"
+	emotes: {
 	},
 	themes: { //autoadded from remote
 	},
@@ -162,37 +145,24 @@ var makeThemeMenu = function() {
 	return menu;
 };
 
-var Feature = function(name, selector, description, screenshot) {
-	this.name = name;
-	this.selector = selector;
-	this.description = description;
-	this.screenshot = screenshot;
-};
-
-var features = [
-	new Feature("pwiEmotes", ".pwiEmotes", "Show PWI emotes in editor"),
-	new Feature("fwEmotes", ".fwEmotes", "Show Forsaken World emotes in editor"),
-	new Feature("herocatEmotes", ".herocatEmotes", "Show Herocat (Champions Online) emotes in editor"),
-	new Feature("fontFacePicker", ".font-face-picker", "Show font picker in editor"),
-	new Feature("fontColorPicker", ".font-color-picker", "Show font color picker in editor"),
-	new Feature("fontSizePicker", ".font-size-picker", "Show font size picker in editor")
-];
-
-Feature.prototype.setEnabled = function(enabled) {
-	pweEnhanceSettings[this.name].enabled = enabled;
-	if (!enabled) {
-		$(this.selector).hide();
-	} else {
-		$(this.selector).show();
+var mergeData = function(to, from) {
+	if (from == null) {
+		return;
+	}
+	var keys = Object.keys(from);
+	for (var i in keys) {
+		if (typeof from[keys[i]] == 'object' && keys[i] in to) 
+			mergeData(to[keys[i]], from[keys[i]]);
+		else
+			to[keys[i]] = from[keys[i]];
 	}
 };
 
 var makeFeatureMenu = function() {
 	var menu = $("<div><h1>Features</h1></div>");
-	
 	for (var i = 0; i < features.length; i++) { 
 		var featureContainer = $("<div class='feature'></div>");
-		var checked = pweEnhanceSettings[features[i].name].enabled ? 'checked' : '';
+		var checked = features[i].isEnabled() ? 'checked' : '';
 		featureContainer.append('<input type="checkbox" class="option" '+checked+'></input><span class="label">'+features[i].description+'</span>');
 		$('.option', featureContainer).click( (function(feature) {
 				return function(){
@@ -226,7 +196,7 @@ var makeEnhancePreferencesMenu = function() {
 
 var makeEmotePanel = function(className, path, categories, emotes, imgWidth, imgHeight) {
 	var container = $('<div class="emotes-dialog editor-insert-dialog Flyout MenuItems"></div>');
-	var defaultCategory = pweEnhanceSettings[className].category;
+	var defaultCategory = pweEnhanceSettings.emotes[className].category;
 	if (categories.length > 1) {
 		var categoryDiv = $('<div class="emote-category"></div>');
 		for (var type=0; type < categories.length; type++) {
@@ -237,7 +207,7 @@ var makeEmotePanel = function(className, path, categories, emotes, imgWidth, img
 				typeImg.addClass('selected');
 			typeImg.click(
 				function(){
-					pweEnhanceSettings[className].category = this.title;
+					pweEnhanceSettings.emotes[className].category = this.title;
 					$("."+className + " .emote-category .selected").removeClass("selected");
 					$(this).addClass("selected");
 					$("."+className + " .icon-emote").css('background-image', "url('"+path+this.title+"-1.gif')");
@@ -282,11 +252,9 @@ var makeEmotePanel = function(className, path, categories, emotes, imgWidth, img
 		$(this).parent().parent().toggleClass("editor-dropdown-open").siblings().removeClass("editor-dropdown-open");
 	});
 	button.find('.editor-action').click(function(){
-		$("."+className+" ."+pweEnhanceSettings[className].category+"-emotes img").each(function(){$(this).attr('src', $(this).data('url'));});
+		$("."+className+" ."+pweEnhanceSettings.emotes[className].category+"-emotes img").each(function(){$(this).attr('src', $(this).data('url'));});
 	});
 	button.find('.icon-emote').css('background-image', "url('"+path+emotes[defaultCategory][0][0]+"')");
-	if (!pweEnhanceSettings[className].enabled)
-		button.hide();
 	return button.append(container);
 };
 
@@ -348,8 +316,8 @@ var generateEmoteArray = function(name, cols, max, start) {
 };
 
 var makeFontSizePicker = function() {
-	var container = $('<div class="editor-insert-dialog Flyout MenuItems font-size-picker-dialog"></div>');
-	var button = $('<div class="editor-dropdown font-size-picker"><span class="editor-action icon" title="Font Size"><span class="icon icon-font-size icon-font-button">A<span class="small-size">A</span></span><span class="icon icon-caret-down"></span></span></div>');
+	var container = $('<div class="editor-insert-dialog Flyout MenuItems fontSizePicker-dialog"></div>');
+	var button = $('<div class="editor-dropdown fontSizePicker"><span class="editor-action icon" title="Font Size"><span class="icon icon-font-size icon-font-button">A<span class="small-size">A</span></span><span class="icon icon-caret-down"></span></span></div>');
 	for (var i = 1; i <= 7; i++) {
 		container.append($("<a title='"+i+"' class='size-select' style='font-size: "+(i*3+6)+"px; line-height: 130% !important'>"+i+"</a>"));
 	}
@@ -357,14 +325,18 @@ var makeFontSizePicker = function() {
 		$('.BodyBox', $(this).closest('.FormWrapper')).surroundSelectedText('[size="'+this.title+'"]', '[/size]', 'select');
 		$(this).closest(".FormWrapper").find(".editor-dropdown-open").removeClass("editor-dropdown-open");
 	});
+	
+	$('.icon-font-button', button).click(function(){
+		$(this).parent().parent().toggleClass("editor-dropdown-open").siblings().removeClass("editor-dropdown-open");
+	});
 	return button.append(container);
 };
 
 var makeFontFacePicker = function() {
-	var dialog = $('<div class="editor-insert-dialog Flyout MenuItems font-face-picker-dialog"></div>');
+	var dialog = $('<div class="editor-insert-dialog Flyout MenuItems enhance-dropdown fontFacePicker-dialog"></div>');
 	var container = $('<div class="container">');
 	dialog.append(container);
-	var button = $('<div class="editor-dropdown font-face-picker"><span class="editor-action icon" title="Font Face"><span class="icon icon-font-face icon-font-button" style="width: 25px !important">Font</span><span class="icon icon-caret-down"></span></span></div>');
+	var button = $('<div class="editor-dropdown fontFacePicker"><span class="editor-action icon" title="Font Face"><span class="icon icon-font-face icon-font-button" style="width: 25px !important">Font</span><span class="icon icon-caret-down"></span></span></div>');
 	var fonts = ["Arial", "Arial Black", "Arial Narrow", "Book Antiqua", "Century Gothic", "Comic Sans MS", "Courier New", "Fixedsys", "Franklin Gothic Medium", "Garamond", "Georgia", "Impact", "Lucida Console", "Lucida Sans Unicode", "Microsoft Sans Serif", "Palatino Linotype", "System", "Tahoma", "Times New Roman", "Trebuchet MS", "Verdana"];
 	for (var i = 0; i < fonts.length; i++) {
 		container.append($("<a title='"+fonts[i]+"' class='face-select' style='font-family: "+fonts[i]+"; font-size: 16px; line-height: 130% !important'>"+fonts[i]+"</a>"));
@@ -373,14 +345,17 @@ var makeFontFacePicker = function() {
 		$('.BodyBox', $(this).closest('.FormWrapper')).surroundSelectedText('[font="'+this.title+'"]', '[/font]', 'select');
 		$(this).closest(".FormWrapper").find(".editor-dropdown-open").removeClass("editor-dropdown-open");
 	});
+	$('.icon-font-button', button).click(function(){
+		$(this).parent().parent().toggleClass("editor-dropdown-open").siblings().removeClass("editor-dropdown-open");
+	});
 	return button.append(dialog);
 };
 
-var makeTextFacePicker = function() {
-	var dialog = $('<div class="editor-insert-dialog Flyout MenuItems text-face-dialog"></div>');
+var makeTextFaceEmotes = function() {
+	var dialog = $('<div class="editor-insert-dialog Flyout MenuItems enhance-dropdown text-face-dialog"></div>');
 	var container = $('<div class="container">');
 	dialog.append(container);
-	var button = $('<div class="editor-dropdown text-face-picker"><span class="editor-action icon" title="Raise Your Dongers"><span class="icon icon-text-face icon-font-button" style="width: 40px !important">( \u0361\u00b0 \u035c\u0296 \u0361\u00b0)</span><span class="icon icon-caret-down"></span></span></div>');
+	var button = $('<div class="editor-dropdown textFaceEmotes"><span class="editor-action icon" title="Text Faces"><span class="icon icon-text-face icon-font-button" style="position: relative;left: -5px;">\u0ca0_\u0ca0</span><span class="icon icon-caret-down"></span></span></div>');
 	var textfaces = [
 		"Donger:\u30FD\u0F3C\u0E88\u0644\u035C\u0E88\u0F3D\uFF89",
 		"Lenny:( \u0361\u00b0 \u035c\u0296 \u0361\u00b0)", 
@@ -404,40 +379,43 @@ var makeTextFacePicker = function() {
 		container.append($("<a title='"+textface[0]+"' class='text-face-select' style='font-size: 16px; line-height: 130% !important'>"+textface[1]+"</a>"));
 	}
 	$('.text-face-select', container).click(function(){
-		$('.BodyBox', $(this).closest('.FormWrapper')).insertAtCaret(this.innerText);
+		$('.BodyBox', $(this).closest('.FormWrapper')).insertAtCaret($(this).text());
 		$(this).closest(".FormWrapper").find(".editor-dropdown-open").removeClass("editor-dropdown-open");
 	});
+	/*
+	$('.icon-font-button', button).click(function(){
+		console.log("HUH");
+		$(this).closest(".editor-dropdown").toggleClass("editor-dropdown-open").siblings().removeClass("editor-dropdown-open");
+	});*/
 	return button.append(dialog);
 };
 
 var makeFontColorPicker = function() {
-	var container = $('<div class="editor-insert-dialog Flyout MenuItems font-color-picker-dialog"><input type="text" class="color-picker"></input></div>');
-	var button = $('<div class="editor-dropdown font-color-picker"><span class="editor-action icon" title="Font Color"><span class="icon icon-font-color">A</span><span class="icon icon-caret-down"></span></span></div>');
+	var container = $('<div class="editor-insert-dialog Flyout MenuItems fontColorPicker-dialog"><input type="text" class="color-picker"></input></div>');
+	var button = $('<div class="editor-dropdown fontColorPicker"><span class="editor-action icon" title="Font Color"><span class="icon icon-font-color">A</span><span class="icon icon-caret-down"></span></span></div>');
 	container.append('<input type="checkbox" class="autoAddColor"></input><span class="label">Auto color when submitting</span>');
 	container.find('.autoAddColor').click(function(){
-		pweEnhanceSettings.fontColorPicker.autoAddColor = $(this).is(":checked");
+		pweEnhanceSettings.editor.fontColorPicker.autoAddColor = $(this).is(":checked");
 		update();
 	});
-	container.find(".icon-font-color").css("box-shadow", "0 -5px 0 0 "+pweEnhanceSettings.fontColorPicker.selectedColor+" inset");
-	if (pweEnhanceSettings.fontColorPicker.autoAddColor) 
+	container.find(".icon-font-color").css("box-shadow", "0 -5px 0 0 "+pweEnhanceSettings.editor.fontColorPicker.selectedColor+" inset");
+	if (pweEnhanceSettings.editor.fontColorPicker.autoAddColor) 
 		container.find('.autoAddColor').prop('checked', true);
-	if (!pweEnhanceSettings.fontColorPicker.enabled)
-		button.hide();
 	return button.append(container);
 };
 
 var setFontColor = function(picker, color) {
 	picker.closest(".FormWrapper").find('.BodyBox').surroundSelectedText('[color="'+color+'"]', '[/color]', 'select');
 	picker.closest(".FormWrapper").find(".icon-font-color").css("box-shadow", "0 -5px 0 0 "+color+" inset");
-	pweEnhanceSettings.fontColorPicker.selectedColor = color;
-	picker.closest(".font-color-picker").removeClass("editor-dropdown-open");
+	pweEnhanceSettings.editor.fontColorPicker.selectedColor = color;
+	picker.closest(".fontColorPicker").removeClass("editor-dropdown-open");
 	update();
 };
 
 var initColorPicker = function(container) {
-	picker = container.find('.color-picker');
+	picker = container.find('.color-picker');	
 	picker.spectrum({
-		color: pweEnhanceSettings.fontColorPicker.selectedColor,
+		color: pweEnhanceSettings.editor.fontColorPicker.selectedColor,
 		showInput: true,
 		className: "full-spectrum",
 		showInitial: true,
@@ -471,9 +449,9 @@ var initColorPicker = function(container) {
 			"rgb(12, 52, 61)", "rgb(28, 69, 135)", "rgb(7, 55, 99)", "rgb(32, 18, 77)", "rgb(76, 17, 48)"]
 		]
 	});
-	container.find(".icon-font-color").css("box-shadow", "0 -5px 0 0 "+pweEnhanceSettings.fontColorPicker.selectedColor+" inset");
+	container.find(".icon-font-color").css("box-shadow", "0 -5px 0 0 "+pweEnhanceSettings.editor.fontColorPicker.selectedColor+" inset");
 	container.find('.icon-font-color').click( function(event) {
-		setFontColor($(event.target), '#'+($(event.target).closest('.font-color-picker').find('.color-picker').spectrum("get").toHex()));
+		setFontColor($(event.target), '#'+($(event.target).closest('.fontColorPicker').find('.color-picker').spectrum("get").toHex()));
 	});
 };
 
@@ -497,12 +475,90 @@ var initSubmitButton = function(container) {
 	container.find("input.CommentButton").click(function(){
 		$(this).closest(".FormWrapper").find(".editor-dropdown-open").removeClass("editor-dropdown-open");
 		
-		if (pweEnhanceSettings.fontColorPicker.autoAddColor) {
+		if (pweEnhanceSettings.editor.fontColorPicker.autoAddColor) {
 			var form = $(this).closest(".FormWrapper");
 			var color = form.find(".color-picker").spectrum("get");
 			autoAddFontColor(form.find(".BodyBox"), color);
 		}
 	});
+};
+
+
+var Feature = function() {};
+
+Feature.prototype.init = function(defaults) {
+	this.selector = "."+this.id;
+	if (!(this.id in pweEnhanceSettings[this.type]))
+		pweEnhanceSettings[this.type][this.id] = {};
+	pweEnhanceSettings[this.type][this.id].enabled = true;
+	mergeData(pweEnhanceSettings[this.type][this.id], defaults);
+};
+
+Feature.prototype.install = function(context) {
+	var panel = this.maker();
+	var destination = $(this.target, context);
+	destination[this.positionMethod](panel);
+	if (!pweEnhanceSettings[this.type][this.id].enabled) {
+		panel.hide();
+	}
+};
+
+Feature.prototype.setEnabled = function(enabled) {
+	pweEnhanceSettings[this.type][this.id].enabled = enabled;
+	if (!enabled) {
+		$(this.selector).hide();
+	} else {
+		$(this.selector).show();
+	}
+};
+
+Feature.prototype.isEnabled = function() {
+	return pweEnhanceSettings[this.type][this.id].enabled;
+};
+
+var EditorFeature = function(name, id, description, maker, defaults, screenshot) {
+	this.name = name;
+	this.id = id;
+	this.description = description;
+	this.maker = maker;
+	this.screenshot = screenshot;
+	this.init(defaults);
+};
+EditorFeature.prototype = new Feature;
+EditorFeature.prototype.type = 'editor';
+EditorFeature.prototype.target = '.editor-action-headers';
+EditorFeature.prototype.positionMethod = 'before';
+
+var EmoteFeature = function(name, id, description, maker, defaults, screenshot) {
+	this.name = name;
+	this.id = id;
+	this.description = description;
+	this.maker = maker;
+	this.screenshot = screenshot;
+	this.init(defaults);
+};
+EmoteFeature.prototype = new Feature;
+EmoteFeature.prototype.type = 'emotes';
+EmoteFeature.prototype.target = '.editor-action-emoji';
+EmoteFeature.prototype.positionMethod = 'after';
+
+var features = [
+	new EditorFeature("Font Picker", "fontFacePicker", "Show font picker in editor", makeFontFacePicker),
+	new EditorFeature("Font Size Picker", "fontSizePicker", "Show font size picker in editor", makeFontSizePicker),
+	new EditorFeature("Font Color Picker", "fontColorPicker", "Show font color picker in editor", makeFontColorPicker, {selectedColor: "#FFFFFF", autoAddColor: false}),
+	new EmoteFeature("PWI Emotes", "pwiEmotes", "Show PWI emotes in editor", makePWIEmotes, {category: "tiger"}),
+	new EmoteFeature("Forsaken World Emotes", "fwEmotes", "Show Forsaken World emotes in editor", makeFWEmotes, {category: "jellyfish"}),
+	new EmoteFeature("Herocat (Champions Online) Emotes", "herocatEmotes", "Show Herocat (Champions Online) emotes in editor", makeHeroEmotes, {category: "herocat", enabled: false}),
+	new EmoteFeature("Text Face Emotes", "textFaceEmotes", "Show Text Face Emotes in editor", makeTextFaceEmotes),
+];
+
+var installFeatures = function(container) {
+	for (var i = 0; i < features.length; i++) {
+		features[i].install(container);
+	}
+	initSubmitButton(container);
+	if($.spectrum) 
+		initColorPicker(container);
 };
 
 /* loadCSS = function(href) {
@@ -526,82 +582,45 @@ loadCSS = function(href) {
  }; 
  
  var update = function() {
-	setCookie();
+	saveSettings();
 };
 
- var setCookie = function(){
-	var exdate=new Date();
-	exdate.setDate(exdate.getDate() + 40); // 40 day expiration
-	var cookieSuffix = ";expires=" + exdate.toUTCString() + ";path=/";
-	document.cookie = "pweEnhancementSettings=" + JSON.stringify(pweEnhanceSettings) + cookieSuffix;
+var saveSettings = function(){
+	localStorage["pweEnhancementSettings"] =  JSON.stringify(pweEnhanceSettings);
 };
 
-var mergeData = function(to, from) {
-	if (from == null) {
-		return;
-	}
-	var keys = Object.keys(from);
-	for (var i in keys) {
-		if (typeof from[keys[i]] == 'object' && keys[i] in to) 
-			mergeData(to[keys[i]], from[keys[i]]);
-		else
-			to[keys[i]] = from[keys[i]];
-	}
-};
-
-
-var getCookie = function() {
-	if (document.cookie) {
-		var cookieData = document.cookie.split(";");
-		for (var i = 0; i < cookieData.length; i++) {
-			var cookieItem = cookieData[i].trim().split("=");
-			if (cookieItem[0] == "pweEnhancementSettings") {
-				cookieSettings = JSON.parse(cookieItem[1]);
-				//merge the cookie data into the settings, but don't overwrite version number
-				if (cookieSettings.version >= "0.5.4") {
-					//$.extend(true, pweEnhanceSettings, cookieSettings);
-					mergeData(pweEnhanceSettings, cookieSettings);
-				} else if (cookieSettings.version >= "0.4"){
-					//$.extend(true, pweEnhanceSettings.fontColorPicker, cookieSettings.fontColorPicker);
-					mergeData(pweEnhanceSettings, cookieSettings);
-				}
-				if (pweEnhanceSettings.version > VERSION) // shouldnt happen
-					pweEnhanceSettings.version = VERSION;
-			}
+var getSettings = function() {
+	var savedSettingsJSON = localStorage["pweEnhancementSettings"];
+	if (savedSettingsJSON) {
+		var savedSettings = JSON.parse(savedSettingsJSON);
+		if(savedSettings.version && savedSettings.version >= "0.6") {
+			mergeData(pweEnhanceSettings, savedSettings);
+			if (pweEnhanceSettings.version > VERSION) // shouldnt happen
+				pweEnhanceSettings.version = VERSION;
+				
 		}
 	}
 };
 
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/13485a3693c924a9de4bb7ded563da0344ba3645/pwevanillaenhance.user.css");
-getCookie();
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/03d398374b0b995fde0c956e1f452a731140f8e3/pwevanillaenhance.user.css");
+getSettings();
 preloadThemes();
-
 
 var jQueryLoaded = function() {
 //$(document).ready(function() {
 	if (pweEnhanceSettings.version < VERSION) {
 		showWhatsNewDialog();
 	}
-	
 	handleThemes();
-	$(".editor-action-emoji").after(makePWIEmotes());
-	$(".editor-action-emoji").after(makeFWEmotes());
-	$(".editor-action-emoji").after(makeHeroEmotes());
-	$(".editor-action-headers").before(makeFontFacePicker()).before(makeFontSizePicker()).before(makeFontColorPicker());
+	installFeatures($('.FormWrapper'));
 	makeEnhancePreferencesMenu();
 	$.getScript("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.js").done(function() {
-	//$.getScript("http://bgrins.github.com/spectrum/spectrum.js", function() {
-		initColorPicker($('.font-color-picker'));
-		initSubmitButton($('.FormWrapper'));
+		initColorPicker($('.fontColorPicker'));
 	});
 	$(document).on( "EditCommentFormLoaded", function(event, container) {
-		container.find(".editor-action-emoji").after(makePWIEmotes()).after(makeFWEmotes()).after(makeHeroEmotes());
-		container.find(".editor-action-headers").before(makeFontFacePicker()).before(makeFontSizePicker()).before(makeFontColorPicker());
-		initColorPicker(container);
-        initSubmitButton(container);
+		installFeatures(container);
 	});
-//});
 };
 
 document.addEventListener("DOMContentLoaded", function(event) {
