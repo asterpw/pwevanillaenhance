@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.7.3
+// @version    0.7.4
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.7.3";  //what we store when we should display what's new dialog
+var VERSION = "0.8.0";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.8.0</div> - added fancy theme manager\
 	<div class='change-ver'>v0.7.4</div> - those emotes ARENT WHITE CATS AT ALL, it's an onion\
 	<div class='change-ver'>v0.7.3</div> - added 'white cat' emotes\
 	<div class='change-ver'>v0.7.2</div> - added MLP emotes\
@@ -53,7 +54,7 @@ var pweEnhanceSettings = {
 };
 
 var showWhatsNewDialog = function() {
-	var whatsNew = $("<div class='whatsNewDialog' style='display: none;'></div>");
+	var whatsNew = $("<div class='whatsNewDialog enhanceDialog' style='display: none;'></div>");
 	whatsNew.append($("<div class='title'>What's new in PWE Vanilla Enhancement v"+getFullVersion()+"<div class='close'>X</div></div>"));
 	whatsNew.append($(CHANGELOG));
 	$(".close", whatsNew).click(function(){
@@ -156,6 +157,43 @@ var makeThemeMenu = function() {
 		menu.append(themeContainer);
 	}
 	return menu;
+};
+
+
+var makeThemePicker = function(name) {
+	var theme = pweEnhanceSettings.themes[name];
+	var container = $("<div class='theme'></div>");
+	if (theme.enabled) {
+		container.addClass('selected');
+	}
+	var screenshotUrl = theme.screenshot[0];
+	var authorName =  theme["author-alias"] ? theme["author-alias"] : theme.author;
+	container.append($('<img class="theme-preview" src="'+theme.screenshot[0]+'">'));
+	container.append($('<div class="theme-name" title='+name+'>'+name+'</div>'));
+	container.append($('<div class="theme-author"><a href="http://perfectworld.vanillaforums.com/profile/'+theme.author+'">'+authorName+'</a></div>'));
+	container.append($('<div class="theme-created">'+theme.created+'</div>'));
+	container.append($('<div class="theme-updated">'+theme.updated+'</div>'));
+	container.append($('<div class="theme-description">'+theme.description+'</div>'));
+	if (theme.discussion)
+		container.append($('<div class="theme-discussion"><a href="'+theme.discussion+'">Discussion</div>'));
+	return container;
+};
+
+var makeThemeManager = function() {
+	$(".themeManager").remove();
+	var dialog = $("<div class='themeManager enhanceDialog' style='display: none;'></div>");
+	dialog.append($("<div class='title'>PWE Vanilla Enhancement Theme Manager<div class='close'>X</div></div>"));
+	$(".close", dialog).click(function(){ $(this).closest('.enhanceDialog').fadeOut();});
+	var content = $("<div class='content'></div>");
+	for (var themeName in pweEnhanceSettings.themes) {
+		if (pweEnhanceSettings.themes[themeName].category == 'Theme')
+			content.append(makeThemePicker(themeName));
+	}
+	dialog.append(content);
+	$(".SiteMenu").append(dialog);
+	var button = $('<div class="button">Theme Manager</div>');
+	button.click(function(){$('.themeManager').fadeIn();});
+	$(".MeMenu").append(button);
 };
 
 var mergeData = function(to, from, allowAddKeys) {
@@ -747,10 +785,12 @@ var getSettings = function() {
 	var savedSettingsJSON = localStorage["pweEnhancementSettings"];
 	if (savedSettingsJSON) {
 		var savedSettings = JSON.parse(savedSettingsJSON);
-		if(savedSettings.version && savedSettings.version >= "0.6") {
+		if(savedSettings.version && savedSettings.version >= "0.6.0") {
 			mergeData(pweEnhanceSettings, savedSettings, false); // dont merge in discarded features
-			if (savedSettings.themes) // allow cached themes
+			if (savedSettings.themes && savedSettings.version >= "0.8.0") // allow cached themes
 				mergeData(pweEnhanceSettings.themes, savedSettings.themes, true); 
+			else
+				pweEnhanceSettings.lastThemeUpdateTime = 0; // force update
 			if (pweEnhanceSettings.version > VERSION) // shouldnt happen
 				pweEnhanceSettings.version = VERSION;
 				
@@ -775,6 +815,7 @@ var jQueryLoaded = function() {
 	installFeatures($('.FormWrapper'));
 	installFeatures($('.Head'));
 	makeEnhancePreferencesMenu();
+	makeThemeManager();
 	$.getScript("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.js").done(function() {
 		initColorPicker($('.fontColorPicker'));
 	});
