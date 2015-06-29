@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.7.4
+// @version    0.8.0
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -103,6 +103,13 @@ var handleThemes = function() {
 	if (currentTime - pweEnhanceSettings.lastThemeUpdateTime > 4*3600*1000) {
 		$.getJSON("https://rawgit.com/Goodlookinguy/pwvnrg/master/files.json", function(json){
 			$.extend(true, pweEnhanceSettings, json);
+			backgroundImages = {
+				"Pro Blue": {screenshot: ['http://i.imgur.com/CnZ2oVF.png']},
+				"VA Eclipse": {screenshot: ['http://i.imgur.com/JhWDDhL.png']},
+				"The Blues": {screenshot: ['http://i.imgur.com/CbbcD88.png']},
+				"STO Federation": {screenshot: ['http://i.imgur.com/qNqW1nu.png']}
+			};
+			$.extend(true, pweEnhanceSettings.themes, backgroundImages);
 			for (var i in pweEnhanceSettings.themes) {
 				if (!(i in json.themes))
 					delete pweEnhanceSettings.themes[i];
@@ -112,6 +119,7 @@ var handleThemes = function() {
 			pweEnhanceSettings.lastThemeUpdateTime = new Date().getTime();
 			update();
 			makeEnhancePreferencesMenu();
+			makeThemeManager();
 		});
 	} else {
 		applyThemes();
@@ -122,14 +130,21 @@ var setThemeEnabled = function(name, enabled) {
 	var theme = pweEnhanceSettings.themes[name];
 	theme.enabled = enabled;
 	url = buildCSSThemeURL(theme);
-	if (enabled) {
+	if (enabled) {		
 		if ($("head link[href='"+url+"']").length === 0)
 			loadCSS(url);
 		else { // do i really need to do this?
 			loadCSS(url);
 			$("head link[href='"+url+"']")[0].remove();
 		}
-			
+		if (theme.category == "Theme") { //only one theme allowed with category == Theme
+			$('.themeManager img[title="'+name+'"]').closest(".theme").addClass("selected").siblings().removeClass("selected");
+			for (var i in pweEnhanceSettings.themes) {
+				if (pweEnhanceSettings.themes[i].category == "Theme"  && i != name) { 
+					setThemeEnabled(i, false);
+				}
+			}
+		}
 	} else {
 		$("head link[href='"+url+"']").remove();
 	}
@@ -137,11 +152,15 @@ var setThemeEnabled = function(name, enabled) {
 
 
 var makeThemeMenu = function() {
-	var menu = $("<div><h1>Themes</h1></div>");
+	var menu = $("<div><h1>Add-ons</h1></div>");
 	keys = Object.keys(pweEnhanceSettings.themes);
 	keys.sort(function(a,b){return pweEnhanceSettings.themes[a].order - pweEnhanceSettings.themes[b].order;});	
 	for (var i = 0; i < keys.length; i++) { 
 		var name = keys[i];
+		
+		if (pweEnhanceSettings.themes[name].category == "Theme")
+			continue;
+		
 		var themeContainer = $("<div class='theme'></div>");
 		var checked = pweEnhanceSettings.themes[name].enabled ? 'checked' : '';
 		themeContainer.append('<input type="checkbox" class="option" '+checked+'></input><span class="label">' +
@@ -168,21 +187,25 @@ var makeThemePicker = function(name) {
 	}
 	var screenshotUrl = theme.screenshot[0];
 	var authorName =  theme["author-alias"] ? theme["author-alias"] : theme.author;
-	container.append($('<img class="theme-preview" src="'+theme.screenshot[0]+'">'));
-	container.append($('<div class="theme-name" title='+name+'>'+name+'</div>'));
-	container.append($('<div class="theme-author"><a href="http://perfectworld.vanillaforums.com/profile/'+theme.author+'">'+authorName+'</a></div>'));
+	container.append($('<img class="theme-preview" title="'+name+'" src="'+theme.screenshot[0]+'">'));
 	container.append($('<div class="theme-created">'+theme.created+'</div>'));
 	container.append($('<div class="theme-updated">'+theme.updated+'</div>'));
+	container.append($('<div class="theme-name" title="'+name+'">'+name+'</div>'));
+	container.append($('<div class="theme-author"><a href="http://perfectworld.vanillaforums.com/profile/'+theme.author+'">'+authorName+'</a></div>'));
 	container.append($('<div class="theme-description">'+theme.description+'</div>'));
+	$("img", container).click(function(){
+		setThemeEnabled(this.title, !(pweEnhanceSettings.themes[this.title].enabled));
+		update();
+	});
 	if (theme.discussion)
 		container.append($('<div class="theme-discussion"><a href="'+theme.discussion+'">Discussion</div>'));
 	return container;
 };
 
 var makeThemeManager = function() {
-	$(".themeManager").remove();
-	var dialog = $("<div class='themeManager enhanceDialog' style='display: none;'></div>");
-	dialog.append($("<div class='title'>PWE Vanilla Enhancement Theme Manager<div class='close'>X</div></div>"));
+	$(".themeManager, .themeButton").remove();
+	var dialog = $("<div class='themeManager enhanceDialog' style='margin: 0px auto; display: none;'></div>");
+	dialog.append($("<div class='title'><div class='close'>X</div>PWE Vanilla Enhancement Theme Manager</div>"));
 	$(".close", dialog).click(function(){ $(this).closest('.enhanceDialog').fadeOut();});
 	var content = $("<div class='content'></div>");
 	for (var themeName in pweEnhanceSettings.themes) {
@@ -191,8 +214,8 @@ var makeThemeManager = function() {
 	}
 	dialog.append(content);
 	$(".SiteMenu").append(dialog);
-	var button = $('<div class="button">Theme Manager</div>');
-	button.click(function(){$('.themeManager').fadeIn();});
+	var button = $('<span class="themeButton">\uf178 Themes</span>');
+	button.click(function(){$('.themeManager').slideToggle();});
 	$(".MeMenu").append(button);
 };
 
@@ -235,7 +258,7 @@ var makeFeatureMenu = function() {
 var makeEnhancePreferencesMenu = function() {
 	$('.enhance-options').remove();
 	var preferencesControl = $("<span class='ToggleFlyout enhance-options'></span>");
-	var preferencesButton = $('<a href="#" class="MeButton FlyoutButton" title="Enhance Options"><span class="Sprite Sprite16 SpOptions"></span><span class="label">Enhance Options</span></a>');
+	var preferencesButton = $('<a href="#" class="MeButton FlyoutButton" title="Enhance Options"><span class="Sprite Sprite16 SpOptions"></span><!-- span class="label">Enhance Options</span --></a>');
 	preferencesControl.append(preferencesButton).append($('<span class="Arrow SpFlyoutHandle"></span>'));
 	
 	var preferencesMenu = $('<div class="Flyout MenuItems" ></div>');
@@ -787,9 +810,9 @@ var getSettings = function() {
 		var savedSettings = JSON.parse(savedSettingsJSON);
 		if(savedSettings.version && savedSettings.version >= "0.6.0") {
 			mergeData(pweEnhanceSettings, savedSettings, false); // dont merge in discarded features
-			if (savedSettings.themes && savedSettings.version >= "0.8.0") // allow cached themes
+			if (savedSettings.themes && savedSettings.version >= "0.8.0") {// allow cached themes
 				mergeData(pweEnhanceSettings.themes, savedSettings.themes, true); 
-			else
+			} else
 				pweEnhanceSettings.lastThemeUpdateTime = 0; // force update
 			if (pweEnhanceSettings.version > VERSION) // shouldnt happen
 				pweEnhanceSettings.version = VERSION;

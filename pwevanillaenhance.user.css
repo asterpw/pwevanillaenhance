@@ -23,7 +23,7 @@
 }
 
 .whatsNewDialog .title {
-	 background: #66CCFF;
+	 background: #69CAFE;
 	font-weight: bold;
 	color: black;
 	padding: 10px;
@@ -48,13 +48,13 @@
 	background: #FFFFFF;
 	color: #666666;
 	padding: 10px;
-	border: 2px solid #66CCFF;
+	border: 2px solid #69CAFE;
 	max-height: 200px;
 	overflow: auto;
 }
 
 .enhance-options .Flyout::after {
-	border-bottom-color: #66CCFF;
+	border-bottom-color: #69CAFE;
 }
 
 .enhance-options .Flyout .title {
@@ -75,7 +75,7 @@
 
 
 .enhance-options .SpOptions::before {
-	color: #66CCFF !important;
+	color: #69CAFE !important;
 }
 
 .enhance-options .Flyout .menu-content {
@@ -88,7 +88,7 @@
 	position: absolute;
 	margin-top: 2px;
 	margin-left: 5px;
-	background-color: #66CCFF;
+	background-color: #69CAFE;
  	border-radius: 10px;
 	color: black;
 	padding: 0px 10px;
@@ -254,4 +254,139 @@
 .icon-font-color {
 	box-shadow: 0 -5px 0 0 #FFFFFF inset; 
 	margin: 0px -5px !important; 
+}
+
+
+
+
+/************************
+  Theme Manager Stuff
+************************/
+
+.themeButton {
+   border-top: 1px solid #96d1f8;
+   background: #1286C4;
+   padding: 5px 10px;
+   -webkit-border-radius: 8px;
+   -moz-border-radius: 8px;
+   border-radius: 8px;
+   -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   box-shadow: rgba(0,0,0,1) 0 1px 0;
+   text-shadow: rgba(0,0,0,.4) 0 1px 0;
+   color: white;
+   font-size: 14px;
+   text-decoration: none;
+   vertical-align: middle;
+	 font-family: vanillicon;
+   font-weight: bold;
+   cursor: pointer;
+   }
+.themeButton:hover {
+   border-top-color: #28597a;
+   background: #0C5982;
+   color: #ccc;
+   }
+.themeButton:active {
+   border-top-color: #1b435e;
+   background: #0A4B6E;
+   }
+	
+.themeManager {	
+	margin-top: 10px;
+	width: 925px;
+	overflow: auto;
+/*	background-color: rgba(200,200,200,0.2);*/
+}
+	
+.themeManager .title {
+	display: none;
+	background-color: #69CCFF;
+	font-size: 15px;
+	padding: 10px;
+	margin: 0px;
+	color: #000000;
+	font-weight: bold;
+}
+
+.close {
+	background-color: white;
+	display: inline;
+	float:right;
+}
+
+.themeManager .content {
+	display: block;
+	padding: 10px 0px 10px 10px;
+	margin: 0px;
+}
+	
+.themeManager .theme {
+	float: left;
+	width: 275px;
+	height: auto;
+	display: block;
+	margin-right: 10px;	
+	margin-bottom: 10px;
+	background: rgba(0, 0, 0, 0.3);
+	padding: 10px;
+	position: relative;
+	box-shadow: 0px 0px 10px 0px  rgba(255,255,255,0.3);
+}
+	
+.themeManager .theme:hover {
+	box-shadow: 0px 0px 10px  #FFFFFF;
+}
+	
+.themeManager .theme-author::before {
+	content: 'by';
+	margin-left: 5px;
+}
+
+.themeManager .theme-created::before {
+	content: 'added';
+	margin-right: 3px;
+}	
+	
+.themeManager .theme-updated::before {
+	content: 'updated';
+	margin-right: 3px;
+}	
+
+.themeManager .theme-created {
+	float: right;
+}
+	
+.themeManager .theme-updated {
+	display: none;
+}
+	
+.themeManager .theme-discussion {
+	float: right;
+}
+	
+.themeManager .theme-name {
+	font-size: 20px;
+}
+
+.themeManager .theme img {
+	width: 275px;
+	height: 137px;
+	cursor: pointer;
+	background-size: 295px auto;
+}
+	
+.themeManager .theme.selected .theme-name:before {
+	content: "\f11c";
+	position: absolute;
+	top: 110px;
+	left: 240px;
+	z-index: 100;
+	font-family: vanillicon;
+	font-size: 30px;
+	text-shadow: 2px 2px 5px #000000;
+	width: 25px;
+	height: 25px;
+	color: lime;
+	opacity: 0.8;
 }
