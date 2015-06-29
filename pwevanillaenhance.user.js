@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.7.1.1
+// @version    0.7.2
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.7.1.1";  //what we store when we should display what's new dialog
+var VERSION = "0.7.2";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.7.2</div> - added MLP emotes\
 	<div class='change-ver'>v0.7.1</div> - made all game links one option (@eiledon)\
 	<div class='change-ver'>v0.7.0</div> - added links to the site menu<br> - better preferences organization \
 	<div class='change-ver'>v0.6.2</div> - added more text faces<br>- fixed ViolentMonkey support on Opera \
@@ -172,7 +173,7 @@ var makeFeatureMenu = function() {
 	var menu = $("<div></div>");
 	var currentFeatureType = null;
 	for (var i = 0; i < features.length; i++) { 
-		if (!(features[i].type == currentFeatureType)) {
+		if (features[i].type != currentFeatureType) {
 			menu.append($("<h1>"+features[i].header+"</h1>"));
 			currentFeatureType = features[i].type;
 		}
@@ -209,14 +210,15 @@ var makeEnhancePreferencesMenu = function() {
 	$('.MeMenu').append(preferencesControl);
 };
 
-var makeEmotePanel = function(className, path, categories, emotes, imgWidth, imgHeight) {
+var makeEmotePanel = function(className, path, emotes, imgWidth, imgHeight) {
+	var categories = Object.keys(emotes);
 	var container = $('<div class="emotes-dialog editor-insert-dialog Flyout MenuItems"></div>');
 	var defaultCategory = pweEnhanceSettings.emotes[className].category;
 	if (categories.length > 1) {
 		var categoryDiv = $('<div class="emote-category"></div>');
 		for (var type=0; type < categories.length; type++) {
 			var typeImg = $('<img width="'+imgWidth+'" height="'+imgHeight+'"/>');
-			typeImg.attr('src', path + categories[type] + "-1.gif");
+			typeImg.attr('src', path + emotes[categories[type]][0][0]);
 			typeImg.attr('title', categories[type]);
 			if (categories[type] == defaultCategory) 
 				typeImg.addClass('selected');
@@ -225,7 +227,7 @@ var makeEmotePanel = function(className, path, categories, emotes, imgWidth, img
 					pweEnhanceSettings.emotes[className].category = this.title;
 					$("."+className + " .emote-category .selected").removeClass("selected");
 					$(this).addClass("selected");
-					$("."+className + " .icon-emote").css('background-image', "url('"+path+this.title+"-1.gif')");
+					$("."+className + " .icon-emote").css('background-image', "url('"+path+ emotes[this.title][0][0]+"')");
 					$("."+className + " .emotes-div").hide();
 					$("."+className + " ."+this.title+"-emotes").show();
 					$("."+className + " ."+this.title+"-emotes img").each(function(){$(this).attr('src', $(this).data('url'));});
@@ -273,7 +275,59 @@ var makeEmotePanel = function(className, path, categories, emotes, imgWidth, img
 	return button.append(container);
 };
 
-
+var makeMLPEmotes = function() {
+	var emotes = {
+		'twilight': [
+			["RM8GEJh.png", "TiQ3RTF.png", "HQ08h1o.png", "WwqQeBH.png", "ieHqlgE.png", "WS1AuNl.png"], 
+			["FTUDM2g.png", "X3luj3O.png", "h6TFMW2.png", "pEpQG2r.png", "8aFaN0c.png", "HGcY6tS.png"], 
+			["3EKgEFh.png", "Ff7bvIg.png"]], 
+		'rarity': [
+			["ID4EPOk.png", "1JjpusR.png", "sFVs4DG.png", "3IpX4V5.png", "kR2zrN6.png", "HdPovB8.png"], 
+			["qBCZn9p.png", "X2EewjE.png", "uG0Tq2w.png", "wcRbE7V.png", "eZzRb8y.png", "buoSa9h.png"], 
+			["JPKjCSv.png", "xCHqidx.png", "oOZoSTg.png"]],
+		'pinkie': [
+			["UlwDXDq.png", "t6uaVly.png", "PwNm4vG.png", "aXQHSfb.png", "UcS7ppJ.png", "zt45dGW.png"], 
+			["dB5gQjK.png", "4BTu862.png", "dfT7aYa.png", "dz7ydAq.png", "lh8RcEI.png", "DvIv1nz.png"], 
+			["VM93JbG.png", "XBZgjAB.png", "ihINN8p.png"]], 
+		'fluttershy': [
+			["UtI9lLg.png", "lVhDhh6.png", "U1RfDlT.png", "XbRluz2.png", "Ykb9TDM.png", "cGv0tWU.png"], 
+			["eKHbWy9.png", "ehGhIDY.png", "MunyKha.png", "1YyWNzt.png", "tQ3kIbT.png", "0eMcrii.png"], 
+			["Huxm9lx.png"]], 
+		'applejack': [
+			["6ayf7WB.png", "xMUrWrX.png", "AObCO9a.png", "mDKCBAe.png", "QxQ5eQP.png", "HOznTBg.png"], 
+			["3qc8sqd.png", "WvGls3t.png", "tu7EXuz.png", "27CH51u.png", "Umm7DTw.png", "xTp7yVN.png"], 
+			["y2tQJVv.png"]], 
+		'rainbow': [
+			["nIYoW7R.png", "iAzJCkE.png", "3bOrpxK.png", "xcDzVlW.png", "akUKXJ6.png", "C1a74ai.png"], 
+			["3wSNr0n.png", "aCAOrCy.png", "bzaTMKG.png", "6O3F5I1.png", "5TtBoTs.png", "547FYQF.png"], 
+			["CwH9LCk.png", "o9znelO.png"]], 
+		'cmc': [
+			["wY3iRiq.png", "cfEFtfy.png", "27fmOZ5.png", "PTl1dS3.png", "1Z1idAY.png", "c6J6pMr.png"], 
+			["TMz4ASY.png", "HAG401X.png", "VdPM41r.png", "xUS1qyV.png", "9qMqwnd.png", "cdPMiGq.png"], 
+			["3aaE4vW.png", "v7nIzYy.png", "mBtQ3DW.png", "I8eLPHH.png", "3gkBTdx.png", "JkNWEQ0.png"]], 
+		'background': [
+			["rTsxIIe.png", "O4r27zq.png", "xUWgsxx.png", "nuvHhlw.png", "DvylyuQ.png", "5P4BNi8.png"], 
+			["BXQjVIv.png", "cpRltvX.png", "kSPK16E.png", "97R4u5U.png", "SNg79cF.png", "gbXTXf4.png"], 
+			["1K4POxV.png", "goANuWj.png", "Dg2qj9I.png"]], 
+		'baddies': [
+			["Z20uT1X.png", "2J6Do89.png", "MuyinNw.png", "WdxBNVE.png", "iM0UZQt.png", "1gJHIZR.png"], 
+			["nvpFYsE.png", "JYk41mv.png", "Z8aZH5M.png", "9uZu48b.png", "RKETeiI.png", "xWaOBp0.png"], 
+			["fKkNDeP.png", "3wNKqgM.png", "asiIerX.png", "d6M3dHX.png", "XqG6yVD.png", "XtVz2f3.png"]],
+		'minor': [
+			["UJHUcXG.png", "Mx4Vj8T.png", "pabmgEK.png", "z5k9RpS.png", "WlLxgSX.png", "R1hkWBQ.png"], 
+			["cesjVyM.png", "Z2UDYJ5.png", "SD99D97.png", "4OgrlC8.png", "osPeE1d.png", "XlfLi8w.png"], 
+			["6sxlmrV.png", "BhRJrIa.png", "KVSpMgc.png", "j3EBrsK.png", "eSs6ZsO.png", "Esj84Mr.png"]], 
+		'royal': [
+			["8Rfc0LZ.png", "p8jrAlB.png", "0blHKsD.png", "SkX9ogN.png", "x6QLxYT.png", "APFdblA.png"], 
+			["CgUjaF6.png", "k7dtGWg.png", "klpRjcz.png", "dTO9w5a.png", "uGi4JH4.png", "JtYqbyF.png"], 
+			["ztdoFuy.png", "tgLDlFM.png"]]
+	};
+	return makeEmotePanel(this.id,
+		'http://i.imgur.com/',
+		emotes,
+		70, 
+		70);		
+};
 
 var makeHeroEmotes = function() {
 	var emotes = {'herocat': [["hfnxG66.gif", "xetj2As.gif", "BIQ2kH9.gif", "zBIeJi5.gif", "vMVtCOc.gif", "pyYfVdt.gif"],
@@ -282,7 +336,6 @@ var makeHeroEmotes = function() {
 		["RtcjLDn.gif", "lLgP7Ld.gif", "taePNbZ.gif", "2WCf0cq.gif", "HLK29cV.gif", "lRQebLq.gif"]]};
 	return makeEmotePanel('herocatEmotes', 
 		'http://i.imgur.com/',
-		['herocat'],
 		emotes,
 		50, 
 		50);
@@ -297,7 +350,6 @@ var makePWIEmotes = function() {
 	return makeEmotePanel('pwiEmotes', 
 		'http://asterpw.github.io/pwicons/emotes/',
 //		'http://cdn.rawgit.com/asterpw/pwicons/gh-pages/emotes/',
-		categories,
 		emotes,
 		32, 
 		32);
@@ -312,7 +364,6 @@ var makeFWEmotes = function() {
 	return makeEmotePanel('fwEmotes', 
 		'http://asterpw.github.io/pwicons/emotes/',
 //		'http://cdn.rawgit.com/asterpw/pwicons/gh-pages/emotes/',
-		categories,
 		emotes,
 		32, 
 		32);
@@ -632,6 +683,7 @@ var features = [
 	new EmoteFeature("Forsaken World Emotes", "fwEmotes", "Show Forsaken World emotes in editor", makeFWEmotes, {category: "jellyfish"}),
 	new EmoteFeature("Herocat (Champions Online) Emotes", "herocatEmotes", "Show Herocat (Champions Online) emotes in editor", makeHeroEmotes, {category: "herocat", enabled: false}),
 	new EmoteFeature("Text Face Emotes", "textFaceEmotes", "Show Text Face Emotes in editor", makeTextFaceEmotes),
+	new EmoteFeature("MLP Emotes", "mlpEmotes", "Show MLP emotes in editor", makeMLPEmotes, {category: "twilight", enabled: false}),
 	new LinkFeature("Show/Hide All Categories", "showHideAllCategories", "Add show/hide all categories links to Account Options Menu", makeShowHideAllCategories),
 	new LinkFeature("Show Draft Link", "draftLink", "Add manage drafts link to Account Options Menu", makeDraftsLink),
 	new LinkFeature("Show/Hide Game Links", "gameLinks", "Add Game-specific links", makeGameLinks, {enabled: false}),
@@ -692,7 +744,7 @@ var getSettings = function() {
 };
 
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/03d398374b0b995fde0c956e1f452a731140f8e3/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/c1bb299acfc692373831d9bffd021a4eb58e644e/pwevanillaenhance.user.css");
 getSettings();
 try{
 	preloadThemes();
