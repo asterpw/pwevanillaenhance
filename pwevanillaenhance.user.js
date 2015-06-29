@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.7.4</div> - those emotes ARENT WHITE CATS AT ALL, it's an onion\
 	<div class='change-ver'>v0.7.3</div> - added 'white cat' emotes\
 	<div class='change-ver'>v0.7.2</div> - added MLP emotes\
 	<div class='change-ver'>v0.7.1</div> - made all game links one option (@eiledon)\
@@ -333,11 +334,11 @@ var makeMLPEmotes = function() {
 		70);		
 };
 
-var makeWhiteCatEmotes = function() {
+var makeOnionEmotes = function() {
 	return makeEmotePanel(this.id, 
-		'http://cdn.rawgit.com/asterpw/e/m/wc/',
+		'http://cdn.rawgit.com/asterpw/e/m/on/',
 //		'http://cdn.rawgit.com/asterpw/pwicons/gh-pages/emotes/',
-		{'whitecat': generateEmoteArray('whitecat', 10, 70, 1, '.gif')},
+		{'onion': generateEmoteArray('onion', 10, 70, 1, '.gif')},
 		35, 
 		35);
 };
@@ -696,7 +697,7 @@ var features = [
 	new EmoteFeature("Forsaken World Emotes", "fwEmotes", "Show Forsaken World emotes in editor", makeFWEmotes, {category: "jellyfish"}),
 	new EmoteFeature("Herocat (Champions Online) Emotes", "herocatEmotes", "Show Herocat (Champions Online) emotes in editor", makeHeroEmotes, {category: "herocat", enabled: false}),
 	new EmoteFeature("Text Face Emotes", "textFaceEmotes", "Show Text Face Emotes in editor", makeTextFaceEmotes),
-	new EmoteFeature("White Cat Emotes", "wcEmotes", "Show Whitecat emotes in editor", makeWhiteCatEmotes, {category: "whitecat", enabled: false}),
+	new EmoteFeature("Onion Emotes", "onionEmotes", "Show Onion emotes in editor", makeOnionEmotes, {category: "onion", enabled: false}),
 	new EmoteFeature("MLP Emotes", "mlpEmotes", "Show MLP emotes in editor", makeMLPEmotes, {category: "twilight", enabled: false}),
 	new LinkFeature("Show/Hide All Categories", "showHideAllCategories", "Add show/hide all categories links to Account Options Menu", makeShowHideAllCategories),
 	new LinkFeature("Show Draft Link", "draftLink", "Add manage drafts link to Account Options Menu", makeDraftsLink),
