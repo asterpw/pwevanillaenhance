@@ -180,8 +180,9 @@
 	background-color: #EEEEEE;   
 }
 
-.pwi-emotes .icon-emote {
-	background: url('http://asterpw.github.io/pwicons/emotes/tiger-1.gif') no-repeat left;
+.mlpEmotes .emote-category img {
+	height: 32px;
+	width: 32px;
 }
 
 .editor-dropdown .editor-action .icon-emote {
