@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.8.0
+// @version    0.8.0.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -822,7 +822,7 @@ var getSettings = function() {
 };
 
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/c1bb299acfc692373831d9bffd021a4eb58e644e/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/299c839f234c052002b29d8960acb4db7c8f2c1f/pwevanillaenhance.user.css");
 getSettings();
 try{
 	preloadThemes();
