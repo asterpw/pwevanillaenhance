@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.7.2
+// @version    0.7.3
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.7.2";  //what we store when we should display what's new dialog
+var VERSION = "0.7.3";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.7.3</div> - added 'white cat' emotes\
 	<div class='change-ver'>v0.7.2</div> - added MLP emotes\
 	<div class='change-ver'>v0.7.1</div> - made all game links one option (@eiledon)\
 	<div class='change-ver'>v0.7.0</div> - added links to the site menu<br> - better preferences organization \
@@ -214,6 +215,9 @@ var makeEmotePanel = function(className, path, emotes, imgWidth, imgHeight) {
 	var categories = Object.keys(emotes);
 	var container = $('<div class="emotes-dialog editor-insert-dialog Flyout MenuItems"></div>');
 	var defaultCategory = pweEnhanceSettings.emotes[className].category;
+	if (!(defaultCategory in emotes)) 
+		defaultCategory = Object.keys(emotes)[0];
+	
 	if (categories.length > 1) {
 		var categoryDiv = $('<div class="emote-category"></div>');
 		for (var type=0; type < categories.length; type++) {
@@ -329,6 +333,15 @@ var makeMLPEmotes = function() {
 		70);		
 };
 
+var makeWhiteCatEmotes = function() {
+	return makeEmotePanel(this.id, 
+		'http://cdn.rawgit.com/asterpw/e/m/wc/',
+//		'http://cdn.rawgit.com/asterpw/pwicons/gh-pages/emotes/',
+		{'whitecat': generateEmoteArray('whitecat', 10, 70, 1, '.gif')},
+		35, 
+		35);
+};
+
 var makeHeroEmotes = function() {
 	var emotes = {'herocat': [["hfnxG66.gif", "xetj2As.gif", "BIQ2kH9.gif", "zBIeJi5.gif", "vMVtCOc.gif", "pyYfVdt.gif"],
 		["xMHLXms.gif", "JXvlt0E.gif", "gvbnePB.gif", "VTiX7E9.gif", "0AJ5u1j.gif", "dWwreGR.gif"],
@@ -345,7 +358,7 @@ var makePWIEmotes = function() {
 	var categories = ["normal", "tiger", "pig", "bear",  "monkey", "fish", "fox", "mouse", "egg"]; 
 	var emotes = {};
 	for (var i = 0; i < categories.length; i++) {
-		emotes[categories[i]] = generateEmoteArray(categories[i], 10, 50, 1);
+		emotes[categories[i]] = generateEmoteArray(categories[i], 10, 50, 1, '.gif');
 	}
 	return makeEmotePanel('pwiEmotes', 
 		'http://asterpw.github.io/pwicons/emotes/',
@@ -359,7 +372,7 @@ var makeFWEmotes = function() {
 	var categories = ["samurai", "jellyfish", "raven", "greenmonkey", "baby", "monkey2", "tiger2"]; 
 	var emotes = {};
 	for (var i = 0; i < categories.length; i++) {
-		emotes[categories[i]] = generateEmoteArray(categories[i], 10, 50, 1);
+		emotes[categories[i]] = generateEmoteArray(categories[i], 10, 50, 1, '.gif');
 	}
 	return makeEmotePanel('fwEmotes', 
 		'http://asterpw.github.io/pwicons/emotes/',
@@ -369,13 +382,13 @@ var makeFWEmotes = function() {
 		32);
 };
 
-var generateEmoteArray = function(name, cols, max, start) {
+var generateEmoteArray = function(name, cols, max, start, ext) {
 	var emotes = new Array(Math.ceil(max/cols));
 	for (var i = 0; i < emotes.length; i++) {
 		emotes[i] = new Array(Math.min(cols, max - i*cols - start + 1));
 		for (var j = 0; j < cols; j++) {
 			if ((i*cols + j + start) <= max)
-				emotes[i][j] = name+'-'+(i*cols+j+start)+'.gif';
+				emotes[i][j] = name+'-'+(i*cols+j+start)+ext;
 		}
 	}
 	return emotes;
@@ -538,7 +551,7 @@ var autoAddFontColor = function(textArea, color) {
 };    
 
 var initSubmitButton = function(container) {
-	container.find("input.CommentButton").click(function(){
+	container.find("input.CommentButton, #Form_SendMessage, #Form_Share, #Form_AddComment").click(function(){
 		$(this).closest(".FormWrapper").find(".editor-dropdown-open").removeClass("editor-dropdown-open");
 		
 		if (pweEnhanceSettings.editor.fontColorPicker.autoAddColor) {
@@ -683,6 +696,7 @@ var features = [
 	new EmoteFeature("Forsaken World Emotes", "fwEmotes", "Show Forsaken World emotes in editor", makeFWEmotes, {category: "jellyfish"}),
 	new EmoteFeature("Herocat (Champions Online) Emotes", "herocatEmotes", "Show Herocat (Champions Online) emotes in editor", makeHeroEmotes, {category: "herocat", enabled: false}),
 	new EmoteFeature("Text Face Emotes", "textFaceEmotes", "Show Text Face Emotes in editor", makeTextFaceEmotes),
+	new EmoteFeature("White Cat Emotes", "wcEmotes", "Show Whitecat emotes in editor", makeWhiteCatEmotes, {category: "whitecat", enabled: false}),
 	new EmoteFeature("MLP Emotes", "mlpEmotes", "Show MLP emotes in editor", makeMLPEmotes, {category: "twilight", enabled: false}),
 	new LinkFeature("Show/Hide All Categories", "showHideAllCategories", "Add show/hide all categories links to Account Options Menu", makeShowHideAllCategories),
 	new LinkFeature("Show Draft Link", "draftLink", "Add manage drafts link to Account Options Menu", makeDraftsLink),
