@@ -848,7 +848,7 @@ var getSettings = function() {
 };
 
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/d49822fc2f49fa73178cbf4b50f82b9cf5fa2ff83/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/49822fc2f49fa73178cbf4b50f82b9cf5fa2ff83/pwevanillaenhance.user.css");
 getSettings();
 try{
 	preloadThemes();
