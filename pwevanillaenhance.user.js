@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.8.3.2
+// @version    0.8.3.3
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -106,13 +106,14 @@ var handleThemes = function() {
 	if (currentTime - pweEnhanceSettings.lastThemeUpdateTime > 0.5*3600*1000) {
 		$.getJSON("https://rawgit.com/Goodlookinguy/pwvnrg/master/files.json", function(json){
 			$.extend(true, pweEnhanceSettings, json);
-			/*backgroundImages = {
-				"Pro Blue": {screenshot: ['http://i.imgur.com/CnZ2oVF.png']},
-				"VA Eclipse": {screenshot: ['http://i.imgur.com/JhWDDhL.png']},
-				"The Blues": {screenshot: ['http://i.imgur.com/CbbcD88.png']},
-				"STO Federation": {screenshot: ['http://i.imgur.com/qNqW1nu.png']}
+			backgroundImages = {
+			//	"Pro Blue": {screenshot: ['http://i.imgur.com/CnZ2oVF.png']},
+			//	"VA Eclipse": {screenshot: ['http://i.imgur.com/JhWDDhL.png']},
+				"The Blues": {"screenshot-480": ['https://raw.githubusercontent.com/Goodlookinguy/pwvnrg/master/screenshots/the-blues.1.480.png']},
+				"STO Federation": {"screenshot-480": ['https://raw.githubusercontent.com/Goodlookinguy/pwvnrg/master/screenshots/sto-federation.1.480.png']}
 			};
-			$.extend(true, pweEnhanceSettings.themes, backgroundImages);*/
+			$.extend(true, pweEnhanceSettings.themes, backgroundImages);
+			console.log(pweEnhanceSettings.themes);
 			for (var i in pweEnhanceSettings.themes) {
 				if (!(i in json.themes))
 					delete pweEnhanceSettings.themes[i];
