@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.8.2.1
+// @version    0.8.2.2
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -188,9 +188,11 @@ var makeThemePicker = function(name) {
 	if (theme.enabled) {
 		container.addClass('selected');
 	}
-	var screenshotUrl = theme.screenshot[0];
+	var screenshotUrl = ""; // needs some default;
+	if (theme.screenshot && theme.screenshot.length)
+		screenshotUrl = theme.screenshot[0];
 	var authorName =  theme["author-alias"] ? theme["author-alias"] : theme.author;
-	container.append($('<img class="theme-preview" title="'+name+'" src="'+theme.screenshot[0]+'">'));
+	container.append($('<img class="theme-preview" title="'+name+'" src="'+screenshotUrl+'">'));
 	container.append($('<div class="theme-created">'+theme.created+'</div>'));
 	container.append($('<div class="theme-updated">'+theme.updated+'</div>'));
 	container.append($('<div class="theme-name" title="'+name+'">'+name+'</div>'));
@@ -229,7 +231,8 @@ var makeThemeManager = function() {
 var applyTitles = function() {
 	var titles = { 
 		'asterelle': {'developer': 'Enhance Developer'},
-		'nrglg': {'developer': 'Enhance Contributor'}
+		'nrglg': {'developer': 'Enhance Contributor'},
+		'eiledon': {'developer': 'Enhance Contributor'}
 	};
 	for (var themeName in pweEnhanceSettings.themes) {
 		var author = pweEnhanceSettings.themes[themeName].author;
