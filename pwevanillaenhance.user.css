@@ -263,8 +263,8 @@
   Theme Manager Stuff
 ************************/
 
-.ehance-themes  SpOptions:before {
-	content: "\uf178" !important;
+.enhance-themes  .SpOptions:before {
+	content: "\f178" !important;
 	color: #69CAFE;
 }
 
