@@ -375,9 +375,11 @@
 .enhance-title.developer {
 	color: #69CAFE; 
 	display: block;
+	font-weight: bold;
 }
 	
 .enhance-title.themeauthor {
 	color: #69FECA; 
 	display: block;
+	font-weight: bold;
 }
