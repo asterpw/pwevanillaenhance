@@ -265,7 +265,7 @@
 
 .enhance-themes  .SpOptions:before {
 	content: "\f178" !important;
-	color: #69CAFE;
+	color: #69CAFE !important;
 }
 
 	
