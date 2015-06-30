@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.8.1.1
+// @version    0.8.2
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.8.1";  //what we store when we should display what's new dialog
+var VERSION = "0.8.2";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.8.2</div> - theme authors now receive a special title\
 	<div class='change-ver'>v0.8.1</div> - turned theme button into small icon, fix green checkmark\
 	<div class='change-ver'>v0.8.0</div> - added fancy theme manager\
 	<div class='change-ver'>v0.7.4</div> - those emotes ARENT WHITE CATS AT ALL, it's an onion\
@@ -223,6 +224,25 @@ var makeThemeManager = function() {
 	var themeControl = $("<span class='ToggleFlyout enhance-themes'></span>");
 	button.click(function(){$('.themeManager').slideToggle();});
 	$(".MeMenu").append(themeControl.append(button));
+};
+
+var applyTitles = function() {
+	var titles = { 
+		'asterelle': {'developer': 'Enhance Developer'},
+		'nrglg': {'developer': 'Enhance Contributor'}
+	};
+	for (var themeName in pweEnhanceSettings.themes) {
+		var author = pweEnhanceSettings.themes[themeName].author;
+		titles[author] = titles[author] || {};
+		titles[author].themeauthor = 'Theme Author';
+	}
+	for (var name in titles) {
+		var container = $('.Username[href$="'+name+'"]').closest(".AuthorWrap").find(".AuthorInfo");
+		for (var title in titles[name]) {
+			console.log(author + container);
+			container.append($('<span class="Rank enhance-title '+title+'">'+titles[name][title]+'</span>'));
+		}
+	}
 };
 
 var mergeData = function(to, from, allowAddKeys) {
@@ -828,7 +848,7 @@ var getSettings = function() {
 };
 
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/d7347c692265ecd1611b7d4aee378b2d1e4b5504/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/d49822fc2f49fa73178cbf4b50f82b9cf5fa2ff83/pwevanillaenhance.user.css");
 getSettings();
 try{
 	preloadThemes();
@@ -845,6 +865,7 @@ var jQueryLoaded = function() {
 	installFeatures($('.Head'));
 	makeThemeManager();
 	makeEnhancePreferencesMenu();
+	applyTitles();
 	$.getScript("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.js").done(function() {
 		initColorPicker($('.fontColorPicker'));
 	});
