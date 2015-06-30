@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.8.0.1
+// @version    0.8.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.8.0";  //what we store when we should display what's new dialog
+var VERSION = "0.8.1";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.8.1</div> - turned theme button into small icon, fix green checkmark\
 	<div class='change-ver'>v0.8.0</div> - added fancy theme manager\
 	<div class='change-ver'>v0.7.4</div> - those emotes ARENT WHITE CATS AT ALL, it's an onion\
 	<div class='change-ver'>v0.7.3</div> - added 'white cat' emotes\
@@ -118,8 +119,8 @@ var handleThemes = function() {
 			applyThemes();
 			pweEnhanceSettings.lastThemeUpdateTime = new Date().getTime();
 			update();
-			makeEnhancePreferencesMenu();
 			makeThemeManager();
+			makeEnhancePreferencesMenu();
 		});
 	} else {
 		applyThemes();
@@ -138,7 +139,7 @@ var setThemeEnabled = function(name, enabled) {
 			$("head link[href='"+url+"']")[0].remove();
 		}
 		if (theme.category == "Theme") { //only one theme allowed with category == Theme
-			$('.themeManager img[title="'+name+'"]').closest(".theme").addClass("selected").siblings().removeClass("selected");
+			$('.themeManager img[title="'+name+'"]').closest(".theme").addClass("selected");
 			for (var i in pweEnhanceSettings.themes) {
 				if (pweEnhanceSettings.themes[i].category == "Theme"  && i != name) { 
 					setThemeEnabled(i, false);
@@ -146,6 +147,7 @@ var setThemeEnabled = function(name, enabled) {
 			}
 		}
 	} else {
+		$('.themeManager img[title="'+name+'"]').closest(".theme").removeClass("selected")
 		$("head link[href='"+url+"']").remove();
 	}
 };
@@ -214,9 +216,13 @@ var makeThemeManager = function() {
 	}
 	dialog.append(content);
 	$(".SiteMenu").append(dialog);
-	var button = $('<span class="themeButton">\uf178 Themes</span>');
+	
+	var button = $('<a href="#" class="MeButton FlyoutButton" title="Themes"><span class="Sprite Sprite16 SpOptions"></span></a>');
+
+	//var button = $('<span class="themeButton">\uf178 Themes</span>');
+	var themeControl = $("<span class='ToggleFlyout enhance-themes'></span>");
 	button.click(function(){$('.themeManager').slideToggle();});
-	$(".MeMenu").append(button);
+	$(".MeMenu").append(themeControl.append(button));
 };
 
 var mergeData = function(to, from, allowAddKeys) {
@@ -822,7 +828,7 @@ var getSettings = function() {
 };
 
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/299c839f234c052002b29d8960acb4db7c8f2c1f/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/722bf4e8ddc4e2ec1caf815a0bb13f64c915b283/pwevanillaenhance.user.css");
 getSettings();
 try{
 	preloadThemes();
@@ -837,8 +843,8 @@ var jQueryLoaded = function() {
 	handleThemes();
 	installFeatures($('.FormWrapper'));
 	installFeatures($('.Head'));
-	makeEnhancePreferencesMenu();
 	makeThemeManager();
+	makeEnhancePreferencesMenu();
 	$.getScript("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.js").done(function() {
 		initColorPicker($('.fontColorPicker'));
 	});
