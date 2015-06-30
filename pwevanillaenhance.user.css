@@ -367,3 +367,17 @@
 	color: lime;
 	opacity: 0.8;
 }
+
+/************************
+  Titles
+************************/
+
+.enhance-title.developer {
+	color: #69CAFE; 
+	display: block;
+}
+	
+.enhance-title.themeauthor {
+	color: #69FECA; 
+	display: block;
+}
