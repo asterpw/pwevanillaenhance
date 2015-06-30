@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.8.2";  //what we store when we should display what's new dialog
+var VERSION = "0.8.3";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.8.3</div> - new theme format from file\
 	<div class='change-ver'>v0.8.2</div> - theme authors now receive a special title\
 	<div class='change-ver'>v0.8.1</div> - turned theme button into small icon, fix green checkmark\
 	<div class='change-ver'>v0.8.0</div> - added fancy theme manager\
@@ -102,16 +103,16 @@ var applyThemes = function() {
 
 var handleThemes = function() {
 	var currentTime = new Date().getTime();
-	if (currentTime - pweEnhanceSettings.lastThemeUpdateTime > 4*3600*1000) {
+	if (currentTime - pweEnhanceSettings.lastThemeUpdateTime > 0.5*3600*1000) {
 		$.getJSON("https://rawgit.com/Goodlookinguy/pwvnrg/master/files.json", function(json){
 			$.extend(true, pweEnhanceSettings, json);
-			backgroundImages = {
+			/*backgroundImages = {
 				"Pro Blue": {screenshot: ['http://i.imgur.com/CnZ2oVF.png']},
 				"VA Eclipse": {screenshot: ['http://i.imgur.com/JhWDDhL.png']},
 				"The Blues": {screenshot: ['http://i.imgur.com/CbbcD88.png']},
 				"STO Federation": {screenshot: ['http://i.imgur.com/qNqW1nu.png']}
 			};
-			$.extend(true, pweEnhanceSettings.themes, backgroundImages);
+			$.extend(true, pweEnhanceSettings.themes, backgroundImages);*/
 			for (var i in pweEnhanceSettings.themes) {
 				if (!(i in json.themes))
 					delete pweEnhanceSettings.themes[i];
@@ -148,7 +149,7 @@ var setThemeEnabled = function(name, enabled) {
 			}
 		}
 	} else {
-		$('.themeManager img[title="'+name+'"]').closest(".theme").removeClass("selected")
+		$('.themeManager img[title="'+name+'"]').closest(".theme").removeClass("selected");
 		$("head link[href='"+url+"']").remove();
 	}
 };
@@ -189,8 +190,14 @@ var makeThemePicker = function(name) {
 		container.addClass('selected');
 	}
 	var screenshotUrl = ""; // needs some default;
-	if (theme.screenshot && theme.screenshot.length)
-		screenshotUrl = theme.screenshot[0];
+	if (theme["screenshot-480"] && theme["screenshot-480"].length) {
+		if (theme["screenshot-480"][0].startsWith("http")) {
+			screenshotUrl = theme["screenshot-480"][0];
+		} else {
+			screenshotUrl = theme.baseurl + (theme['branch-commit'].length > 0 ? theme['branch-commit'] + "/" : '') + theme["screenshot-480"][0];
+		}
+	}
+	
 	var authorName =  theme["author-alias"] ? theme["author-alias"] : theme.author;
 	container.append($('<img class="theme-preview" title="'+name+'" src="'+screenshotUrl+'">'));
 	container.append($('<div class="theme-created">'+theme.created+'</div>'));
@@ -242,7 +249,6 @@ var applyTitles = function() {
 	for (var name in titles) {
 		var container = $('.Username[href$="'+name+'"]').closest(".AuthorWrap").find(".AuthorInfo");
 		for (var title in titles[name]) {
-			console.log(author + container);
 			container.append($('<span class="Rank enhance-title '+title+'">'+titles[name][title]+'</span>'));
 		}
 	}
@@ -837,14 +843,20 @@ var getSettings = function() {
 	var savedSettingsJSON = localStorage["pweEnhancementSettings"];
 	if (savedSettingsJSON) {
 		var savedSettings = JSON.parse(savedSettingsJSON);
-		if(savedSettings.version && savedSettings.version >= "0.6.0") {
+		if (savedSettings.version && savedSettings.version >= "0.6.0") {
 			mergeData(pweEnhanceSettings, savedSettings, false); // dont merge in discarded features
-			if (savedSettings.themes && savedSettings.version >= "0.8.0") {// allow cached themes
-				mergeData(pweEnhanceSettings.themes, savedSettings.themes, true); 
-			} else
-				pweEnhanceSettings.lastThemeUpdateTime = 0; // force update
-			if (pweEnhanceSettings.version > VERSION) // shouldnt happen
+			if (savedSettings.version < "0.8.3") {
+				pweEnhanceSettings.lastThemeUpdateTime = 0; // force theme update
+			}
+			if (savedSettings.themes && savedSettings.version >= "0.8.3") {// allow cached themes
+				mergeData(pweEnhanceSettings.themes, savedSettings.themes, true);
+			} else {
+				pweEnhanceSettings.lastThemeUpdateTime = 0; // force theme update
+			}
+			}
+			if (pweEnhanceSettings.version > VERSION) {// shouldnt happen
 				pweEnhanceSettings.version = VERSION;
+			}
 				
 		}
 	}
