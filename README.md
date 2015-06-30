@@ -1,15 +1,14 @@
 # pwevanillaenhance
 PWE Vanilla Forums Enhancement - Adds useful tools to the pwe vanilla forums
 <h1>Features</h1>
-<b>Font Color Picker</b>
-This really should have already been a part of the forums shouldn't it?<br>
-<img src="http://i.imgur.com/kwivfJo.png"><p>
-<b>Theme Manager</b>
-Let's you manage various improvements to the forums users have made without needing any other browser extensions.<br>
-<img src="http://i.imgur.com/tuKsLA9.png"><p>
-<b>PWI Emotes</b>
-The best emotes.<br>
-<img src="http://i.imgur.com/EMfoL4u.png"><p>
+<b>Complete editor options</b>
+Did you miss being able to set your font size or color without having to remember hard to use BBcode?  The new editor options do that for you automatically!
+
+<b>Builtin Theme Manager</b>
+Choose from several amazing community-made themes.  More themes will automatically become available over time.<br>
+<b>Lots of new emotes!</b>
+Hundreds of new emotes to choose from such as <a href="http://i.imgur.com/EMfoL4u.png">PWI emotes</a>, Forsaken World emotes, Onion Head emotes, and many more!<br>
+<p>
 
 <h1> Installation</h1>
 <p>How you install user scripts depends on which browser you use. Typically, you will need to install a browser extension. The list below is not an exhaustive list.</p>
