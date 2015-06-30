@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.8.3.1
+// @version    0.8.3.2
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -215,7 +215,7 @@ var makeThemePicker = function(name) {
 };
 
 var makeThemeManager = function() {
-	$(".themeManager, .themeButton").remove();
+	$(".themeManager, .enhance-themes").remove();
 	var dialog = $("<div class='themeManager enhanceDialog' style='margin: 0px auto; display: none;'></div>");
 	dialog.append($("<div class='title'><div class='close'>X</div>PWE Vanilla Enhancement Theme Manager</div>"));
 	$(".close", dialog).click(function(){ $(this).closest('.enhanceDialog').fadeOut();});
