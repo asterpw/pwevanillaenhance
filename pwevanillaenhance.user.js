@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.8.3.3
+// @version    0.8.3.4
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -192,7 +192,7 @@ var makeThemePicker = function(name) {
 	}
 	var screenshotUrl = ""; // needs some default;
 	if (theme["screenshot-480"] && theme["screenshot-480"].length) {
-		if (theme["screenshot-480"][0].startsWith("http")) {
+		if (theme["screenshot-480"][0].indexOf("http") == 0) {
 			screenshotUrl = theme["screenshot-480"][0];
 		} else {
 			screenshotUrl = theme.baseurl + (theme['branch-commit'].length > 0 ? theme['branch-commit'] + "/" : '') + theme["screenshot-480"][0];
@@ -250,7 +250,7 @@ var applyTitles = function() {
 	for (var name in titles) {
 		var container = $('.Username[href$="'+name+'"]').closest(".AuthorWrap").find(".AuthorInfo");
 		for (var title in titles[name]) {
-			container.append($('<span class="Rank enhance-title '+title+'">'+titles[name][title]+'</span>'));
+			container.append($('<span class="Rank MItem enhance-title '+title+'">'+titles[name][title]+'</span>'));
 		}
 	}
 };
@@ -643,7 +643,7 @@ var autoAddFontColor = function(textArea, color) {
 	}
 	
 	var text = textArea.val();
-	if (!text.substring(startpos).startsWith(startTag)) {
+	if (text.substring(startpos).indexOf(startTag) != 0) {
 		textArea.val(text.substring(0, startpos) + startTag + text.substring(startpos) + endTag);	
 	}
 };    
