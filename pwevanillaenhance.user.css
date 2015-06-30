@@ -263,34 +263,11 @@
   Theme Manager Stuff
 ************************/
 
-.themeButton {
-   border-top: 1px solid #96d1f8;
-   background: #1286C4;
-   padding: 5px 10px;
-   -webkit-border-radius: 8px;
-   -moz-border-radius: 8px;
-   border-radius: 8px;
-   -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
-   -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
-   box-shadow: rgba(0,0,0,1) 0 1px 0;
-   text-shadow: rgba(0,0,0,.4) 0 1px 0;
-   color: white;
-   font-size: 14px;
-   text-decoration: none;
-   vertical-align: middle;
-	 font-family: vanillicon;
-   font-weight: bold;
-   cursor: pointer;
-   }
-.themeButton:hover {
-   border-top-color: #28597a;
-   background: #0C5982;
-   color: #ccc;
-   }
-.themeButton:active {
-   border-top-color: #1b435e;
-   background: #0A4B6E;
-   }
+.ehance-themes  SpOptions:before {
+	content: "\uf178" !important;
+	color: #69CAFE;
+}
+
 	
 .themeManager {	
 	margin-top: 10px;
