@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.8.3.5
+// @version    0.8.4
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.8.3";  //what we store when we should display what's new dialog
+var VERSION = "0.8.4";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.8.4</div> - show new/updated themes\
 	<div class='change-ver'>v0.8.3</div> - new theme format from file\
 	<div class='change-ver'>v0.8.2</div> - theme authors now receive a special title\
 	<div class='change-ver'>v0.8.1</div> - turned theme button into small icon, fix green checkmark\
@@ -106,13 +107,6 @@ var handleThemes = function() {
 	if (currentTime - pweEnhanceSettings.lastThemeUpdateTime > 0.5*3600*1000) {
 		$.getJSON("https://rawgit.com/Goodlookinguy/pwvnrg/master/files.json", function(json){
 			$.extend(true, pweEnhanceSettings, json);
-			backgroundImages = {
-			//	"Pro Blue": {screenshot: ['http://i.imgur.com/CnZ2oVF.png']},
-			//	"VA Eclipse": {screenshot: ['http://i.imgur.com/JhWDDhL.png']},
-				"The Blues": {"screenshot-480": ['https://raw.githubusercontent.com/Goodlookinguy/pwvnrg/master/screenshots/the-blues.1.480.png']},
-				"STO Federation": {"screenshot-480": ['https://raw.githubusercontent.com/Goodlookinguy/pwvnrg/master/screenshots/sto-federation.1.480.png']}
-			};
-			$.extend(true, pweEnhanceSettings.themes, backgroundImages);
 			console.log(pweEnhanceSettings.themes);
 			for (var i in pweEnhanceSettings.themes) {
 				if (!(i in json.themes))
@@ -190,6 +184,12 @@ var makeThemePicker = function(name) {
 	if (theme.enabled) {
 		container.addClass('selected');
 	}
+	var now = new Date().getTime();
+	var day = 24*3600*1000;
+	if (((now - Date.parse(theme.created))/day) < 2) 
+		container.append($('<span class="new">New!</span>'));
+	else if (((now - Date.parse(theme.updated))/day) < 2) 
+		container.append($('<span class="updated">Updated!</span>'));
 	var screenshotUrl = ""; // needs some default;
 	if (theme["screenshot-480"] && theme["screenshot-480"].length) {
 		if (theme["screenshot-480"][0].indexOf("http") == 0) {
@@ -201,11 +201,13 @@ var makeThemePicker = function(name) {
 	
 	var authorName =  theme["author-alias"] ? theme["author-alias"] : theme.author;
 	container.append($('<img class="theme-preview" title="'+name+'" src="'+screenshotUrl+'">'));
-	container.append($('<div class="theme-created">'+theme.created+'</div>'));
-	container.append($('<div class="theme-updated">'+theme.updated+'</div>'));
+	container.append($('<div class="theme-created '+(theme.updated != theme.created?'Hidden':'')+'">'+theme.created+'</div>'));
+	container.append($('<div class="theme-updated '+(theme.updated == theme.created?'Hidden':'')+'">'+theme.updated+'</div>'));
+	
 	container.append($('<div class="theme-name" title="'+name+'">'+name+'</div>'));
 	container.append($('<div class="theme-author"><a href="http://perfectworld.vanillaforums.com/profile/'+theme.author+'">'+authorName+'</a></div>'));
 	container.append($('<div class="theme-description">'+theme.description+'</div>'));
+	
 	$("img", container).click(function(){
 		setThemeEnabled(this.title, !(pweEnhanceSettings.themes[this.title].enabled));
 		update();
@@ -864,7 +866,7 @@ var getSettings = function() {
 };
 
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/49822fc2f49fa73178cbf4b50f82b9cf5fa2ff83/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/283670413d0867bd4463b5f03a9b1560d2d9237c/pwevanillaenhance.user.css");
 getSettings();
 try{
 	preloadThemes();
