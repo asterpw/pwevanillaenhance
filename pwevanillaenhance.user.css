@@ -335,7 +335,7 @@
 }
 	
 .themeManager .theme-updated {
-	display: none;
+	float: right;
 }
 	
 .themeManager .theme-discussion {
@@ -368,6 +368,41 @@
 	opacity: 0.8;
 }
 
+.themeManager .new, .themeManager .updated {
+	animation: colorRotate 6s linear 0s infinite;
+	text-shadow: 1px 1px #000000;
+	position: absolute; 
+	font-size: 15px; 
+	margin: 10px;
+}
+
+
+@keyframes colorRotate {
+    from {
+        color: rgb(255, 128, 128);
+    }
+    16.6% {
+        color: rgb(255, 128, 255);
+    }
+    33.3% {
+        color: rgb(128, 128, 255);
+    }
+    50% {
+        color: rgb(128, 255, 255);
+    }
+    66.6% {
+        color: rgb(128, 255, 128);
+    }
+    83.3% {
+        color: rgb(255, 255,128);
+    }
+    to {
+        color: rgb(255, 128, 128);
+    }
+}
+
+
+
 /************************
   Titles
 ************************/
@@ -375,11 +410,9 @@
 .enhance-title.developer {
 	color: #69CAFE; 
 	display: block;
-	font-weight: bold;
 }
 	
 .enhance-title.themeauthor {
 	color: #69FECA; 
 	display: block;
-	font-weight: bold;
 }
