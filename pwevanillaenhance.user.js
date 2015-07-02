@@ -222,7 +222,7 @@ var makeThemePicker = function(name) {
 			var delayedUncollapse = function(themename) { 
 				var variantName = pweEnhanceSettings.themes[themename].variant;
 				var className = getNameForVariantGroup(variantName);
-				setTimeout(function(){$('.'+className).removeClass('collapsed')}, 1000);
+				setTimeout(function(){$('.'+className).removeClass('collapsed')}, 500);
 			};
 			if ($(this).closest(".collapsible").siblings('.collapsible:not(.collapsed)').length) {
 				$(this).closest(".collapsible").siblings('.collapsible').addClass('collapsed');
@@ -934,7 +934,7 @@ var getSettings = function() {
 };
 
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/acb8cd8aa97171704b489bb86306a071416995f1/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/fef6fe182e4e1de499b2e27776c0a6673a438261/pwevanillaenhance.user.css");
 getSettings();
 try{
 	preloadThemes();
