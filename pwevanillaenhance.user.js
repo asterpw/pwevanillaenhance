@@ -128,10 +128,37 @@ var handleThemes = function() {
 	}
 };
 
+var invertTextColors = function(enabled) {	
+	var doInvert = function() {
+		$('.Message span[style^=color]').each(function(){
+			var color = tinycolor($(this).css('color')).toHsl();
+			color.l = 1 - color.l;
+			$(this).css({'color': tinycolor(color).toRgbString()});
+		});
+	};
+	if (typeof tinycolor == 'undefined') {
+		$.getScript('https://rawgit.com/bgrins/TinyColor/master/tinycolor.js').done( function() {
+			invertTextColors(enabled);
+		});
+		return;
+	}
+	if (enabled) {
+		if ($('body.inverted').length)
+			return;
+		doInvert();
+		$('body').addClass('inverted');
+	} else if ($('body.inverted').length) {
+		doInvert(); // reverse it
+		$('body').removeClass('inverted');
+	}
+};
+
 var setThemeEnabled = function(name, enabled) {
 	var theme = pweEnhanceSettings.themes[name];
 	theme.enabled = enabled;
 	url = buildCSSThemeURL(theme);
+	if (theme.invertTextColors)
+		invertTextColors(enabled);
 	if (enabled) {		
 		if ($("head link[href='"+url+"']").length === 0)
 			loadCSS(url);
@@ -222,7 +249,7 @@ var makeThemePicker = function(name) {
 			var delayedUncollapse = function(themename) { 
 				var variantName = pweEnhanceSettings.themes[themename].variant;
 				var className = getNameForVariantGroup(variantName);
-				setTimeout(function(){$('.'+className).removeClass('collapsed')}, 500);
+				setTimeout(function(){$('.'+className).removeClass('collapsed');}, 500);
 			};
 			if ($(this).closest(".collapsible").siblings('.collapsible:not(.collapsed)').length) {
 				$(this).closest(".collapsible").siblings('.collapsible').addClass('collapsed');
@@ -342,8 +369,8 @@ var makeFeatureMenu = function() {
 		);
 		menu.append(featureContainer);
 	}
-	var checked = pweEnhanceSettings.collapseThemes ? 'checked' : '';
-	var collapseOption = $('<input type="checkbox" '+checked+'></input><span class="label">Collapse variant themes</span>');
+	checked = pweEnhanceSettings.collapseThemes ? 'checked' : '';
+	var collapseOption = $('<input type="checkbox" '+checked+'></input><span class="label">Group together versions of the same theme</span>');
 	collapseOption.click(function(){ 
 		if ($(this).is(":checked")) {
 			$(".themeManager").addClass("collapseEnabled");
@@ -917,11 +944,8 @@ var getSettings = function() {
 			if (savedSettings.version < "0.8.3") {
 				pweEnhanceSettings.lastThemeUpdateTime = 0; // force theme update
 			}
-			if (savedSettings.themes && savedSettings.version >= "0.8.3") {// allow cached themes
+			if (savedSettings.themes && savedSettings.version >= "0.8.5") {// allow cached themes
 				mergeData(pweEnhanceSettings.themes, savedSettings.themes, true);
-				mergeData(pweEnhanceSettings.themes, {"Pro Blue": {"variant": "Pro Blue"}, 
-					"STO Federation": {"variant": "STO Federation"}, 
-					"STO KDF": {"variant": "STO Federation"}}, false);
 			} else {
 				pweEnhanceSettings.lastThemeUpdateTime = 0; // force theme update
 			}
