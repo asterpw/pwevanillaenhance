@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.8.5
+// @version    0.8.5.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -227,10 +227,13 @@ var makeThemePicker = function(name) {
 			if ($(this).closest(".collapsible").siblings('.collapsible:not(.collapsed)').length) {
 				$(this).closest(".collapsible").siblings('.collapsible').addClass('collapsed');
 				delayedUncollapse(this.title);
-				return;
+				if (pweEnhanceSettings.collapseThemes) {
+					return;
+				}
 			}
 			$(this).closest(".collapsible").removeClass('collapsed');
-			return;
+			if (pweEnhanceSettings.collapseThemes) 
+				return;
 		} else if ($(this).closest(".collapsible").length) {
 			pweEnhanceSettings.themes[pweEnhanceSettings.themes[this.title].variant].defaultVariant = this.title;
 			$(this).closest(".theme").addClass("defaultVariant").siblings(".defaultVariant").removeClass("defaultVariant");
@@ -339,14 +342,12 @@ var makeFeatureMenu = function() {
 		);
 		menu.append(featureContainer);
 	}
-	console.log("WTF IS GOING ON HERE " + pweEnhanceSettings.collapseThemes);
 	var checked = pweEnhanceSettings.collapseThemes ? 'checked' : '';
 	var collapseOption = $('<input type="checkbox" '+checked+'></input><span class="label">Collapse variant themes</span>');
 	collapseOption.click(function(){ 
 		if ($(this).is(":checked")) {
 			$(".themeManager").addClass("collapseEnabled");
 			pweEnhanceSettings.collapseThemes = true;
-			console.log(pweEnhanceSettings);
 			update();
 		} else {
 			$(".themeManager").removeClass("collapseEnabled");
@@ -913,8 +914,6 @@ var getSettings = function() {
 		var savedSettings = JSON.parse(savedSettingsJSON);
 		if (savedSettings.version && savedSettings.version >= "0.6.0") {
 			mergeData(pweEnhanceSettings, savedSettings, false); // dont merge in discarded features
-			console.log(savedSettings);
-			console.log(pweEnhanceSettings);
 			if (savedSettings.version < "0.8.3") {
 				pweEnhanceSettings.lastThemeUpdateTime = 0; // force theme update
 			}
@@ -935,7 +934,7 @@ var getSettings = function() {
 };
 
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/abd62c907d8b6994d2885999859befd9ddd06fac/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/acb8cd8aa97171704b489bb86306a071416995f1/pwevanillaenhance.user.css");
 getSettings();
 try{
 	preloadThemes();
