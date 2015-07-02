@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.8.4
+// @version    0.8.5
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.8.4";  //what we store when we should display what's new dialog
+var VERSION = "0.8.5";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.8.5</div> - collapsible theme variants<br>(experimental need feedback)\
 	<div class='change-ver'>v0.8.4</div> - show new/updated themes\
 	<div class='change-ver'>v0.8.3</div> - new theme format from file\
 	<div class='change-ver'>v0.8.2</div> - theme authors now receive a special title\
@@ -54,6 +55,7 @@ var pweEnhanceSettings = {
 	themes: { //autoadded from remote
 	},
 	lastThemeUpdateTime: 0,
+	collapseThemes: false,
 	version: "0"
 };
 
@@ -104,14 +106,16 @@ var applyThemes = function() {
 
 var handleThemes = function() {
 	var currentTime = new Date().getTime();
-	if (currentTime - pweEnhanceSettings.lastThemeUpdateTime > 0.5*3600*1000) {
+	if (currentTime - pweEnhanceSettings.lastThemeUpdateTime > 3*3600*1000) {
 		$.getJSON("https://rawgit.com/Goodlookinguy/pwvnrg/master/files.json", function(json){
 			$.extend(true, pweEnhanceSettings, json);
-			console.log(pweEnhanceSettings.themes);
 			for (var i in pweEnhanceSettings.themes) {
 				if (!(i in json.themes))
 					delete pweEnhanceSettings.themes[i];
 			}
+			mergeData(pweEnhanceSettings.themes, {"Pro Blue": {"variant": "Pro Blue"}, 
+					"STO Federation": {"variant": "STO Federation"}, 
+					"STO KDF": {"variant": "STO Federation"}}, false);
 			
 			applyThemes();
 			pweEnhanceSettings.lastThemeUpdateTime = new Date().getTime();
@@ -177,6 +181,9 @@ var makeThemeMenu = function() {
 	return menu;
 };
 
+var getNameForVariantGroup = function (variantName) { 
+	return variantName.replace(/\s/g, '');
+};
 
 var makeThemePicker = function(name) {
 	var theme = pweEnhanceSettings.themes[name];
@@ -207,8 +214,29 @@ var makeThemePicker = function(name) {
 	container.append($('<div class="theme-name" title="'+name+'">'+name+'</div>'));
 	container.append($('<div class="theme-author"><a href="http://perfectworld.vanillaforums.com/profile/'+theme.author+'">'+authorName+'</a></div>'));
 	container.append($('<div class="theme-description">'+theme.description+'</div>'));
+
+	
 	
 	$("img", container).click(function(){
+		if ($(this).closest(".collapsed").length) {
+			var delayedUncollapse = function(themename) { 
+				var variantName = pweEnhanceSettings.themes[themename].variant;
+				var className = getNameForVariantGroup(variantName);
+				setTimeout(function(){$('.'+className).removeClass('collapsed')}, 1000);
+			};
+			if ($(this).closest(".collapsible").siblings('.collapsible:not(.collapsed)').length) {
+				$(this).closest(".collapsible").siblings('.collapsible').addClass('collapsed');
+				delayedUncollapse(this.title);
+				return;
+			}
+			$(this).closest(".collapsible").removeClass('collapsed');
+			return;
+		} else if ($(this).closest(".collapsible").length) {
+			pweEnhanceSettings.themes[pweEnhanceSettings.themes[this.title].variant].defaultVariant = this.title;
+			$(this).closest(".theme").addClass("defaultVariant").siblings(".defaultVariant").removeClass("defaultVariant");
+		} else {
+			$(this).closest(".themeManager").find('.collapsible').addClass('collapsed');
+		}
 		setThemeEnabled(this.title, !(pweEnhanceSettings.themes[this.title].enabled));
 		update();
 	});
@@ -219,13 +247,33 @@ var makeThemePicker = function(name) {
 
 var makeThemeManager = function() {
 	$(".themeManager, .enhance-themes").remove();
-	var dialog = $("<div class='themeManager enhanceDialog' style='margin: 0px auto; display: none;'></div>");
+	var collapseEnabled = pweEnhanceSettings.collapseThemes ? 'collapseEnabled' : '';
+	var dialog = $("<div class='themeManager enhanceDialog "+collapseEnabled+"' style='margin: 0px auto; display: none;'></div>");
 	dialog.append($("<div class='title'><div class='close'>X</div>PWE Vanilla Enhancement Theme Manager</div>"));
 	$(".close", dialog).click(function(){ $(this).closest('.enhanceDialog').fadeOut();});
 	var content = $("<div class='content'></div>");
+	var encounteredVariantGroup = {};
+	
 	for (var themeName in pweEnhanceSettings.themes) {
-		if (pweEnhanceSettings.themes[themeName].category == 'Theme')
-			content.append(makeThemePicker(themeName));
+		if (pweEnhanceSettings.themes[themeName].category == 'Theme') {
+			if (pweEnhanceSettings.themes[themeName].variant) {
+				var variant = pweEnhanceSettings.themes[themeName].variant;
+				if (!(variant in encounteredVariantGroup)) {
+					content.append($('<span class="collapsible '+getNameForVariantGroup(variant)+' collapsed"></span>'));
+					encounteredVariantGroup[variant] = true;
+				} 
+				var picker = makeThemePicker(themeName);
+				if (pweEnhanceSettings.themes[variant].defaultVariant == undefined) {
+					pweEnhanceSettings.themes[variant].defaultVariant = variant;
+				}
+				if (pweEnhanceSettings.themes[variant].defaultVariant == themeName) {
+						picker.addClass("defaultVariant");
+				}
+				$("."+getNameForVariantGroup(variant), content).append(picker);
+			} else {
+				content.append(makeThemePicker(themeName));
+			}
+		}
 	}
 	dialog.append(content);
 	$(".SiteMenu").append(dialog);
@@ -291,6 +339,22 @@ var makeFeatureMenu = function() {
 		);
 		menu.append(featureContainer);
 	}
+	console.log("WTF IS GOING ON HERE " + pweEnhanceSettings.collapseThemes);
+	var checked = pweEnhanceSettings.collapseThemes ? 'checked' : '';
+	var collapseOption = $('<input type="checkbox" '+checked+'></input><span class="label">Collapse variant themes</span>');
+	collapseOption.click(function(){ 
+		if ($(this).is(":checked")) {
+			$(".themeManager").addClass("collapseEnabled");
+			pweEnhanceSettings.collapseThemes = true;
+			console.log(pweEnhanceSettings);
+			update();
+		} else {
+			$(".themeManager").removeClass("collapseEnabled");
+			pweEnhanceSettings.collapseThemes = false;
+			update();
+		}
+	});
+	$('h1:first-child', menu).after(collapseOption);
 	return menu;
 };
 
@@ -796,7 +860,7 @@ var features = [
 	new EmoteFeature("PWI Emotes", "pwiEmotes", "Show PWI emotes in editor", makePWIEmotes, {category: "tiger"}),
 	new EmoteFeature("Forsaken World Emotes", "fwEmotes", "Show Forsaken World emotes in editor", makeFWEmotes, {category: "jellyfish"}),
 	new EmoteFeature("Herocat (Champions Online) Emotes", "herocatEmotes", "Show Herocat (Champions Online) emotes in editor", makeHeroEmotes, {category: "herocat", enabled: false}),
-	new EmoteFeature("Text Face Emotes", "textFaceEmotes", "Show Text Face Emotes in editor", makeTextFaceEmotes),
+	new EmoteFeature("Text Face Emotes", "textFaceEmotes", "Show Text Face emotes in editor", makeTextFaceEmotes),
 	new EmoteFeature("Onion Emotes", "onionEmotes", "Show Onion emotes in editor", makeOnionEmotes, {category: "onion", enabled: false}),
 	new EmoteFeature("MLP Emotes", "mlpEmotes", "Show MLP emotes in editor", makeMLPEmotes, {category: "twilight", enabled: false}),
 	new LinkFeature("Show/Hide All Categories", "showHideAllCategories", "Add show/hide all categories links to Account Options Menu", makeShowHideAllCategories),
@@ -849,11 +913,16 @@ var getSettings = function() {
 		var savedSettings = JSON.parse(savedSettingsJSON);
 		if (savedSettings.version && savedSettings.version >= "0.6.0") {
 			mergeData(pweEnhanceSettings, savedSettings, false); // dont merge in discarded features
+			console.log(savedSettings);
+			console.log(pweEnhanceSettings);
 			if (savedSettings.version < "0.8.3") {
 				pweEnhanceSettings.lastThemeUpdateTime = 0; // force theme update
 			}
 			if (savedSettings.themes && savedSettings.version >= "0.8.3") {// allow cached themes
 				mergeData(pweEnhanceSettings.themes, savedSettings.themes, true);
+				mergeData(pweEnhanceSettings.themes, {"Pro Blue": {"variant": "Pro Blue"}, 
+					"STO Federation": {"variant": "STO Federation"}, 
+					"STO KDF": {"variant": "STO Federation"}}, false);
 			} else {
 				pweEnhanceSettings.lastThemeUpdateTime = 0; // force theme update
 			}
@@ -866,7 +935,7 @@ var getSettings = function() {
 };
 
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/283670413d0867bd4463b5f03a9b1560d2d9237c/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/abd62c907d8b6994d2885999859befd9ddd06fac/pwevanillaenhance.user.css");
 getSettings();
 try{
 	preloadThemes();
