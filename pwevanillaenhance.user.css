@@ -372,8 +372,7 @@
 	animation: colorRotate 6s linear 0s infinite;
 	text-shadow: 1px 1px #000000;
 	position: absolute; 
-	font-size: 15px;
-	font-weight: bold;
+	font-size: 15px; 
 	margin: 10px;
 }
 
@@ -402,8 +401,42 @@
     }
 }
 
+.themeManager .content {
+	overflow: hidden;
+}
+	
+.themeManager .theme {
+	transition: margin 1s, opacity 2s;
+	-webkit-transition: margin 1s, opacity 2s;
+}
 
+.themeManager.collapseEnabled .collapsible.collapsed .theme {
+	margin-right: -305px;
+	opacity: 0;
+}	
+	
+.themeManager.collapseEnabled .collapsible.collapsed .defaultVariant.theme {
+	margin-right: 10px;
+	margin-left: 0px;
+	opacity: 1;
+}	
 
+.themeManager.collapseEnabled .collapsible.collapsed .defaultVariant.theme ~ .theme {
+	margin-left: -305px;
+	opacity: 0;
+}	
+	
+.themeManager.collapseEnabled .collapsible.collapsed .defaultVariant.theme .theme-name::before {
+    content: "More versions available!";
+	font-weight: bold;
+	font-size: 14px;
+	top: 220px;
+	left: 10px;
+	color: #69CAFE;
+	width: 100%;
+	position: absolute;
+}	
+	
 /************************
   Titles
 ************************/
