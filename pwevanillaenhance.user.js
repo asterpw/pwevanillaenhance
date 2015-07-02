@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.8.5.2
+// @version    0.8.6
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.8.5";  //what we store when we should display what's new dialog
+var VERSION = "0.8.6";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.8.6</div> - added support for text color inversion for light themes\
 	<div class='change-ver'>v0.8.5</div> - collapsible theme variants<br>(experimental need feedback)\
 	<div class='change-ver'>v0.8.4</div> - show new/updated themes\
 	<div class='change-ver'>v0.8.3</div> - new theme format from file\
@@ -958,7 +959,7 @@ var getSettings = function() {
 };
 
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/fef6fe182e4e1de499b2e27776c0a6673a438261/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/5419bbdd899d4052aec77db920f382a235371b4f/pwevanillaenhance.user.css");
 getSettings();
 try{
 	preloadThemes();
