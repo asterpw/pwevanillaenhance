@@ -406,8 +406,12 @@
 }
 	
 .themeManager .theme {
-	transition: margin 1s, opacity 2s;
-	-webkit-transition: margin 1s, opacity 2s;
+	transition: margin 0.5s, opacity 0.2s, top 1s;
+	-webkit-transition: margin 0.5s, opacity 0.2s, top 1s;
+}
+	
+.themeManager.collapseEnabled .collapsible .theme {
+	background-color: rgba(128,128,128,0.2);
 }
 
 .themeManager.collapseEnabled .collapsible.collapsed .theme {
@@ -420,6 +424,7 @@
 	margin-left: 0px;
 	opacity: 1;
 	z-index: 1;
+	background-color: rgba(128,128,128,0.5);
 }	
 
 .themeManager.collapseEnabled .collapsible.collapsed .defaultVariant.theme ~ .theme {
@@ -427,10 +432,11 @@
 	opacity: 0;
 }	
 	
-.themeManager.collapseEnabled .collapsible.collapsed .defaultVariant.theme .theme-name::before {
-    content: "More versions available!";
+.themeManager.collapseEnabled .collapsible.collapsed .defaultVariant.theme .theme-name::after {
+	content: "More versions available!";
 	font-weight: bold;
 	font-size: 14px;
+	text-shadow: 2px 2px 5px #000000;
 	top: 220px;
 	left: 10px;
 	color: #69CAFE;
