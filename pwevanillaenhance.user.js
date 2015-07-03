@@ -385,7 +385,6 @@ var addPreviews = function() {
 			$.getJSON("http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=" + match[1], 
 				function(json) {
 					var text = json.Comments[json.Comments.length - 1].Body;
-					console.log(text);
 					text = stripBlockTags('code', stripBlockTags('quote', text));
 					$('time', link).attr('title', stripTags(text));
 				}
