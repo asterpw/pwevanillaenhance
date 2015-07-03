@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.8.6.1
+// @version    0.9.0
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.8.6";  //what we store when we should display what's new dialog
+var VERSION = "0.9.0";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.9.0</div> - Used the API to add comment preview text from discussions view\
 	<div class='change-ver'>v0.8.6</div> - added support for text color inversion for light themes\
 	<div class='change-ver'>v0.8.5</div> - collapsible theme variants<br>(experimental need feedback)\
 	<div class='change-ver'>v0.8.4</div> - show new/updated themes\
@@ -354,6 +355,58 @@ var applyTitles = function() {
 			$('span[title="Arc User"]', container).remove();
 		}
 	}
+};
+
+var stripBlockTags = function(tag, text) {
+	var re = new RegExp("\\["+tag+"((?!\\["+tag+")[\\S\\s])*?\\[/"+tag+"\\]", "i");
+	match = re.exec(text)
+	while (match != null) {
+		text = text.replace(match[0], "");
+		match = re.exec(text)
+	}
+	return text.trim();
+};
+
+var stripTags = function(text) {
+	var re = new RegExp("\\[.+?\\]", "i");
+	for (var match = re.exec(text); match != null; match = re.exec(text)) {
+		text = text.replace(match[0], "");
+	}
+	return text.trim();
+};
+
+var addPreviews = function() {
+	$(".LastUser .CommentDate").mouseover(function() {
+		var url = $(this).attr('href');
+		var match = /discussion\/([0-9]+)/g.exec(url);
+		if (!($(this).data('call-issued'))) {
+			$(this).data('call-issued', true);
+			var link = $(this);
+			$.getJSON("http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=" + match[1], 
+				function(json) {
+					var text = json.Comments[json.Comments.length - 1].Body;
+					console.log(text);
+					text = stripBlockTags('code', stripBlockTags('quote', text));
+					$('time', link).attr('title', stripTags(text));
+				}
+			);
+		}
+	});
+	$(".DiscussionName .Title").mouseover(function() {
+		var url = $(this).attr('href');
+		var match = /discussion\/([0-9]+)/g.exec(url);
+		if (!($(this).data('call-issued'))) {
+			$(this).data('call-issued', true);
+			var link = $(this);
+			$.getJSON("http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=" + match[1], 
+				function(json) {					
+					var text = json.Discussion.Body;
+					text = stripBlockTags('code', stripBlockTags('quote', text));
+					link.attr('title', stripTags(text));
+				}
+			);
+		}
+	});
 };
 
 var mergeData = function(to, from, allowAddKeys) {
@@ -996,6 +1049,7 @@ var jQueryLoaded = function() {
 	makeThemeManager();
 	makeEnhancePreferencesMenu();
 	applyTitles();
+	addPreviews();
 	$.getScript("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.js").done(function() {
 		initColorPicker($('.fontColorPicker'));
 	});
