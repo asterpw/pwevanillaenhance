@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.8.6
+// @version    0.8.6.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -143,6 +143,22 @@ var invertTextColors = function(enabled) {
 		});
 		return;
 	}
+	/*var doInvert = function() {
+		$('.Message span[style^=color]').each(function(){
+			var color = $(this).css('color').split('(')[1].split(')')[0].split(', ');
+			var r = Number(color[0]), g = Number(color[1]), b = Number(color[2]);
+			var ave = 0.2126*r + 0.7152*g + 0.0722*b;
+			if (ave == 0) {
+				$(this).css({'color': '#FFFFFF'});
+				return;
+			}
+			var ratio = (255 - ave) / ave;
+			r = Math.round(Math.max(Math.min(ratio*r, 255), 0));
+			g = Math.round(Math.max(Math.min(ratio*g, 255), 0));
+			b = Math.round(Math.max(Math.min(ratio*b, 255), 0));
+			$(this).css({'color': 'rgb('+r+', '+g+', '+b+')'});
+		});
+	};*/
 	if (enabled) {
 		if ($('body.inverted').length)
 			return;
@@ -226,12 +242,15 @@ var makeThemePicker = function(name) {
 	else if (((now - Date.parse(theme.updated))/day) < 2) 
 		container.append($('<span class="updated">Updated!</span>'));
 	var screenshotUrl = ""; // needs some default;
-	if (theme["screenshot-480"] && theme["screenshot-480"].length) {
-		if (theme["screenshot-480"][0].indexOf("http") == 0) {
-			screenshotUrl = theme["screenshot-480"][0];
-		} else {
-			screenshotUrl = theme.baseurl + (theme['branch-commit'].length > 0 ? theme['branch-commit'] + "/" : '') + theme["screenshot-480"][0];
-		}
+	if (theme["thumbnail"]) {
+		screenshotUrl = theme["thumbnail"];
+	} else if (theme["screenshot-480"] && theme["screenshot-480"].length) {
+		screenshotUrl = theme["screenshot-480"][0];
+	} else {
+		screenshotUrl = "https://cdn.rawgit.com/Goodlookinguy/pwvnrg/master/thumbnails/missing-thumbnail.png";
+	}
+	if (screenshotUrl.indexOf("http") != 0) {
+		screenshotUrl = theme.baseurl + (theme['branch-commit'].length > 0 ? theme['branch-commit'] + "/" : '') + screenshotUrl;
 	}
 	
 	var authorName =  theme["author-alias"] ? theme["author-alias"] : theme.author;
