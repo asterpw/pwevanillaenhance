@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.0
+// @version    0.9.0.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -372,11 +372,18 @@ var stripTags = function(text) {
 	for (var match = re.exec(text); match != null; match = re.exec(text)) {
 		text = text.replace(match[0], "");
 	}
-	return text.trim();
+	return text;
+};
+
+var bbcodeToText = function(bbcode) {
+	var text = stripBlockTags('quote', bbcode);
+	text = stripBlockTags('code', bbcode);
+	text = stripBlockTags('img', bbcode);
+	return stripTags(text).trim();
 };
 
 var addPreviews = function() {
-	$(".LastUser .CommentDate").mouseover(function() {
+	$(".LastUser .CommentDate, .LatestPost .CommentDate").mouseover(function() {
 		var url = $(this).attr('href');
 		var match = /discussion\/([0-9]+)/g.exec(url);
 		if (!($(this).data('call-issued'))) {
@@ -385,13 +392,12 @@ var addPreviews = function() {
 			$.getJSON("http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=" + match[1], 
 				function(json) {
 					var text = json.Comments[json.Comments.length - 1].Body;
-					text = stripBlockTags('code', stripBlockTags('quote', text));
-					$('time', link).attr('title', stripTags(text));
+					$('time', link).attr('title', bbcodeToText(text));
 				}
 			);
 		}
 	});
-	$(".DiscussionName .Title").mouseover(function() {
+	$(".DiscussionName .Title, .LatestPost .LatestPostTitle").mouseover(function() {
 		var url = $(this).attr('href');
 		var match = /discussion\/([0-9]+)/g.exec(url);
 		if (!($(this).data('call-issued'))) {
@@ -400,8 +406,7 @@ var addPreviews = function() {
 			$.getJSON("http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=" + match[1], 
 				function(json) {					
 					var text = json.Discussion.Body;
-					text = stripBlockTags('code', stripBlockTags('quote', text));
-					link.attr('title', stripTags(text));
+					link.attr('title', bbcodeToText(text));
 				}
 			);
 		}
