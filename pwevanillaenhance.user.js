@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.0.1
+// @version    0.9.0.2
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -377,8 +377,8 @@ var stripTags = function(text) {
 
 var bbcodeToText = function(bbcode) {
 	var text = stripBlockTags('quote', bbcode);
-	text = stripBlockTags('code', bbcode);
-	text = stripBlockTags('img', bbcode);
+	text = stripBlockTags('code', text);
+	text = stripBlockTags('img', text);
 	return stripTags(text).trim();
 };
 
@@ -391,8 +391,14 @@ var addPreviews = function() {
 			var link = $(this);
 			$.getJSON("http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=" + match[1], 
 				function(json) {
-					var text = json.Comments[json.Comments.length - 1].Body;
-					$('time', link).attr('title', bbcodeToText(text));
+					var text = json.Discussion.Body;
+					var format = json.Discussion.Format;
+					if (json.Comments && json.Comments.length) {
+						text = json.Comments[json.Comments.length - 1].Body;
+						format = json.Comments[json.Comments.length - 1].Format;
+					}
+					if (format == 'BBCode')
+						$('time', link).attr('title', bbcodeToText(text));
 				}
 			);
 		}
@@ -406,7 +412,8 @@ var addPreviews = function() {
 			$.getJSON("http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=" + match[1], 
 				function(json) {					
 					var text = json.Discussion.Body;
-					link.attr('title', bbcodeToText(text));
+					if (json.Discussion.Format == 'BBCode')
+						link.attr('title', bbcodeToText(text));
 				}
 			);
 		}
