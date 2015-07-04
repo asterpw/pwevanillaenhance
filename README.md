@@ -1,11 +1,12 @@
 # pwevanillaenhance
 PWE Vanilla Forums Enhancement - Adds useful tools to the pwe vanilla forums
 <h1>Features</h1>
-<b>Complete editor options</b>
-Did you miss being able to set your font size or color without having to remember hard to use BBcode?  The new editor options do that for you automatically!
-
+<b>Full editor options</b>
+Did you miss being able to set your font size or color without having to remember hard to use BBcode?  The new editor options do that for you automatically!<br>
 <b>Builtin Theme Manager</b>
 Choose from several amazing community-made themes.  More themes will automatically become available over time.<br>
+<b>Comment preview from category / discussion view</b>
+Just like in VBulletin you can preview posts by hovering your cursor over a link.<br>
 <b>Lots of new emotes!</b>
 Hundreds of new emotes to choose from such as <a href="http://i.imgur.com/EMfoL4u.png">PWI emotes</a>, Forsaken World emotes, Onion Head emotes, and many more!<br>
 <p>
