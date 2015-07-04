@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.0.2
+// @version    0.9.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.9.0";  //what we store when we should display what's new dialog
+var VERSION = "0.9.1";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.9.0</div> - Everyone gets the coveted Enhance User title\
 	<div class='change-ver'>v0.9.0</div> - Used the API to add comment preview text from discussions view\
 	<div class='change-ver'>v0.8.6</div> - added support for text color inversion for light themes\
 	<div class='change-ver'>v0.8.5</div> - collapsible theme variants<br>(experimental need feedback)\
@@ -56,8 +57,11 @@ var pweEnhanceSettings = {
 	},
 	themes: { //autoadded from remote
 	},
+	options: {
+		collapseThemes: false,
+		showEnhanceTitle: true
+	},
 	lastThemeUpdateTime: 0,
-	collapseThemes: false,
 	version: "0"
 };
 
@@ -275,12 +279,12 @@ var makeThemePicker = function(name) {
 			if ($(this).closest(".collapsible").siblings('.collapsible:not(.collapsed)').length) {
 				$(this).closest(".collapsible").siblings('.collapsible').addClass('collapsed');
 				delayedUncollapse(this.title);
-				if (pweEnhanceSettings.collapseThemes) {
+				if (pweEnhanceSettings.options.collapseThemes) {
 					return;
 				}
 			}
 			$(this).closest(".collapsible").removeClass('collapsed');
-			if (pweEnhanceSettings.collapseThemes) 
+			if (pweEnhanceSettings.options.collapseThemes) 
 				return;
 		} else if ($(this).closest(".collapsible").length) {
 			pweEnhanceSettings.themes[pweEnhanceSettings.themes[this.title].variant].defaultVariant = this.title;
@@ -298,7 +302,7 @@ var makeThemePicker = function(name) {
 
 var makeThemeManager = function() {
 	$(".themeManager, .enhance-themes").remove();
-	var collapseEnabled = pweEnhanceSettings.collapseThemes ? 'collapseEnabled' : '';
+	var collapseEnabled = pweEnhanceSettings.options.collapseThemes ? 'collapseEnabled' : '';
 	var dialog = $("<div class='themeManager enhanceDialog "+collapseEnabled+"' style='margin: 0px auto; display: none;'></div>");
 	dialog.append($("<div class='title'><div class='close'>X</div>PWE Vanilla Enhancement Theme Manager</div>"));
 	$(".close", dialog).click(function(){ $(this).closest('.enhanceDialog').fadeOut();});
@@ -331,12 +335,12 @@ var makeThemeManager = function() {
 	
 	var button = $('<a href="#" class="MeButton FlyoutButton" title="Themes"><span class="Sprite Sprite16 SpOptions"></span></a>');
 
-	//var button = $('<span class="themeButton">\uf178 Themes</span>');
 	var themeControl = $("<span class='ToggleFlyout enhance-themes'></span>");
 	button.click(function(){$('.themeManager').slideToggle();});
 	$(".MeMenu").append(themeControl.append(button));
 };
 
+var ENHANCE_IDENTIFIER = '\u200B\u200B'; //It's invisible... spooky
 var applyTitles = function() {
 	var titles = { 
 		'asterelle': {'developer': 'Enhance Developer'},
@@ -348,6 +352,16 @@ var applyTitles = function() {
 		titles[author] = titles[author] || {};
 		titles[author].themeauthor = 'Theme Author';
 	}
+	
+	$(".Message").filter(function () {
+		return $(this).text().trim().indexOf(ENHANCE_IDENTIFIER) == 0;
+		}).closest(".Item-BodyWrap").siblings(".Item-Header").find('.PhotoWrap').each(function(){
+			var name = $(this).attr('title');
+			if (!(name in titles)) {
+				titles[name] = {'user': 'Enhance User'};
+			}
+		});
+	
 	for (var name in titles) {
 		var container = $('.Username[href$="'+name+'"]').closest(".AuthorWrap").find(".AuthorInfo");
 		for (var title in titles[name]) {
@@ -355,6 +369,7 @@ var applyTitles = function() {
 			$('span[title="Arc User"]', container).remove();
 		}
 	}
+	
 };
 
 var stripBlockTags = function(tag, text) {
@@ -433,6 +448,26 @@ var mergeData = function(to, from, allowAddKeys) {
 	}
 };
 
+var makeFeatureOption = function(option, description, handler) {
+	var closureOption = option;
+	var checked = pweEnhanceSettings.options[option] ? 'checked' : '';
+	var optioninput = $('<div class="feature"><input type="checkbox" '+checked+'></input><span class="label">'+description+'</span></div>');
+	$('input', optioninput).click(function(){ 
+		pweEnhanceSettings.options[closureOption] = $(this).is(":checked");
+		update();
+		if (handler)
+			handler(pweEnhanceSettings.options[closureOption]);
+	});
+	return optioninput;
+};
+
+var collapseThemesHandler = function(enabled) {
+	if (enabled) {
+		$(".themeManager").addClass("collapseEnabled");
+	} else {
+		$(".themeManager").removeClass("collapseEnabled");
+	}
+};
 var makeFeatureMenu = function() {
 	var menu = $("<div></div>");
 	var currentFeatureType = null;
@@ -453,20 +488,9 @@ var makeFeatureMenu = function() {
 		);
 		menu.append(featureContainer);
 	}
-	checked = pweEnhanceSettings.collapseThemes ? 'checked' : '';
-	var collapseOption = $('<input type="checkbox" '+checked+'></input><span class="label">Group together versions of the same theme</span>');
-	collapseOption.click(function(){ 
-		if ($(this).is(":checked")) {
-			$(".themeManager").addClass("collapseEnabled");
-			pweEnhanceSettings.collapseThemes = true;
-			update();
-		} else {
-			$(".themeManager").removeClass("collapseEnabled");
-			pweEnhanceSettings.collapseThemes = false;
-			update();
-		}
-	});
-	$('h1:first-child', menu).after(collapseOption);
+	menu.append($("<h1>Options</h1>"));
+	menu.append(makeFeatureOption("collapseThemes", 'Group together versions of the same theme', collapseThemesHandler));
+	//menu.append(makeFeatureOption("showEnhanceTitle", "Use 'Enhance User' title"));
 	return menu;
 };
 
@@ -825,17 +849,30 @@ var autoAddFontColor = function(textArea, color) {
 	if (text.substring(startpos).indexOf(startTag) != 0) {
 		textArea.val(text.substring(0, startpos) + startTag + text.substring(startpos) + endTag);	
 	}
-};    
+};
 
 var initSubmitButton = function(container) {
+	var removeIdentifier = function(textArea) { 
+		var text = textArea.val();
+		textArea.val(text.replace(ENHANCE_IDENTIFIER, ''));
+	};
+	var addIdentifier = function(textArea) { 
+		var text = textArea.val();
+		if (text.indexOf(ENHANCE_IDENTIFIER) != 0)
+			textArea.val(ENHANCE_IDENTIFIER + text);
+	};
+
 	container.find("input.CommentButton, #Form_SendMessage, #Form_Share, #Form_AddComment").click(function(){
 		$(this).closest(".FormWrapper").find(".editor-dropdown-open").removeClass("editor-dropdown-open");
 		
+		var form = $(this).closest(".FormWrapper");
+		removeIdentifier(form.find(".BodyBox"));
 		if (pweEnhanceSettings.editor.fontColorPicker.autoAddColor) {
-			var form = $(this).closest(".FormWrapper");
 			var color = form.find(".color-picker").spectrum("get");
 			autoAddFontColor(form.find(".BodyBox"), color);
 		}
+		if (pweEnhanceSettings.options.showEnhanceTitle)
+			addIdentifier(form.find(".BodyBox"));
 	});
 };
 
