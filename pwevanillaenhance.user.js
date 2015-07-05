@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.1
+// @version    0.9.1.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -23,7 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
-	<div class='change-ver'>v0.9.0</div> - Everyone gets the coveted Enhance User title\
+	<div class='change-ver'>v0.9.1</div> - Everyone gets the coveted Enhance User title (disabled for now)\
 	<div class='change-ver'>v0.9.0</div> - Used the API to add comment preview text from discussions view\
 	<div class='change-ver'>v0.8.6</div> - added support for text color inversion for light themes\
 	<div class='change-ver'>v0.8.5</div> - collapsible theme variants<br>(experimental need feedback)\
@@ -871,8 +871,8 @@ var initSubmitButton = function(container) {
 			var color = form.find(".color-picker").spectrum("get");
 			autoAddFontColor(form.find(".BodyBox"), color);
 		}
-		if (pweEnhanceSettings.options.showEnhanceTitle)
-			addIdentifier(form.find(".BodyBox"));
+		//if (pweEnhanceSettings.options.showEnhanceTitle)
+			//addIdentifier(form.find(".BodyBox"));
 	});
 };
 
