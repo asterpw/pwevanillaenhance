@@ -119,10 +119,6 @@ var handleThemes = function() {
 				if (!(i in json.themes))
 					delete pweEnhanceSettings.themes[i];
 			}
-			mergeData(pweEnhanceSettings.themes, {"Pro Blue": {"variant": "Pro Blue"}, 
-					"STO Federation": {"variant": "STO Federation"}, 
-					"STO KDF": {"variant": "STO Federation"}}, false);
-			
 			applyThemes();
 			pweEnhanceSettings.lastThemeUpdateTime = new Date().getTime();
 			update();
@@ -353,8 +349,8 @@ var applyTitles = function() {
 		titles[author].themeauthor = 'Theme Author';
 	}
 	
-	$(".Message").filter(function () {
-		return $(this).text().trim().indexOf(ENHANCE_IDENTIFIER) == 0;
+	$(".Message").filter(function () { var text = $(this).text().trim();
+			return text.indexOf(ENHANCE_IDENTIFIER) == (text.length - ENHANCE_IDENTIFIER.length - 1);
 		}).closest(".Item-BodyWrap").siblings(".Item-Header").find('.PhotoWrap').each(function(){
 			var name = $(this).attr('title');
 			if (!(name in titles)) {
@@ -750,7 +746,8 @@ var makeTextFaceEmotes = function() {
 		"Table Flip:(\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b",
 		"Double Table:\u253b\u2501\u253b \ufe35\u30fd(`\u0414\u00b4)\uff89\ufe35 \u253b\u2501\u253b",
 		"Shades:(\u2022_\u2022) ( \u2022_\u2022)>\u2310\u25A0-\u25A0 (\u2310\u25A0_\u25A0)",
-		"Strong:\u1566(\u00F2_\u00F3\u02C7)\u1564"
+		"Strong:\u1566(\u00F2_\u00F3\u02C7)\u1564",
+		"Bring It:\u10da(\u0ca0_\u0ca0\u10da)"
 	];
 	button.find('.editor-action .icon').click(function(){
 		$(this).parent().parent().toggleClass("editor-dropdown-open").siblings().removeClass("editor-dropdown-open");
@@ -854,12 +851,12 @@ var autoAddFontColor = function(textArea, color) {
 var initSubmitButton = function(container) {
 	var removeIdentifier = function(textArea) { 
 		var text = textArea.val();
-		textArea.val(text.replace(ENHANCE_IDENTIFIER, ''));
+		textArea.val(text.replace(new RegExp(ENHANCE_IDENTIFIER, 'g'), ''));
 	};
 	var addIdentifier = function(textArea) { 
 		var text = textArea.val();
 		if (text.indexOf(ENHANCE_IDENTIFIER) != 0)
-			textArea.val(ENHANCE_IDENTIFIER + text);
+			textArea.val(text + ENHANCE_IDENTIFIER);
 	};
 
 	container.find("input.CommentButton, #Form_SendMessage, #Form_Share, #Form_AddComment").click(function(){
@@ -871,8 +868,8 @@ var initSubmitButton = function(container) {
 			var color = form.find(".color-picker").spectrum("get");
 			autoAddFontColor(form.find(".BodyBox"), color);
 		}
-		//if (pweEnhanceSettings.options.showEnhanceTitle)
-			//addIdentifier(form.find(".BodyBox"));
+		if (pweEnhanceSettings.options.showEnhanceTitle)
+			addIdentifier(form.find(".BodyBox"));
 	});
 };
 
@@ -904,7 +901,7 @@ var makeGameLinks = function(container) {
 		"prime-world|PW on ARC|http://www.arcgames.com/en/games/Prime_World",
 		"pwi|PWI on ARC|http://www.arcgames.com/en/games/pwi",
 		"pwi|Calc|http://mypers.pw/1.8/",
-		"pwi|PWDB|http://pwdatabse.com",
+		"pwi|PWDB|http://pwdatabase.com",
 		"pwi|Aster Tools|http://aster.ohmydays.net/pw",
 		"raiderz|Raiderz on ARC|http://www.arcgames.com/en/games/raiderz",
 		"royal-quest|RQ on ARC|http://www.arcgames.com/en/games/Royal_Quest",
@@ -1028,6 +1025,11 @@ var installFeatures = function(container) {
 		initColorPicker(container);
 };
 
+var preventEmbed = function() {
+	document.getElementsByTagName('html')[0].setAttribute('class', 'is-embedded');
+	gdn.meta.ForceEmbedForum = "0";
+};
+
 /* loadCSS = function(href) {
      var cssLink = $("<link rel='stylesheet' type='text/css' href='"+href+"'>");
      $("head").append(cssLink); 
@@ -1078,6 +1080,9 @@ var getSettings = function() {
 	}
 };
 
+
+
+preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
 loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/5419bbdd899d4052aec77db920f382a235371b4f/pwevanillaenhance.user.css");
 getSettings();
@@ -1088,6 +1093,7 @@ try{
 }
 var jQueryLoaded = function() {
 //$(document).ready(function() {
+	preventEmbed();
 	if (pweEnhanceSettings.version < VERSION) {
 		showWhatsNewDialog();
 	}
