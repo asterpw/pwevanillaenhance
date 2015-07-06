@@ -1027,7 +1027,8 @@ var installFeatures = function(container) {
 
 var preventEmbed = function() {
 	document.getElementsByTagName('html')[0].setAttribute('class', 'is-embedded');
-	gdn.meta.ForceEmbedForum = "0";
+	if (typeof gdn != 'undefined')
+		gdn.meta.ForceEmbedForum = "0";
 };
 
 /* loadCSS = function(href) {
@@ -1080,7 +1081,7 @@ var getSettings = function() {
 	}
 };
 
-
+preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
 loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/5419bbdd899d4052aec77db920f382a235371b4f/pwevanillaenhance.user.css");
 getSettings();
