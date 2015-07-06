@@ -1081,8 +1081,6 @@ var getSettings = function() {
 };
 
 
-
-preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
 loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/5419bbdd899d4052aec77db920f382a235371b4f/pwevanillaenhance.user.css");
 getSettings();
