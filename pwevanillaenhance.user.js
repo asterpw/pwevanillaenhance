@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.2
+// @version    0.9.3
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.9.2";  //what we store when we should display what's new dialog
+var VERSION = "0.9.3";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,8 +23,9 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.9.3</div> - Added word wrapping of long comment previews for chrome+opera\
 	<div class='change-ver'>v0.9.2</div> - Block the forced embedding arc redirect\
-	<div class='change-ver'>v0.9.1</div> - Everyone gets the coveted Enhance User title (disabled for now)\
+	<div class='change-ver'>v0.9.1</div> - Everyone gets the coveted Enhance User title\
 	<div class='change-ver'>v0.9.0</div> - Used the API to add comment preview text from discussions view\
 	<div class='change-ver'>v0.8.6</div> - added support for text color inversion for light themes\
 	<div class='change-ver'>v0.8.5</div> - collapsible theme variants<br>(experimental need feedback)\
@@ -113,7 +114,7 @@ var applyThemes = function() {
 
 var handleThemes = function() {
 	var currentTime = new Date().getTime();
-	if (currentTime - pweEnhanceSettings.lastThemeUpdateTime > 3*3600*1000) {
+	if (currentTime - pweEnhanceSettings.lastThemeUpdateTime > 0*3600*1000) {
 		$.getJSON("https://rawgit.com/Goodlookinguy/pwvnrg/master/files.json", function(json){
 			$.extend(true, pweEnhanceSettings, json);
 			for (var i in pweEnhanceSettings.themes) {
@@ -351,7 +352,7 @@ var applyTitles = function() {
 	}
 	
 	$(".Message").filter(function () { var text = $(this).text().trim();
-			return text.indexOf(ENHANCE_IDENTIFIER) == (text.length - ENHANCE_IDENTIFIER.length - 1);
+			return text.lastIndexOf(ENHANCE_IDENTIFIER) == (text.length - ENHANCE_IDENTIFIER.length);
 		}).closest(".Item-BodyWrap").siblings(".Item-Header").find('.PhotoWrap').each(function(){
 			var name = $(this).attr('title');
 			if (!(name in titles)) {
@@ -391,7 +392,18 @@ var bbcodeToText = function(bbcode) {
 	var text = stripBlockTags('quote', bbcode);
 	text = stripBlockTags('code', text);
 	text = stripBlockTags('img', text);
-	return stripTags(text).trim();
+	text = stripTags(text).trim();
+	return insertWrapping(text);
+};
+
+var insertWrapping = function(text) {
+	var regex = /^.{80}.*[\S]+.*$/m;
+	for (var longLineMatch = regex.exec(text); longLineMatch != null; longLineMatch = regex.exec(text)) {
+		var lastSpaceIndex = longLineMatch[0].substring(0,80).lastIndexOf(" ");
+		if (lastSpaceIndex <= 0) lastSpaceIndex = 80;
+		text = text.substring(0, longLineMatch.index + lastSpaceIndex) + " \r\n" + text.substring(longLineMatch.index + lastSpaceIndex + 1);
+	}
+	return text;
 };
 
 var addPreviews = function() {
