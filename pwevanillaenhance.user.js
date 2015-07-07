@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.3
+// @version    0.9.3.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -114,7 +114,7 @@ var applyThemes = function() {
 
 var handleThemes = function() {
 	var currentTime = new Date().getTime();
-	if (currentTime - pweEnhanceSettings.lastThemeUpdateTime > 0*3600*1000) {
+	if (currentTime - pweEnhanceSettings.lastThemeUpdateTime > 3*3600*1000) {
 		$.getJSON("https://rawgit.com/Goodlookinguy/pwvnrg/master/files.json", function(json){
 			$.extend(true, pweEnhanceSettings, json);
 			for (var i in pweEnhanceSettings.themes) {
@@ -522,71 +522,76 @@ var makeEnhancePreferencesMenu = function() {
 };
 
 var makeEmotePanel = function(className, path, emotes, imgWidth, imgHeight) {
-	var categories = Object.keys(emotes);
-	var container = $('<div class="emotes-dialog editor-insert-dialog Flyout MenuItems"></div>');
-	var defaultCategory = pweEnhanceSettings.emotes[className].category;
-	if (!(defaultCategory in emotes)) 
-		defaultCategory = Object.keys(emotes)[0];
-	
-	if (categories.length > 1) {
-		var categoryDiv = $('<div class="emote-category"></div>');
-		for (var type=0; type < categories.length; type++) {
-			var typeImg = $('<img width="'+imgWidth+'" height="'+imgHeight+'"/>');
-			typeImg.attr('src', path + emotes[categories[type]][0][0]);
-			typeImg.attr('title', categories[type]);
-			if (categories[type] == defaultCategory) 
-				typeImg.addClass('selected');
-			typeImg.click(
-				function(){
-					pweEnhanceSettings.emotes[className].category = this.title;
-					$("."+className + " .emote-category .selected").removeClass("selected");
-					$(this).addClass("selected");
-					$("."+className + " .icon-emote").css('background-image', "url('"+path+ emotes[this.title][0][0]+"')");
-					$("."+className + " .emotes-div").hide();
-					$("."+className + " ."+this.title+"-emotes").show();
-					$("."+className + " ."+this.title+"-emotes img").each(function(){$(this).attr('src', $(this).data('url'));});
-					update();
-					return false;
-				}
-			);
-			categoryDiv.append(typeImg);
-		}
-		container.append(categoryDiv);
-	}
-	
-	var emoteClick = function () {
-		var position = $(this).closest(".FormWrapper").find('.BodyBox').insertAtCaret("[img]"+$(this).attr('src')+"[/img]");
-		return false;
-	};
-	for (var k = 0; k < categories.length; k++) {
-		emotesdiv = $('<div class="emotes-div"></div>').addClass(categories[k]+"-emotes");
-		if (categories[k] != defaultCategory)
-			emotesdiv.hide();
-		var emoteCount = 0;
-		var currentEmotes = emotes[categories[k]];
-		for (var i = 0; i < currentEmotes.length; i++) {
-			for (var j = 0; j < currentEmotes[i].length; j++) {
-				emoteCount++;
-				var img = $('<img width="'+imgWidth+'" height="'+imgHeight+'" class="'+categories[k]+(emoteCount)+'"/>');
-				//img.attr('src', path + currentEmotes[i][j]);  don't bother loading images until div is shown
-				img.data('url', path + currentEmotes[i][j]);
-				img.attr('title', categories[k]+(emoteCount));
-				img.click(emoteClick);
-				img.appendTo(emotesdiv);
+	var lazyLoad = function() {
+		var categories = Object.keys(emotes);
+		var container = $('<div class="emotes-dialog editor-insert-dialog Flyout MenuItems"></div>');
+		var defaultCategory = pweEnhanceSettings.emotes[className].category;
+		if (!(defaultCategory in emotes)) 
+			defaultCategory = Object.keys(emotes)[0];
+		
+		if (categories.length > 1) {
+			var categoryDiv = $('<div class="emote-category"></div>');
+			for (var type=0; type < categories.length; type++) {
+				var typeImg = $('<img width="'+imgWidth+'" height="'+imgHeight+'"/>');
+				typeImg.attr('src', path + emotes[categories[type]][0][0]);
+				typeImg.attr('title', categories[type]);
+				if (categories[type] == defaultCategory) 
+					typeImg.addClass('selected');
+				typeImg.click(
+					function(){
+						pweEnhanceSettings.emotes[className].category = this.title;
+						$("."+className + " .emote-category .selected").removeClass("selected");
+						$(this).addClass("selected");
+						$("."+className + " .icon-emote").css('background-image', "url('"+path+ emotes[this.title][0][0]+"')");
+						$("."+className + " .emotes-div").hide();
+						$("."+className + " ."+this.title+"-emotes").show();
+						$("."+className + " ."+this.title+"-emotes img").each(function(){$(this).attr('src', $(this).data('url'));});
+						update();
+						return false;
+					}
+				);
+				categoryDiv.append(typeImg);
 			}
-			emotesdiv.append($("<br>"));
+			container.append(categoryDiv);
 		}
-		container.append(emotesdiv);
-	}
+		
+		var emoteClick = function () {
+			var position = $(this).closest(".FormWrapper").find('.BodyBox').insertAtCaret("[img]"+$(this).attr('src')+"[/img]");
+			return false;
+		};
+		for (var k = 0; k < categories.length; k++) {
+			emotesdiv = $('<div class="emotes-div"></div>').addClass(categories[k]+"-emotes");
+			if (categories[k] != defaultCategory)
+				emotesdiv.hide();
+			var emoteCount = 0;
+			var currentEmotes = emotes[categories[k]];
+			for (var i = 0; i < currentEmotes.length; i++) {
+				for (var j = 0; j < currentEmotes[i].length; j++) {
+					emoteCount++;
+					var img = $('<img width="'+imgWidth+'" height="'+imgHeight+'" class="'+categories[k]+(emoteCount)+'"/>');
+					//img.attr('src', path + currentEmotes[i][j]);  don't bother loading images until div is shown
+					img.data('url', path + currentEmotes[i][j]);
+					img.attr('title', categories[k]+(emoteCount));
+					img.click(emoteClick);
+					img.appendTo(emotesdiv);
+				}
+				emotesdiv.append($("<br>"));
+			}
+			container.append(emotesdiv);
+		}
+		return container;
+	};
 	var button = $('<div class="editor-dropdown '+className+'"><span class="editor-action icon" title="Emotes"><span class="icon icon-emote"></span><span class="icon icon-caret-down"></span></span></div>');
 	button.find('.editor-action .icon-emote').click(function(){
 		$(this).parent().parent().toggleClass("editor-dropdown-open").siblings().removeClass("editor-dropdown-open");
 	});
 	button.find('.editor-action').click(function(){
+		if ($(this).closest('.editor-dropdown').find('.emotes-dialog').length == 0)
+			$(this).closest('.editor-dropdown').append(lazyLoad());
 		$("."+className+" ."+pweEnhanceSettings.emotes[className].category+"-emotes img").each(function(){$(this).attr('src', $(this).data('url'));});
 	});
-	button.find('.icon-emote').css('background-image', "url('"+path+emotes[defaultCategory][0][0]+"')");
-	return button.append(container);
+	button.find('.icon-emote').css('background-image', "url('"+path+emotes[pweEnhanceSettings.emotes[className].category][0][0]+"')");
+	return button;//.append(container);
 };
 
 var makeMLPEmotes = function() {
