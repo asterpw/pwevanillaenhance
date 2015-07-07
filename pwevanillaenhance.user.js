@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.3.1
+// @version    0.9.3.2
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -57,6 +57,8 @@ var pweEnhanceSettings = {
 	},
 	emotes: {
 	},
+	actions: {
+	},
 	themes: { //autoadded from remote
 	},
 	options: {
@@ -86,12 +88,7 @@ var buildCSSThemeURL = function(theme) {
 };
 
 var preloadThemes = function() { //loads before jquery
-	keys = Object.keys(pweEnhanceSettings.themes);
-	if (keys.length === 0) 
-		return;
-	keys.sort(function(a,b){
-			return pweEnhanceSettings.themes[a].order - pweEnhanceSettings.themes[b].order;
-	});
+	var keys = getSortedThemeNames();
 	for (var i = 0; i < keys.length; i++) { 
 		var name = keys[i];
 		enabled = 'enabled' in pweEnhanceSettings.themes[name] ? pweEnhanceSettings.themes[name].enabled : false;
@@ -103,8 +100,7 @@ var preloadThemes = function() { //loads before jquery
 };
 
 var applyThemes = function() {
-	keys = Object.keys(pweEnhanceSettings.themes);
-	keys.sort(function(a,b){return pweEnhanceSettings.themes[a].order - pweEnhanceSettings.themes[b].order;});
+	var keys = getSortedThemeNames();
 	for (var i = 0; i < keys.length; i++) { 
 		var name = keys[i];
 		enabled = 'enabled' in pweEnhanceSettings.themes[name] ? pweEnhanceSettings.themes[name].enabled : false; 
@@ -200,14 +196,22 @@ var setThemeEnabled = function(name, enabled) {
 	}
 };
 
+var getSortedThemeNames = function() {
+	var keys = Object.keys(pweEnhanceSettings.themes);
+	try {
+		keys.sort(function(a,b){
+				return pweEnhanceSettings.themes[a].order - pweEnhanceSettings.themes[b].order;
+		});
+	} catch(err) {// some stupid browser bug omg
+	};	
+	return keys;
+};
 
 var makeThemeMenu = function() {
 	var menu = $("<div><h1>Add-ons</h1></div>");
-	keys = Object.keys(pweEnhanceSettings.themes);
-	keys.sort(function(a,b){return pweEnhanceSettings.themes[a].order - pweEnhanceSettings.themes[b].order;});	
+	var keys = getSortedThemeNames();
 	for (var i = 0; i < keys.length; i++) { 
 		var name = keys[i];
-		
 		if (pweEnhanceSettings.themes[name].category == "Theme")
 			continue;
 		
@@ -372,10 +376,10 @@ var applyTitles = function() {
 
 var stripBlockTags = function(tag, text) {
 	var re = new RegExp("\\["+tag+"((?!\\["+tag+")[\\S\\s])*?\\[/"+tag+"\\]", "i");
-	match = re.exec(text)
+	match = re.exec(text);
 	while (match != null) {
 		text = text.replace(match[0], "");
-		match = re.exec(text)
+		match = re.exec(text);
 	}
 	return text.trim();
 };
@@ -944,6 +948,15 @@ var makeGameLinks = function(container) {
 	return $(links);
 };
 
+var makeBlockUser = function(container) {
+	var button = $('<a class="ReactButton '+this.id+'" title="Block User" style="cursor: pointer"><span class="ReactSprite ReactReject"></span>Block</a>');
+	button.click(function() {
+		var username = $(this).closest(".Item-BodyWrap").siblings(".Item-Header").find(".PhotoWrap").attr('title');
+		console.log(username);
+	});
+	return button;
+};
+
 var Feature = function() {};
 Feature.prototype.init = function(defaults) {
 	this.selector = "."+this.id;
@@ -1017,6 +1030,20 @@ LinkFeature.prototype.header = 'Links';
 LinkFeature.prototype.target = '.SiteMenu';
 LinkFeature.prototype.positionMethod = 'append';
 
+var ActionFeature = function(name, id, description, maker, defaults, screenshot) {
+	this.name = name;
+	this.id = id;
+	this.description = description;
+	this.maker = maker;
+	this.screenshot = screenshot;
+	this.init(defaults);
+};
+ActionFeature.prototype = new Feature;
+ActionFeature.prototype.type = 'actions';
+ActionFeature.prototype.header = 'Actions';
+ActionFeature.prototype.target = '.Reactions';
+ActionFeature.prototype.positionMethod = 'append';
+
 var features = [
 	new EditorFeature("Font Picker", "fontFacePicker", "Show font picker in editor", makeFontFacePicker),
 	new EditorFeature("Font Size Picker", "fontSizePicker", "Show font size picker in editor", makeFontSizePicker),
@@ -1029,7 +1056,8 @@ var features = [
 	new EmoteFeature("MLP Emotes", "mlpEmotes", "Show MLP emotes in editor", makeMLPEmotes, {category: "twilight", enabled: false}),
 	new LinkFeature("Show/Hide All Categories", "showHideAllCategories", "Add show/hide all categories links to Account Options Menu", makeShowHideAllCategories),
 	new LinkFeature("Show Draft Link", "draftLink", "Add manage drafts link to Account Options Menu", makeDraftsLink),
-	new LinkFeature("Show/Hide Game Links", "gameLinks", "Add Game-specific links", makeGameLinks, {enabled: false}),
+	new LinkFeature("Show/Hide Game Links", "gameLinks", "Add Game-specific links", makeGameLinks, {enabled: false})
+	//new ActionFeature("Block User action", "blockUser", "Show block user action", makeBlockUser)
 ];
 
 var installFeatures = function(container) {
@@ -1103,11 +1131,8 @@ preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
 loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/5419bbdd899d4052aec77db920f382a235371b4f/pwevanillaenhance.user.css");
 getSettings();
-try{
-	preloadThemes();
-} catch(err) {
-	//sometimes fails, idk why, theme will get loaded after jquery so whatever.
-}
+preloadThemes();
+
 var jQueryLoaded = function() {
 //$(document).ready(function() {
 	preventEmbed();
@@ -1117,6 +1142,7 @@ var jQueryLoaded = function() {
 	handleThemes();
 	installFeatures($('.FormWrapper'));
 	installFeatures($('.Head'));
+	installFeatures($('.Item-BodyWrap'));
 	makeThemeManager();
 	makeEnhancePreferencesMenu();
 	applyTitles();
