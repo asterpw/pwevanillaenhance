@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.4
+// @version    0.9.5
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.9.4";  //what we store when we should display what's new dialog
+var VERSION = "0.9.5";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.9.5</div> - Added star trek emotes courtesy <a href='http://irvinis.deviantart.com' style='color:black; text-decoration: bold'>IrvinIS</a>\
 	<div class='change-ver'>v0.9.4</div> - Added fancier emote option picker\
 	<div class='change-ver'>v0.9.3</div> - Added word wrapping of long comment previews for chrome+opera\
 	<div class='change-ver'>v0.9.2</div> - Block the forced embedding arc redirect\
@@ -701,6 +702,17 @@ var makeHeroEmotes = function() {
 		50);
 };
 
+var makeStarTrekEmotes = function() {
+	var emotes = {'trek': [["vQTD03D.png", "LiJf02C.png", "R0qtiA5.png", "6sEcCRP.png", "ZPEvG0r.png", "OPKfOKi.png"], 
+		["hzG3baX.png", "7H0tNfX.png", "CqARubD.png", "X1lhMI3.png", "Eut8V8e.png", "DE7lsR2.png"], 
+		["IvaWOgM.png", "TvNf8Vs.png", "Wi8hgCx.png", "hG7UctY.png", "m8ufiyH.png", "eRTce0J.png"]]};
+	return makeEmotePanel(this.id, 
+		'http://i.imgur.com/',
+		emotes,
+		50, 
+		50);
+};
+
 var makePWIEmotes = function() {
 	var categories = ["normal", "tiger", "pig", "bear",  "monkey", "fish", "fox", "mouse", "egg"]; 
 	var emotes = {};
@@ -1097,11 +1109,12 @@ var features = [
 	new EditorFeature("Font Size Picker", "fontSizePicker", "Show font size picker in editor", makeFontSizePicker),
 	new EditorFeature("Font Color Picker", "fontColorPicker", "Show font color picker in editor", makeFontColorPicker, {selectedColor: "#FFFFFF", autoAddColor: false}),
 	new EmoteFeature("PWI Emotes", "pwiEmotes", "Straight from Pan Gu!", makePWIEmotes, {category: "tiger"}, "http://asterpw.github.io/pwicons/emotes/tiger-3.gif"),
-	new EmoteFeature("Forsaken Emotes", "fwEmotes", "Who remembers these?", makeFWEmotes, {category: "jellyfish"}, "http://asterpw.github.io/pwicons/emotes/samurai-4.gif"),
+	new EmoteFeature("Forsaken Emotes", "fwEmotes", "Who remembers these?", makeFWEmotes, {category: "jellyfish", enabled: false}, "http://asterpw.github.io/pwicons/emotes/samurai-4.gif"),
 	new EmoteFeature("Text Face Emotes", "textFaceEmotes", "\u0f3c \u3064 \u25d5_\u25d5 \u0f3d\u3064 more emotes", makeTextFaceEmotes, {}, "http://i.imgur.com/Zsjx9TM.png"),
 	new EmoteFeature("Herocat Emotes", "herocatEmotes", "Be a champion.", makeHeroEmotes, {category: "herocat", enabled: false}, "http://i.imgur.com/xMHLXms.gif"),
 	new EmoteFeature("Onion Emotes", "onionEmotes", "Or is this is a white cat?", makeOnionEmotes, {category: "onion", enabled: false}, "http://cdn.rawgit.com/asterpw/e/m/on/onion-7.gif"),
 	new EmoteFeature("MLP Emotes", "mlpEmotes", "Friendship is Magic", makeMLPEmotes, {category: "twilight", enabled: false}, "http://i.imgur.com/RM8GEJh.png"),
+	new EmoteFeature("Star Trek Emotes", "trekEmotes", "\u00A9 irvinis.deviantart.com", makeStarTrekEmotes, {category: "trek"}, "http://i.imgur.com/vQTD03D.png"),
 	new LinkFeature("Show/Hide All Categories", "showHideAllCategories", "Add show/hide all categories links to Account Options Menu", makeShowHideAllCategories),
 	new LinkFeature("Show Draft Link", "draftLink", "Add manage drafts link to Account Options Menu", makeDraftsLink),
 	new LinkFeature("Show/Hide Game Links", "gameLinks", "Add Game-specific links", makeGameLinks, {enabled: false})
