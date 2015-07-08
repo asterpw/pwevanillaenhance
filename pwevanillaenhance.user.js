@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.3.4
+// @version    0.9.4
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.9.3";  //what we store when we should display what's new dialog
+var VERSION = "0.9.4";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.9.4</div> - Added fancier emote option picker\
 	<div class='change-ver'>v0.9.3</div> - Added word wrapping of long comment previews for chrome+opera\
 	<div class='change-ver'>v0.9.2</div> - Block the forced embedding arc redirect\
 	<div class='change-ver'>v0.9.1</div> - Everyone gets the coveted Enhance User title\
@@ -70,7 +71,7 @@ var pweEnhanceSettings = {
 };
 
 var showWhatsNewDialog = function() {
-	var whatsNew = $("<div class='whatsNewDialog enhanceDialog' style='display: none;'></div>");
+	var whatsNew = $("<div class='whatsNewDialog' style='display: none;'></div>");
 	whatsNew.append($("<div class='title'>What's new in PWE Vanilla Enhancement v"+getFullVersion()+"<div class='close'>X</div></div>"));
 	whatsNew.append($(CHANGELOG));
 	$(".close", whatsNew).click(function(){
@@ -242,7 +243,7 @@ var getNameForVariantGroup = function (variantName) {
 
 var makeThemePicker = function(name) {
 	var theme = pweEnhanceSettings.themes[name];
-	var container = $("<div class='theme'></div>");
+	var container = $("<div class='theme picker'></div>");
 	if (theme.enabled) {
 		container.addClass('selected');
 	}
@@ -342,8 +343,30 @@ var makeThemeManager = function() {
 	var button = $('<a href="#" class="MeButton FlyoutButton" title="Themes"><span class="Sprite Sprite16 SpOptions"></span></a>');
 
 	var themeControl = $("<span class='ToggleFlyout enhance-themes'></span>");
-	button.click(function(){$('.themeManager').slideToggle();});
+	button.click(function(){$('.themeManager').slideToggle();
+		$('.themeManager').siblings('.enhanceDialog:visible').detach().insertAfter($('.themeManager')).slideToggle();});
 	$(".MeMenu").append(themeControl.append(button));
+};
+
+
+var makeEmoteManager = function() {
+	$(".emoteManager, .enhance-emotes").remove();
+	var dialog = $("<div class='emoteManager enhanceDialog' style='margin: 0px auto; display: none;'></div>");
+	var content = $("<div class='content'></div>");	
+	for (var i = 0; i < features.length; i++) { 
+		if (features[i].type != 'emotes')
+			continue;
+		content.append(features[i].optionPicker());
+	}
+	dialog.append(content);
+	$(".SiteMenu").append(dialog);
+	
+	var button = $('<a href="#" class="MeButton FlyoutButton" title="Emotes"><span class="Sprite Sprite16 SpOptions"></span></a>');
+
+	var control = $("<span class='ToggleFlyout enhance-emotes'></span>");
+	button.click(function(){$('.emoteManager').slideToggle();
+		$('.emoteManager').siblings('.enhanceDialog:visible').detach().insertAfter($('.emoteManager')).slideToggle();});
+	$(".MeMenu").append(control.append(button));
 };
 
 var ENHANCE_IDENTIFIER = '\u200B\u200B'; //It's invisible... spooky
@@ -488,6 +511,8 @@ var makeFeatureMenu = function() {
 	var menu = $("<div></div>");
 	var currentFeatureType = null;
 	for (var i = 0; i < features.length; i++) { 
+		if (features[i].type == "emotes")
+			continue;
 		if (features[i].type != currentFeatureType) {
 			menu.append($("<h1>"+features[i].header+"</h1>"));
 			currentFeatureType = features[i].type;
@@ -991,12 +1016,12 @@ Feature.prototype.isEnabled = function() {
 	return pweEnhanceSettings[this.type][this.id].enabled;
 };
 
-var EditorFeature = function(name, id, description, maker, defaults, screenshot) {
+var EditorFeature = function(name, id, description, maker, defaults, thumbnail) {
 	this.name = name;
 	this.id = id;
 	this.description = description;
 	this.maker = maker;
-	this.screenshot = screenshot;
+	this.thumbnail = thumbnail;
 	this.init(defaults);
 };
 EditorFeature.prototype = new Feature;
@@ -1005,12 +1030,12 @@ EditorFeature.prototype.type = 'editor';
 EditorFeature.prototype.target = '.editor-action-headers';
 EditorFeature.prototype.positionMethod = 'before';
 
-var EmoteFeature = function(name, id, description, maker, defaults, screenshot) {
+var EmoteFeature = function(name, id, description, maker, defaults, thumbnail) {
 	this.name = name;
 	this.id = id;
 	this.description = description;
 	this.maker = maker;
-	this.screenshot = screenshot;
+	this.thumbnail = thumbnail;
 	this.init(defaults);
 };
 EmoteFeature.prototype = new Feature;
@@ -1019,12 +1044,12 @@ EmoteFeature.prototype.type = 'emotes';
 EmoteFeature.prototype.target = '.editor-action-emoji';
 EmoteFeature.prototype.positionMethod = 'after';
 
-var LinkFeature = function(name, id, description, maker, defaults, screenshot) {
+var LinkFeature = function(name, id, description, maker, defaults, thumbnail) {
 	this.name = name;
 	this.id = id;
 	this.description = description;
 	this.maker = maker;
-	this.screenshot = screenshot;
+	this.thumbnail = thumbnail;
 	this.init(defaults);
 };
 LinkFeature.prototype = new Feature;
@@ -1033,12 +1058,12 @@ LinkFeature.prototype.header = 'Links';
 LinkFeature.prototype.target = '.SiteMenu';
 LinkFeature.prototype.positionMethod = 'append';
 
-var ActionFeature = function(name, id, description, maker, defaults, screenshot) {
+var ActionFeature = function(name, id, description, maker, defaults, thumbnail) {
 	this.name = name;
 	this.id = id;
 	this.description = description;
 	this.maker = maker;
-	this.screenshot = screenshot;
+	this.thumbnail = thumbnail;
 	this.init(defaults);
 };
 ActionFeature.prototype = new Feature;
@@ -1047,16 +1072,36 @@ ActionFeature.prototype.header = 'Actions';
 ActionFeature.prototype.target = '.Reactions';
 ActionFeature.prototype.positionMethod = 'append';
 
+EmoteFeature.prototype.optionPicker = function() {
+	var container = $('<div class="picker"></div>');
+	container.append($('<img src="'+this.thumbnail+'">'));
+	container.append($('<span class="title">'+this.name+'</span>'));
+	container.append($('<span class="description">'+this.description+'</span>'));
+	if (pweEnhanceSettings[this.type][this.id].enabled) {
+		container.addClass("selected");
+	}
+	container.attr('title', 'Show '+this.name+' in the editor');
+	var closure = this;
+	container.click(function(){
+		closure.setEnabled(!(pweEnhanceSettings[closure.type][closure.id].enabled));
+		if (pweEnhanceSettings[closure.type][closure.id].enabled)
+			$(this).addClass("selected");
+		else
+			$(this).removeClass("selected");
+	});
+	return container;
+};
+
 var features = [
 	new EditorFeature("Font Picker", "fontFacePicker", "Show font picker in editor", makeFontFacePicker),
 	new EditorFeature("Font Size Picker", "fontSizePicker", "Show font size picker in editor", makeFontSizePicker),
 	new EditorFeature("Font Color Picker", "fontColorPicker", "Show font color picker in editor", makeFontColorPicker, {selectedColor: "#FFFFFF", autoAddColor: false}),
-	new EmoteFeature("PWI Emotes", "pwiEmotes", "Show PWI emotes in editor", makePWIEmotes, {category: "tiger"}),
-	new EmoteFeature("Forsaken World Emotes", "fwEmotes", "Show Forsaken World emotes in editor", makeFWEmotes, {category: "jellyfish"}),
-	new EmoteFeature("Herocat (Champions Online) Emotes", "herocatEmotes", "Show Herocat (Champions Online) emotes in editor", makeHeroEmotes, {category: "herocat", enabled: false}),
-	new EmoteFeature("Text Face Emotes", "textFaceEmotes", "Show Text Face emotes in editor", makeTextFaceEmotes),
-	new EmoteFeature("Onion Emotes", "onionEmotes", "Show Onion emotes in editor", makeOnionEmotes, {category: "onion", enabled: false}),
-	new EmoteFeature("MLP Emotes", "mlpEmotes", "Show MLP emotes in editor", makeMLPEmotes, {category: "twilight", enabled: false}),
+	new EmoteFeature("PWI Emotes", "pwiEmotes", "Straight from Pan Gu!", makePWIEmotes, {category: "tiger"}, "http://asterpw.github.io/pwicons/emotes/tiger-3.gif"),
+	new EmoteFeature("Forsaken Emotes", "fwEmotes", "Who remembers these?", makeFWEmotes, {category: "jellyfish"}, "http://asterpw.github.io/pwicons/emotes/samurai-4.gif"),
+	new EmoteFeature("Text Face Emotes", "textFaceEmotes", "\u0f3c \u3064 \u25d5_\u25d5 \u0f3d\u3064 more emotes", makeTextFaceEmotes, {}, "http://i.imgur.com/Zsjx9TM.png"),
+	new EmoteFeature("Herocat Emotes", "herocatEmotes", "Be a champion.", makeHeroEmotes, {category: "herocat", enabled: false}, "http://i.imgur.com/xMHLXms.gif"),
+	new EmoteFeature("Onion Emotes", "onionEmotes", "Or is this is a white cat?", makeOnionEmotes, {category: "onion", enabled: false}, "http://cdn.rawgit.com/asterpw/e/m/on/onion-7.gif"),
+	new EmoteFeature("MLP Emotes", "mlpEmotes", "Friendship is Magic", makeMLPEmotes, {category: "twilight", enabled: false}, "http://i.imgur.com/RM8GEJh.png"),
 	new LinkFeature("Show/Hide All Categories", "showHideAllCategories", "Add show/hide all categories links to Account Options Menu", makeShowHideAllCategories),
 	new LinkFeature("Show Draft Link", "draftLink", "Add manage drafts link to Account Options Menu", makeDraftsLink),
 	new LinkFeature("Show/Hide Game Links", "gameLinks", "Add Game-specific links", makeGameLinks, {enabled: false})
@@ -1132,7 +1177,7 @@ var getSettings = function() {
 
 preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/5419bbdd899d4052aec77db920f382a235371b4f/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/3404559cf7c1e92300afb726c0b00367a31395dd/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
 
@@ -1147,6 +1192,7 @@ var jQueryLoaded = function() {
 	installFeatures($('.Head'));
 	installFeatures($('.Item-BodyWrap'));
 	makeThemeManager();
+	makeEmoteManager();
 	makeEnhancePreferencesMenu();
 	applyTitles();
 	addPreviews();
