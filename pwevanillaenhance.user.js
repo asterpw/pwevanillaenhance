@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.3.2
+// @version    0.9.3.3
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -91,6 +91,7 @@ var preloadThemes = function() { //loads before jquery
 	var keys = getSortedThemeNames();
 	for (var i = 0; i < keys.length; i++) { 
 		var name = keys[i];
+		
 		enabled = 'enabled' in pweEnhanceSettings.themes[name] ? pweEnhanceSettings.themes[name].enabled : false;
 		if (enabled) {
 			var theme = pweEnhanceSettings.themes[name];
@@ -198,11 +199,14 @@ var setThemeEnabled = function(name, enabled) {
 
 var getSortedThemeNames = function() {
 	var keys = Object.keys(pweEnhanceSettings.themes);
+	
 	try {
 		keys.sort(function(a,b){
-				return pweEnhanceSettings.themes[a].order - pweEnhanceSettings.themes[b].order;
+			if (typeof a == 'function') return Number.MAX_VALUE;
+			if (typeof b == 'function') return -Number.MAX_VALUE; //this is BS
+			return pweEnhanceSettings.themes[a].order - pweEnhanceSettings.themes[b].order;
 		});
-	} catch(err) {// some stupid browser bug omg
+	} catch(err) {
 	};	
 	return keys;
 };
