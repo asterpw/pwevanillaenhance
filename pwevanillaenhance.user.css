@@ -1,5 +1,5 @@
 .full-spectrum {
-	min-width: 418px;   
+	min-width: 418px;	
 }
 
 .full-spectrum.sp-palette-only {
@@ -7,12 +7,12 @@
 }
 
 .sp-palette-container {
-	width: 200px;   
+	width: 200px;	
 }
 
 
 .whatsNewDialog {
- 	width: 415px;
+	width: 415px;
 	float: right;
 	position: absolute;
 	top: 150px;
@@ -89,7 +89,7 @@
 	margin-top: 2px;
 	margin-left: 5px;
 	background-color: #69CAFE;
- 	border-radius: 10px;
+	border-radius: 10px;
 	color: black;
 	padding: 0px 10px;
 	width: inherit;
@@ -135,7 +135,7 @@
 }
 
 .emotes-dialog img {
-	padding: 2px;   
+	padding: 2px;	
 	cursor: pointer;
 }
 
@@ -154,7 +154,7 @@
 }
 
 .emote-category img {
-	padding: 3px;   
+	padding: 3px;	
 	border: 1px solid transparent;
 }
 
@@ -177,7 +177,7 @@
 
 
 .emotes-div img:hover {
-	background-color: #EEEEEE;   
+	background-color: #EEEEEE;	
 }
 
 .mlpEmotes .emote-category img {
@@ -233,7 +233,7 @@
 }
 
 .fontColorPicker-dialog {
-	width: auto !important;   
+	width: auto !important;	
 }
 
 .fontColorPicker-dialog input.autocolor {
@@ -247,7 +247,7 @@
 }
 
 .fontColorPicker > .icon {
-	padding: 0px 7px;   
+	padding: 0px 7px;	
 	height: 22px;
 }
 
@@ -257,7 +257,86 @@
 }
 
 
+/************************
+  Enhance Dialog General
+************************/
+.enhanceDialog {
+	margin-top: 10px;
+	width: 925px;
+	overflow: auto;	
+}
 
+.enhanceDialog .picker {
+	float: left;
+	width: 275px;
+	height: auto;
+	display: block;
+	margin-right: 10px;	
+	margin-bottom: 10px;
+	background: rgba(0, 0, 0, 0.3);
+	padding: 10px;
+	position: relative;
+	box-shadow: 0px 0px 10px 0px  rgba(255,255,255,0.3);
+}
+
+.enhanceDialog .content {
+	display: block;
+	padding: 10px 0px 10px 10px;
+	margin: 0px;
+	overflow: hidden;
+}
+
+.enhanceDialog .picker:hover {
+	box-shadow: 0px 0px 10px  #FFFFFF;
+}
+
+
+/************************
+  Emote Manager Stuff
+************************/
+.enhance-emotes  .SpOptions:before {
+	content: "\f167" !important;
+	color: #69CAFE !important;
+}
+
+.emoteManager .picker img {
+	width: 50px;
+	height: 50px;
+	margin: 0px;
+	position: absolute;
+}
+
+.emoteManager .picker {
+	height: 50px !important;	
+	cursor: pointer;
+}
+
+.emoteManager .title {
+	font-size: 23px;
+	font-weight: bold;
+	margin-left: 60px;
+	display: block;
+}
+.emoteManager .description {
+	font-size: 12px;	
+	margin-left: 60px;
+	margin-top: 20px;
+}
+
+.emoteManager .selected .title:before {
+	content: "\f11c";
+	position: absolute;
+	top: 40px;
+	left: 260px;
+	z-index: 100;
+	font-family: vanillicon;
+	font-size: 30px;
+	text-shadow: 2px 2px 5px #000000;
+	width: 25px;
+	height: 25px;
+	color: lime;
+	opacity: 0.8;
+}
 
 /************************
   Theme Manager Stuff
@@ -268,14 +347,7 @@
 	color: #69CAFE !important;
 }
 
-	
-.themeManager {	
-	margin-top: 10px;
-	width: 925px;
-	overflow: auto;
-/*	background-color: rgba(200,200,200,0.2);*/
-}
-	
+
 .themeManager .title {
 	display: none;
 	background-color: #69CCFF;
@@ -292,29 +364,6 @@
 	float:right;
 }
 
-.themeManager .content {
-	display: block;
-	padding: 10px 0px 10px 10px;
-	margin: 0px;
-}
-	
-.themeManager .theme {
-	float: left;
-	width: 275px;
-	height: auto;
-	display: block;
-	margin-right: 10px;	
-	margin-bottom: 10px;
-	background: rgba(0, 0, 0, 0.3);
-	padding: 10px;
-	position: relative;
-	box-shadow: 0px 0px 10px 0px  rgba(255,255,255,0.3);
-}
-	
-.themeManager .theme:hover {
-	box-shadow: 0px 0px 10px  #FFFFFF;
-}
-	
 .themeManager .theme-author::before {
 	content: 'by';
 	margin-left: 5px;
@@ -379,27 +428,27 @@
 
 
 @keyframes colorRotate {
-    from {
-        color: rgb(255, 128, 128);
-    }
-    16.6% {
-        color: rgb(255, 128, 255);
-    }
-    33.3% {
-        color: rgb(128, 128, 255);
-    }
-    50% {
-        color: rgb(128, 255, 255);
-    }
-    66.6% {
-        color: rgb(128, 255, 128);
-    }
-    83.3% {
-        color: rgb(255, 255,128);
-    }
-    to {
-        color: rgb(255, 128, 128);
-    }
+	from {
+		color: rgb(255, 128, 128);
+	}
+	16.6% {
+		color: rgb(255, 128, 255);
+	}
+	33.3% {
+		color: rgb(128, 128, 255);
+	}
+	50% {
+		color: rgb(128, 255, 255);
+	}
+	66.6% {
+		color: rgb(128, 255, 128);
+	}
+	83.3% {
+		color: rgb(255, 255,128);
+	}
+	to {
+		color: rgb(255, 128, 128);
+	}
 }
 
 .themeManager .content {
