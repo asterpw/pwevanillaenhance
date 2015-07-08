@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.3.3
+// @version    0.9.3.4
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -456,12 +456,11 @@ var mergeData = function(to, from, allowAddKeys) {
 	if (from == null) {
 		return;
 	}
-	var keys = Object.keys(from);
-	for (var i in keys) {
-		if (typeof from[keys[i]] == 'object' && keys[i] in to) 
-			mergeData(to[keys[i]], from[keys[i]]);
-		else if (keys[i] in to || allowAddKeys) 
-			to[keys[i]] = from[keys[i]];
+	for (var key in from) {
+		if (typeof from[key] == 'object' && key in to) 
+			mergeData(to[key], from[key]);
+		else if (key in to || allowAddKeys) 
+			to[key] = from[key];
 	}
 };
 
