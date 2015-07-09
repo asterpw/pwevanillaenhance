@@ -507,3 +507,16 @@
 	color: #69FECA; 
 	display: block;
 }
+
+/************************
+  User Blocking
+************************/
+.unhideComment {
+	margin: 2px 10px;
+	cursor: pointer;
+	opacity: 0.3;
+}
+	
+.unhideComment:hover {
+	opacity: 1;
+}
