@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.6
+// @version    0.9.6.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -210,7 +210,7 @@ var getSortedThemeNames = function() {
 			return pweEnhanceSettings.themes[a].order - pweEnhanceSettings.themes[b].order;
 		});
 	} catch(err) {
-	};	
+	}
 	return keys;
 };
 
@@ -1130,7 +1130,7 @@ var features = [
 	new EmoteFeature("Onion Emotes", "onionEmotes", "Or is this is a white cat?", makeOnionEmotes, {category: "onion", enabled: false}, "http://cdn.rawgit.com/asterpw/e/m/on/onion-7.gif"),
 	new EmoteFeature("MLP Emotes", "mlpEmotes", "Friendship is Magic", makeMLPEmotes, {category: "twilight", enabled: false}, "http://i.imgur.com/RM8GEJh.png"),
 	new EmoteFeature("Star Trek Emotes", "trekEmotes", "\u00A9 irvinis.deviantart.com", makeStarTrekEmotes, {category: "trek"}, "http://i.imgur.com/vQTD03D.png"),
-	new EmoteFeature("Dino Emotes", "dinoEmotes", "Qoobee Agapi!", makeDinoEmotes, {category: "dino1"; enabled: false}, "http://cdn.rawgit.com/asterpw/e/m/dino/dino1-1.gif"),
+	new EmoteFeature("Dino Emotes", "dinoEmotes", "Qoobee Agapi!", makeDinoEmotes, {category: "dino1", enabled: false}, "http://cdn.rawgit.com/asterpw/e/m/dino/dino1-1.gif"),
 	new LinkFeature("Show/Hide All Categories", "showHideAllCategories", "Add show/hide all categories links to Account Options Menu", makeShowHideAllCategories),
 	new LinkFeature("Show Draft Link", "draftLink", "Add manage drafts link to Account Options Menu", makeDraftsLink),
 	new LinkFeature("Show/Hide Game Links", "gameLinks", "Add Game-specific links", makeGameLinks, {enabled: false})
