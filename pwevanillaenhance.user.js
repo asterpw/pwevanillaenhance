@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.6.2
+// @version    0.9.6.3
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -687,8 +687,7 @@ var makeOnionEmotes = function() {
 		'http://cdn.rawgit.com/asterpw/e/m/on/',
 //		'http://cdn.rawgit.com/asterpw/pwicons/gh-pages/emotes/',
 		{'onion': generateEmoteArray('onion', 10, 70, 1, '.gif')},
-		35, 
-		35);
+		35, 35);
 };
 
 var makeHeroEmotes = function() {
@@ -698,9 +697,7 @@ var makeHeroEmotes = function() {
 		["RtcjLDn.gif", "lLgP7Ld.gif", "taePNbZ.gif", "2WCf0cq.gif", "HLK29cV.gif", "lRQebLq.gif"]]};
 	return makeEmotePanel('herocatEmotes', 
 		'http://i.imgur.com/',
-		emotes,
-		50, 
-		50);
+		emotes, 50, 50);
 };
 
 var makeStarTrekEmotes = function() {
@@ -709,23 +706,18 @@ var makeStarTrekEmotes = function() {
 		["IvaWOgM.png", "TvNf8Vs.png", "Wi8hgCx.png", "hG7UctY.png", "m8ufiyH.png", "eRTce0J.png"]]};
 	return makeEmotePanel(this.id, 
 		'http://i.imgur.com/',
-		emotes,
-		50, 
-		50);
+		emotes, 50, 50);
 };
 
 var makeDinoEmotes = function() {
-	var categories = ["dino1", "dino2", "dino3"]; 
+	var categories = ["dino1", "dino2", "dino3", "dino4", "dino5"]; 
 	var emotes = {};
 	for (var i = 0; i < categories.length; i++) {
-		emotes[categories[i]] = generateEmoteArray(categories[i], 10, 40, 1, '.gif');
+		emotes[categories[i]] = generateEmoteArray(categories[i], 8, 24, 1, '.gif');
 	}
 	return makeEmotePanel(this.id, 
 		'http://cdn.rawgit.com/asterpw/e/m/dino/',
-//		'http://cdn.rawgit.com/asterpw/pwicons/gh-pages/emotes/',
-		emotes,
-		50, 
-		50);
+		emotes, 50, 50);
 };
 
 var makePWIEmotes = function() {
@@ -736,10 +728,7 @@ var makePWIEmotes = function() {
 	}
 	return makeEmotePanel('pwiEmotes', 
 		'http://asterpw.github.io/pwicons/emotes/',
-//		'http://cdn.rawgit.com/asterpw/pwicons/gh-pages/emotes/',
-		emotes,
-		32, 
-		32);
+		emotes, 32, 32);
 };
 
 var makeFWEmotes = function() {
