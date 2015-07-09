@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.6.3
+// @version    0.9.7
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.9.6";  //what we store when we should display what's new dialog
+var VERSION = "0.9.7";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.9.7</div> - Added User Blocking<br>- Redirect embedded urls to native urls \
 	<div class='change-ver'>v0.9.6</div> - Added dino emotes \
 	<div class='change-ver'>v0.9.5</div> - Added star trek emotes courtesy <a href='http://irvinis.deviantart.com' style='color:black; text-decoration: bold'>IrvinIS</a>\
 	<div class='change-ver'>v0.9.4</div> - Added fancier emote option picker\
@@ -67,6 +68,8 @@ var pweEnhanceSettings = {
 	options: {
 		collapseThemes: false,
 		showEnhanceTitle: true
+	},
+	blockedUsers: {
 	},
 	lastThemeUpdateTime: 0,
 	version: "0"
@@ -401,6 +404,12 @@ var applyTitles = function() {
 		}
 	}
 	
+};
+
+var redirectUrls = function() {
+	$('a[href^="http://www.arcgames.com/en/forums#"]').each(function(){
+		$(this).attr('href', $(this).attr('href').replace("www.arcgames.com/en/forums#", "perfectworld.vanillaforums.com"));
+	});
 };
 
 var stripBlockTags = function(tag, text) {
@@ -992,13 +1001,47 @@ var makeGameLinks = function(container) {
 	return $(links);
 };
 
+var hideBlockedUsers = function() {
+	$(".Comment, td .Block.Wrap").show();
+	$(".unhideComment").remove();
+	$(".unblockUser").hide();
+	if (pweEnhanceSettings.links.blockUser.enabled)
+		$(".blockUser").show();
+	for (var user in pweEnhanceSettings.blockedUsers) {
+		var unhideControl = $("<div class='unhideComment'>Show blocked comment</div>").click(function(){
+			$(this).siblings(".Comment").show();
+			$(this).siblings(".Comment").find(".unblockUser").show();
+			$(this).siblings(".Comment").find(".blockUser").hide();
+			$(this).remove();
+		});
+		$('.PhotoWrap[title="'+user+'"]').closest(".Block.Wrap").hide();
+		var blocked = $('.PhotoWrap[title="'+user+'"]').closest(".Comment").hide();
+		$(".unblockUser", blocked).show();
+		$(".blockUser", blocked).hide();
+		blocked.before(unhideControl);
+	}
+}
+
 var makeBlockUser = function(container) {
-	var button = $('<a class="ReactButton '+this.id+'" title="Block User" style="cursor: pointer"><span class="ReactSprite ReactReject"></span>Block</a>');
-	button.click(function() {
+	this.positionMethod = 'before';
+	this.target = 'a.Quote';
+	var buttons = $('<span><a class="ReactButton blockUser" title="Block User" style="display: none; cursor: pointer"><span class="ReactSprite ReactReject"></span>Block</a>' + 
+		'<a class="ReactButton unblockUser" title="Unblock User" style="display: none; cursor: pointer"><span class="ReactSprite ReactReject"></span>Unblock</a></span>');	
+	buttons.find('.blockUser').click(function() {
 		var username = $(this).closest(".Item-BodyWrap").siblings(".Item-Header").find(".PhotoWrap").attr('title');
-		console.log(username);
+		pweEnhanceSettings.blockedUsers[username] = true;
+		update();
+		hideBlockedUsers();
 	});
-	return button;
+	buttons.find('.unblockUser').click(function() {
+		var username = $(this).closest(".Item-BodyWrap").siblings(".Item-Header").find(".PhotoWrap").attr('title');
+		if (username in pweEnhanceSettings.blockedUsers) {
+			delete pweEnhanceSettings.blockedUsers[username];
+		} 
+		update();
+		hideBlockedUsers();
+	});
+	return buttons.children();
 };
 
 var Feature = function() {};
@@ -1123,8 +1166,8 @@ var features = [
 	new EmoteFeature("Dino Emotes", "dinoEmotes", "Qoobee Agapi!", makeDinoEmotes, {category: "dino1", enabled: false}, "http://cdn.rawgit.com/asterpw/e/m/dino/dino1-1.gif"),
 	new LinkFeature("Show/Hide All Categories", "showHideAllCategories", "Add show/hide all categories links to Account Options Menu", makeShowHideAllCategories),
 	new LinkFeature("Show Draft Link", "draftLink", "Add manage drafts link to Account Options Menu", makeDraftsLink),
-	new LinkFeature("Show/Hide Game Links", "gameLinks", "Add Game-specific links", makeGameLinks, {enabled: false})
-	//new ActionFeature("Block User action", "blockUser", "Show block user action", makeBlockUser)
+	new LinkFeature("Show/Hide Game Links", "gameLinks", "Add Game-specific links", makeGameLinks, {enabled: false}),
+	new LinkFeature("Block User action", "blockUser", "Show block user action", makeBlockUser)
 ];
 
 var installFeatures = function(container) {
@@ -1181,6 +1224,7 @@ var getSettings = function() {
 			if (savedSettings.version < "0.8.3") {
 				pweEnhanceSettings.lastThemeUpdateTime = 0; // force theme update
 			}
+			mergeData(pweEnhanceSettings.blockedUsers, savedSettings.blockedUsers, true)
 			if (savedSettings.themes && savedSettings.version >= "0.8.5") {// allow cached themes
 				mergeData(pweEnhanceSettings.themes, savedSettings.themes, true);
 			} else {
@@ -1196,7 +1240,7 @@ var getSettings = function() {
 
 preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/3404559cf7c1e92300afb726c0b00367a31395dd/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/bc7047f28dfb66e4265f5f779e46a9aa2071191f/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
 
@@ -1215,6 +1259,8 @@ var jQueryLoaded = function() {
 	makeEnhancePreferencesMenu();
 	applyTitles();
 	addPreviews();
+	redirectUrls();
+	hideBlockedUsers();
 	$.getScript("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.js").done(function() {
 		initColorPicker($('.fontColorPicker'));
 	});
