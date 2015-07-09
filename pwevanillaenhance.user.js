@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.5
+// @version    0.9.6
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.9.5";  //what we store when we should display what's new dialog
+var VERSION = "0.9.6";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.9.5</div> - Added dino emotes \
 	<div class='change-ver'>v0.9.5</div> - Added star trek emotes courtesy <a href='http://irvinis.deviantart.com' style='color:black; text-decoration: bold'>IrvinIS</a>\
 	<div class='change-ver'>v0.9.4</div> - Added fancier emote option picker\
 	<div class='change-ver'>v0.9.3</div> - Added word wrapping of long comment previews for chrome+opera\
@@ -713,6 +714,20 @@ var makeStarTrekEmotes = function() {
 		50);
 };
 
+var makeDinoEmotes = function() {
+	var categories = ["dino1", "dino2", "dino3"]; 
+	var emotes = {};
+	for (var i = 0; i < categories.length; i++) {
+		emotes[categories[i]] = generateEmoteArray(categories[i], 10, 40, 1, '.gif');
+	}
+	return makeEmotePanel(this.id, 
+		'http://cdn.rawgit.com/asterpw/e/m/dino/',
+//		'http://cdn.rawgit.com/asterpw/pwicons/gh-pages/emotes/',
+		emotes,
+		50, 
+		50);
+};
+
 var makePWIEmotes = function() {
 	var categories = ["normal", "tiger", "pig", "bear",  "monkey", "fish", "fox", "mouse", "egg"]; 
 	var emotes = {};
@@ -1115,6 +1130,7 @@ var features = [
 	new EmoteFeature("Onion Emotes", "onionEmotes", "Or is this is a white cat?", makeOnionEmotes, {category: "onion", enabled: false}, "http://cdn.rawgit.com/asterpw/e/m/on/onion-7.gif"),
 	new EmoteFeature("MLP Emotes", "mlpEmotes", "Friendship is Magic", makeMLPEmotes, {category: "twilight", enabled: false}, "http://i.imgur.com/RM8GEJh.png"),
 	new EmoteFeature("Star Trek Emotes", "trekEmotes", "\u00A9 irvinis.deviantart.com", makeStarTrekEmotes, {category: "trek"}, "http://i.imgur.com/vQTD03D.png"),
+	new EmoteFeature("Dino Emotes", "dinoEmotes", "Qoobee Agapi!", makeDinoEmotes, {category: "dino1"; enabled: false}, "http://cdn.rawgit.com/asterpw/e/m/dino/dino1-1.gif"),
 	new LinkFeature("Show/Hide All Categories", "showHideAllCategories", "Add show/hide all categories links to Account Options Menu", makeShowHideAllCategories),
 	new LinkFeature("Show Draft Link", "draftLink", "Add manage drafts link to Account Options Menu", makeDraftsLink),
 	new LinkFeature("Show/Hide Game Links", "gameLinks", "Add Game-specific links", makeGameLinks, {enabled: false})
