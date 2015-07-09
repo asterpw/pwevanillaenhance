@@ -7,8 +7,9 @@ Did you miss being able to set your font size or color without having to remembe
 Choose from several amazing community-made themes.  More themes will automatically become available over time.<br>
 <b>Comment preview from category / discussion view</b>
 Just like in VBulletin you can preview posts by hovering your cursor over a link.<br>
+<b>User Blocking</b> Hide posts from annoying people<br>
 <b>Lots of new emotes!</b>
-Hundreds of new emotes to choose from such as <a href="http://i.imgur.com/EMfoL4u.png">PWI emotes</a>, Forsaken World emotes, Onion Head emotes, and many more!<br>
+Over 1000 new emotes to choose from such as <a href="http://i.imgur.com/EMfoL4u.png">PWI emotes</a>, Forsaken World emotes, Onion Head emotes, and many more!<br>
 <p>
 
 <h1> Installation</h1>
