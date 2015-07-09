@@ -23,7 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
-	<div class='change-ver'>v0.9.5</div> - Added dino emotes \
+	<div class='change-ver'>v0.9.6</div> - Added dino emotes \
 	<div class='change-ver'>v0.9.5</div> - Added star trek emotes courtesy <a href='http://irvinis.deviantart.com' style='color:black; text-decoration: bold'>IrvinIS</a>\
 	<div class='change-ver'>v0.9.4</div> - Added fancier emote option picker\
 	<div class='change-ver'>v0.9.3</div> - Added word wrapping of long comment previews for chrome+opera\
