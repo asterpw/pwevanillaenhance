@@ -193,8 +193,14 @@
 	margin-left: -6px;
 	padding: 0px;
 	border: 0;
+	position: absolute;
+	left: 12px;
+	background-color: transparent !important;
 }
-
+.editor-action .icon-emote ~ .icon-caret-down:before {
+	margin-left: 14px;
+}
+	
 
 .fontSizePicker-dialog {
 	width: auto !important;
@@ -210,6 +216,20 @@
 	max-height: 150px !important;
 }
 
+.icon-font-face::before {
+	font-weight: bold;
+	font-size: 16px;
+	content: "Font";
+	width: 39px;
+	margin: 0px -5px 0px -5px !important; 
+}
+
+.face-select, .text-face-select {
+	font-size: 16px;
+	line-height: 130%;
+	padding-right: 25px !important;
+}
+	
 .enhance-dropdown .container {
 	max-height: 200px;
 	overflow-x: hidden;
@@ -217,19 +237,20 @@
 	padding: 5px 0px;
 }
 
-.icon-font-button {
-	width: 14px;
-	height: 14px;
-	padding: 0px !important;
-	margin: 0px !important;
-	border: 0px none !important;
+.icon-font-size::before {
+	content: "A";
+	font-weight: bold;
+	width: 24px;
+	margin: 0px -5px !important; 
 }
-
-.fontSizePicker span.small-size {
-	position: relative; 
-	left: 0px; 
-	top: -6px; 
-	font-size: 8px;
+	
+.icon-font-size::after {
+	content: "A";
+	font-weight: bold;
+	position: absolute;
+	left: 20px;
+	font-size: 10px;
+	font-family: vanillicon;
 }
 
 .fontColorPicker-dialog {
@@ -246,16 +267,28 @@
 	display: inline-block;
 }
 
-.fontColorPicker > .icon {
-	padding: 0px 7px;	
-	height: 22px;
-}
 
-.icon-font-color {
-	box-shadow: 0 -5px 0 0 #FFFFFF inset; 
+.icon-font-color::before {
+	content: "A";
+	font-weight: bold;
+	width: 24px;
 	margin: 0px -5px !important; 
 }
+	
+.icon-font-color-button {
+	width: 20px;
+	height: 20px;
+	left: 5px;
+/*	background-color: rgba(100, 0, 100, 0.5) !important;*/
+	position: absolute;
+	box-shadow: 0 -4px 0 0 #FFFFFF inset;
+}
 
+.icon-text-face::before {
+	content: "\0ca0_\0ca0";
+	width: 24px;
+	margin: 0px -5px !important; 
+}
 
 /************************
   Enhance Dialog General
@@ -525,6 +558,6 @@
     background-position: -341px -5px !important;
 }
 
-a.ReactButton, a.ReactButton-Flag, div.Reactions {
+.ReactButton, .ReactButton-Flag {
 	line-height: 15px;
 }
