@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.7.2
+// @version    0.9.7.3
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -180,8 +180,8 @@ var setThemeEnabled = function(name, enabled) {
 	var theme = pweEnhanceSettings.themes[name];
 	theme.enabled = enabled;
 	url = buildCSSThemeURL(theme);
-	if (theme.invertTextColors)
-		invertTextColors(enabled);
+	//if (theme.invertTextColors)
+	//	invertTextColors(enabled);
 	if (enabled) {		
 		if ($("head link[href='"+url+"']").length === 0)
 			loadCSS(url);
@@ -768,7 +768,7 @@ var generateEmoteArray = function(name, cols, max, start, ext) {
 
 var makeFontSizePicker = function() {
 	var container = $('<div class="editor-insert-dialog Flyout MenuItems fontSizePicker-dialog"></div>');
-	var button = $('<div class="editor-dropdown fontSizePicker"><span class="editor-action icon" title="Font Size"><span class="icon icon-font-size icon-font-button">A<span class="small-size">A</span></span><span class="icon icon-caret-down"></span></span></div>');
+	var button = $('<div class="editor-dropdown fontSizePicker"><span class="editor-action icon icon-font-size" title="Font Size"><span class="icon icon-caret-down"></span></span></div>');
 	for (var i = 1; i <= 7; i++) {
 		container.append($("<a title='"+i+"' class='size-select' style='font-size: "+(i*3+6)+"px; line-height: 130% !important'>"+i+"</a>"));
 	}
@@ -787,10 +787,10 @@ var makeFontFacePicker = function() {
 	var dialog = $('<div class="editor-insert-dialog Flyout MenuItems enhance-dropdown fontFacePicker-dialog"></div>');
 	var container = $('<div class="container">');
 	dialog.append(container);
-	var button = $('<div class="editor-dropdown fontFacePicker"><span class="editor-action icon" title="Font Face"><span class="icon icon-font-face icon-font-button" style="width: 25px !important">Font</span><span class="icon icon-caret-down"></span></span></div>');
+	var button = $('<div class="editor-dropdown fontFacePicker"><span class="editor-action icon icon-font-face" title="Font Face"><span class="icon icon-caret-down"></span></span></div>');
 	var fonts = ["Arial", "Arial Black", "Arial Narrow", "Book Antiqua", "Century Gothic", "Comic Sans MS", "Courier New", "Fixedsys", "Franklin Gothic Medium", "Garamond", "Georgia", "Impact", "Lucida Console", "Lucida Sans Unicode", "Microsoft Sans Serif", "Palatino Linotype", "System", "Tahoma", "Times New Roman", "Trebuchet MS", "Verdana"];
 	for (var i = 0; i < fonts.length; i++) {
-		container.append($("<a title='"+fonts[i]+"' class='face-select' style='font-family: "+fonts[i]+"; font-size: 16px; line-height: 130% !important'>"+fonts[i]+"</a>"));
+		container.append($("<a title='"+fonts[i]+"' class='face-select' style='font-family: "+fonts[i]+"'>"+fonts[i]+"</a>"));
 	}
 	$('.face-select', container).click(function(){
 		$('.BodyBox', $(this).closest('.FormWrapper')).surroundSelectedText('[font="'+this.title+'"]', '[/font]', 'select');
@@ -806,13 +806,13 @@ var makeTextFaceEmotes = function() {
 	var dialog = $('<div class="editor-insert-dialog Flyout MenuItems enhance-dropdown text-face-dialog"></div>');
 	var container = $('<div class="container">');
 	dialog.append(container);
-	var button = $('<div class="editor-dropdown textFaceEmotes"><span class="editor-action icon" title="Text Faces"><span class="icon icon-text-face icon-font-button" style="position: relative;left: -5px;">\u0ca0_\u0ca0</span><span class="icon icon-caret-down"></span></span></div>');
+	var button = $('<div class="editor-dropdown textFaceEmotes"><span class="editor-action icon icon-text-face" title="Text Faces"><span class="icon icon-caret-down"></span></span></div>');
 	var textfaces = [
 		"Donger:\u30FD\u0F3C\u0E88\u0644\u035C\u0E88\u0F3D\uFF89",
 		"Lenny:( \u0361\u00b0 \u035c\u0296 \u0361\u00b0)", 
 		"Ohh Well:\u00af\\_(\u30c4)_/\u00af",
 		"Gun:\u2584\ufe3b\u0337\u033f\u253b\u033f\u2550\u2501\u4e00",
-		"Stare:\u0ca0_\u0ca0",
+		"Disapproval:\u0ca0_\u0ca0",
 		"Fancy Stare:\u0ca0_\u0ca0\u0cca",
 		"Cry:\u0ca5_\u0ca5",
 		"Need More:\u0f3c \u3064 \u25d5_\u25d5 \u0f3d\u3064",
@@ -830,7 +830,7 @@ var makeTextFaceEmotes = function() {
 		
 	for (var i = 0; i < textfaces.length; i++) {
 		var textface = textfaces[i].split(":");
-		container.append($("<a title='"+textface[0]+"' class='text-face-select' style='font-size: 16px; line-height: 130% !important'>"+textface[1]+"</a>"));
+		container.append($("<a title='"+textface[0]+"' class='text-face-select'>"+textface[1]+"</a>"));
 	}
 	$('.text-face-select', container).click(function(){
 		$('.BodyBox', $(this).closest('.FormWrapper')).insertAtCaret($(this).text());
@@ -845,13 +845,13 @@ var makeTextFaceEmotes = function() {
 
 var makeFontColorPicker = function() {
 	var container = $('<div class="editor-insert-dialog Flyout MenuItems fontColorPicker-dialog"><input type="text" class="color-picker"></input></div>');
-	var button = $('<div class="editor-dropdown fontColorPicker"><span class="editor-action icon" title="Font Color"><span class="icon icon-font-color">A</span><span class="icon icon-caret-down"></span></span></div>');
+	var button = $('<div class="editor-dropdown fontColorPicker"><span class="editor-action icon icon-font-color" title="Font Color"><span class="icon-font-color-button"></span><span class="icon icon-caret-down"></span></span></div>');
 	container.append('<input type="checkbox" class="autoAddColor"></input><span class="label">Auto color when submitting</span>');
 	container.find('.autoAddColor').click(function(){
 		pweEnhanceSettings.editor.fontColorPicker.autoAddColor = $(this).is(":checked");
 		update();
 	});
-	container.find(".icon-font-color").css("box-shadow", "0 -5px 0 0 "+pweEnhanceSettings.editor.fontColorPicker.selectedColor+" inset");
+	container.find(".icon-font-color-button").css("box-shadow", "0 -4px 0 0 "+pweEnhanceSettings.editor.fontColorPicker.selectedColor+" inset");
 	if (pweEnhanceSettings.editor.fontColorPicker.autoAddColor) 
 		container.find('.autoAddColor').prop('checked', true);
 	return button.append(container);
@@ -859,7 +859,7 @@ var makeFontColorPicker = function() {
 
 var setFontColor = function(picker, color) {
 	picker.closest(".FormWrapper").find('.BodyBox').surroundSelectedText('[color="'+color+'"]', '[/color]', 'select');
-	picker.closest(".FormWrapper").find(".icon-font-color").css("box-shadow", "0 -5px 0 0 "+color+" inset");
+	picker.closest(".FormWrapper").find(".icon-font-color-button").css("box-shadow", "0 -4px 0 0 "+color+" inset");
 	pweEnhanceSettings.editor.fontColorPicker.selectedColor = color;
 	picker.closest(".fontColorPicker").removeClass("editor-dropdown-open");
 	update();
@@ -902,8 +902,8 @@ var initColorPicker = function(container) {
 			"rgb(12, 52, 61)", "rgb(28, 69, 135)", "rgb(7, 55, 99)", "rgb(32, 18, 77)", "rgb(76, 17, 48)"]
 		]
 	});
-	container.find(".icon-font-color").css("box-shadow", "0 -5px 0 0 "+pweEnhanceSettings.editor.fontColorPicker.selectedColor+" inset");
-	container.find('.icon-font-color').click( function(event) {
+	container.find(".icon-font-color-button").css("box-shadow", "0 -4px 0 0 "+pweEnhanceSettings.editor.fontColorPicker.selectedColor+" inset");
+	container.find('.icon-font-color-button').click( function(event) {
 		setFontColor($(event.target), '#'+($(event.target).closest('.fontColorPicker').find('.color-picker').spectrum("get").toHex()));
 	});
 };
@@ -1242,7 +1242,7 @@ var getSettings = function() {
 
 preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/5a52e79618d22a662e848b24d065bf6cb175441a/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/0062bd0a721cf1f72f0a9ecee2742bdd565e5fa5/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
 
