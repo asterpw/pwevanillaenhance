@@ -520,3 +520,11 @@
 .unhideComment:hover {
 	opacity: 1;
 }
+
+.ReactReject {
+    background-position: -341px -5px !important;
+}
+
+.ReactButton, .ReactButton-Flag {
+	line-height: 15px;
+}
