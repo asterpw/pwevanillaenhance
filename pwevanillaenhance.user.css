@@ -525,6 +525,6 @@
     background-position: -341px -5px !important;
 }
 
-.ReactButton, .ReactButton-Flag {
+a.ReactButton, a.ReactButton-Flag {
 	line-height: 15px;
 }
