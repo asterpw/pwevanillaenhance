@@ -1242,7 +1242,7 @@ var getSettings = function() {
 
 preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/bc7047f28dfb66e4265f5f779e46a9aa2071191f/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/5a52e79618d22a662e848b24d065bf6cb175441a/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
 
