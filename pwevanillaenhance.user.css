@@ -525,6 +525,6 @@
     background-position: -341px -5px !important;
 }
 
-a.ReactButton, a.ReactButton-Flag {
+a.ReactButton, a.ReactButton-Flag, div.Reactions {
 	line-height: 15px;
 }
