@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.7
+// @version    0.9.7.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -1002,20 +1002,20 @@ var makeGameLinks = function(container) {
 };
 
 var hideBlockedUsers = function() {
-	$(".Comment, td .Block.Wrap").show();
+	$(".Comment, .Discussion, td .Block.Wrap").show();
 	$(".unhideComment").remove();
 	$(".unblockUser").hide();
 	if (pweEnhanceSettings.links.blockUser.enabled)
 		$(".blockUser").show();
 	for (var user in pweEnhanceSettings.blockedUsers) {
 		var unhideControl = $("<div class='unhideComment'>Show blocked comment</div>").click(function(){
-			$(this).siblings(".Comment").show();
-			$(this).siblings(".Comment").find(".unblockUser").show();
-			$(this).siblings(".Comment").find(".blockUser").hide();
+			$(this).siblings(".Comment, .Discussion").show();
+			$(this).siblings(".Comment, .Discussion").find(".unblockUser").show();
+			$(this).siblings(".Comment, .Discussion").find(".blockUser").hide();
 			$(this).remove();
 		});
 		$('.PhotoWrap[title="'+user+'"]').closest(".Block.Wrap").hide();
-		var blocked = $('.PhotoWrap[title="'+user+'"]').closest(".Comment").hide();
+		var blocked = $('.PhotoWrap[title="'+user+'"]').closest(".Comment, .Discussion").hide();
 		$(".unblockUser", blocked).show();
 		$(".blockUser", blocked).hide();
 		blocked.before(unhideControl);
