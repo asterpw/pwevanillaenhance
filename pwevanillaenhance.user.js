@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.7.3
+// @version    0.9.8
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.9.7";  //what we store when we should display what's new dialog
+var VERSION = "0.9.8";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.9.8</div> - Previews don't mark a thread as read (proxied api) \
 	<div class='change-ver'>v0.9.7</div> - Added User Blocking<br>- Redirect embedded urls to native urls \
 	<div class='change-ver'>v0.9.6</div> - Added dino emotes \
 	<div class='change-ver'>v0.9.5</div> - Added star trek emotes courtesy <a href='http://irvinis.deviantart.com' style='color:black; text-decoration: bold'>IrvinIS</a>\
@@ -52,7 +53,7 @@ var CHANGELOG = "<div class='content'> \
 	<div class='change-ver'>v0.5.3</div> - Some theme preload bugfixes \
 	<div class='change-ver'>v0.5.2</div> - Themes load faster now (before page render)<br> - Allow remote themes to be renamed or deleted \
 	<div class='change-ver'>v0.5.1</div> - Added Forsaken World Emotes<br> - Added What's New Dialog \
-	<div class='change-ver'>v0.5</div> - Added auto-loading of themes from @nrglg</div>";
+	<div class='change-ver'>v0.5.0</div> - Added auto-loading of themes from @nrglg</div>";
 
 var pweEnhanceSettings = {
 	editor: {
@@ -435,7 +436,8 @@ var bbcodeToText = function(bbcode) {
 	text = stripBlockTags('code', text);
 	text = stripBlockTags('img', text);
 	text = stripTags(text).trim();
-	return insertWrapping(text);
+	return text;
+	//return insertWrapping(text);
 };
 
 var insertWrapping = function(text) {
@@ -449,37 +451,58 @@ var insertWrapping = function(text) {
 };
 
 var addPreviews = function() {
+	var yql = 'https://query.yahooapis.com/v1/public/yql?format=json&q=';
+	var base = 'select * from json where url="';
+	var apiBaseUrl = 'http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=';
+	
 	$(".LastUser .CommentDate, .LatestPost .CommentDate").mouseover(function() {
 		var url = $(this).attr('href');
-		var match = /discussion\/([0-9]+)/g.exec(url);
+		var match = /discussion\/([0-9]+)\/[^\/]*(?:\/p([0-9]+))?/g.exec(url);
 		if (!($(this).data('call-issued'))) {
 			$(this).data('call-issued', true);
 			var link = $(this);
-			$.getJSON("http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=" + match[1], 
-				function(json) {
+			var apiCall = apiBaseUrl + match[1];
+			if (typeof match[2] != 'undefined')
+				apiCall += "&Page=" + match[2];
+			//$.getJSON("http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=" + match[1],
+			$.getJSON(yql+encodeURIComponent(base+apiCall+'"'),			
+				function(data) {
+					var json = data.query.results.json;
 					var text = json.Discussion.Body;
 					var format = json.Discussion.Format;
 					if (json.Comments && json.Comments.length) {
 						text = json.Comments[json.Comments.length - 1].Body;
 						format = json.Comments[json.Comments.length - 1].Format;
 					}
-					if (format == 'BBCode')
-						$('time', link).attr('title', bbcodeToText(text));
+					if (format == 'BBCode') {
+						var tooltip = $('<div class="tooltip-me-left"></div>');
+						tooltip.html(bbcodeToText(text).replace(/\n/g, "<p><p>"));
+						var container = $('<div class="tooltip-contain-left"></div>').append(tooltip);
+						link.append($('<span style="position:relative; width: 0px; height: 0px"></span>').append(container));
+					}
 				}
 			);
 		}
 	});
 	$(".DiscussionName .Title, .LatestPost .LatestPostTitle").mouseover(function() {
 		var url = $(this).attr('href');
-		var match = /discussion\/([0-9]+)/g.exec(url);
+		var match = /discussion\/([0-9]+)\/[^\/]*(?:\/p([0-9]+))?/g.exec(url);
 		if (!($(this).data('call-issued'))) {
 			$(this).data('call-issued', true);
 			var link = $(this);
-			$.getJSON("http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=" + match[1], 
-				function(json) {					
+			var apiCall = apiBaseUrl + match[1];
+			//$.getJSON("http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=" + match[1],
+			$.getJSON(yql+encodeURIComponent(base+apiCall+'"'),	
+				function(data) {					
+					var json = data.query.results.json;
 					var text = json.Discussion.Body;
-					if (json.Discussion.Format == 'BBCode')
-						link.attr('title', bbcodeToText(text));
+					if (json.Discussion.Format == 'BBCode') {
+						//link.attr('title', bbcodeToText(text));
+						var tooltip = $('<div class="tooltip-me-right"></div>');
+						tooltip.html(bbcodeToText(text).replace(/\n/g, "<p><p>"));
+						var container = $('<div class="tooltip-contain-right"></div>').append(tooltip);
+						link.prepend($('<span style="position:relative; width: 0px; height: 0px"></span>').append(container));
+					}
 				}
 			);
 		}
@@ -549,7 +572,7 @@ var makeFeatureMenu = function() {
 var makeEnhancePreferencesMenu = function() {
 	$('.enhance-options').remove();
 	var preferencesControl = $("<span class='ToggleFlyout enhance-options'></span>");
-	var preferencesButton = $('<a href="#" class="MeButton FlyoutButton" title="Enhance Options"><span class="Sprite Sprite16 SpOptions"></span><!-- span class="label">Enhance Options</span --></a>');
+	var preferencesButton = $('<a href="#" class="MeButton FlyoutButton" title="Enhance Settings"><span class="Sprite Sprite16 SpOptions"></span><!-- span class="label">Enhance Options</span --></a>');
 	preferencesControl.append(preferencesButton).append($('<span class="Arrow SpFlyoutHandle"></span>'));
 	
 	var preferencesMenu = $('<div class="Flyout MenuItems" ></div>');
@@ -1242,7 +1265,7 @@ var getSettings = function() {
 
 preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/0062bd0a721cf1f72f0a9ecee2742bdd565e5fa5/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/d8e5cd332967341c2b721be97dac7a1433458ba2/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
 
