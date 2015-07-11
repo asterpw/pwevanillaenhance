@@ -134,14 +134,19 @@
 	white-space: nowrap;
 }
 
-.emotes-dialog img {
-	padding: 2px;	
+.emotes-dialog .image {
+	margin: 2px;	
 	cursor: pointer;
+ 	display: inline-block;
+    background-size: contain;
+	background-position: center;
+	background-repeat: no-repeat;
 }
 
-.emotes-dialog > img:hover {
-	background-color: rgba(0,0,0,0.1);
+.emotes-dialog .image:hover {
+	background-color: #CCCCCC;
 	border-radius: 2px;
+    box-shadow: 0px 0px 0px 3px #CCCCCC;;
 }
 
 .emote-category {
@@ -175,18 +180,11 @@
 	margin: 0px;
 }
 
-
-.emotes-div img:hover {
-	background-color: #EEEEEE;	
-}
-
-.mlpEmotes .emote-category img {
-	height: 32px;
-	width: 32px;
-}
-
 .editor-dropdown .editor-action .icon-emote {
 	background-size: contain;
+    background-color: transparent !important;
+	background-position: center;
+	background-repeat: no-repeat;
 	width: 20px;
 	height: 20px;
 	vertical-align: text-top;
@@ -195,7 +193,6 @@
 	border: 0;
 	position: absolute;
 	left: 12px;
-	background-color: transparent !important;
 }
 .editor-action .icon-emote ~ .icon-caret-down:before {
 	margin-left: 14px;
@@ -596,3 +593,15 @@ a:hover .tooltip-me-left, a:hover .tooltip-me-right {
 	left: 30px;
 	top: 30px;
 }
+
+/****************
+  TWITCH stuff
+****************/
+
+.twitchEmotes .emotes-div {
+	padding-right: 20px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	max-height: 240px;
+}
+
