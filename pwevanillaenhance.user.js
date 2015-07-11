@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.8
+// @version    0.9.9
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.9.8";  //what we store when we should display what's new dialog
+var VERSION = "0.9.9";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v0.9.9</div> - Added Twitch Emotes \
 	<div class='change-ver'>v0.9.8</div> - Previews don't mark a thread as read (proxied api) \
 	<div class='change-ver'>v0.9.7</div> - Added User Blocking<br>- Redirect embedded urls to native urls \
 	<div class='change-ver'>v0.9.6</div> - Added dino emotes \
@@ -463,7 +464,8 @@ var addPreviews = function() {
 			var link = $(this);
 			var apiCall = apiBaseUrl + match[1];
 			if (typeof match[2] != 'undefined')
-				apiCall += "&Page=" + match[2];
+				apiCall += "&Page=p" + match[2];
+			//console.log("making API call " + apiCall);
 			//$.getJSON("http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=" + match[1],
 			$.getJSON(yql+encodeURIComponent(base+apiCall+'"'),			
 				function(data) {
@@ -611,7 +613,7 @@ var makeEmotePanel = function(className, path, emotes, imgWidth, imgHeight) {
 						$("."+className + " .icon-emote").css('background-image', "url('"+path+ emotes[this.title][0][0]+"')");
 						$("."+className + " .emotes-div").hide();
 						$("."+className + " ."+this.title+"-emotes").show();
-						$("."+className + " ."+this.title+"-emotes img").each(function(){$(this).attr('src', $(this).data('url'));});
+						$("."+className + " ."+this.title+"-emotes .image").each(function(){$(this).css({'background-image': 'url('+$(this).data('url')+')'});});
 						update();
 						return false;
 					}
@@ -622,7 +624,7 @@ var makeEmotePanel = function(className, path, emotes, imgWidth, imgHeight) {
 		}
 		
 		var emoteClick = function () {
-			var position = $(this).closest(".FormWrapper").find('.BodyBox').insertAtCaret("[img]"+$(this).attr('src')+"[/img]");
+			var position = $(this).closest(".FormWrapper").find('.BodyBox').insertAtCaret("[img]"+$(this).data('url')+"[/img]");
 			return false;
 		};
 		for (var k = 0; k < categories.length; k++) {
@@ -634,7 +636,7 @@ var makeEmotePanel = function(className, path, emotes, imgWidth, imgHeight) {
 			for (var i = 0; i < currentEmotes.length; i++) {
 				for (var j = 0; j < currentEmotes[i].length; j++) {
 					emoteCount++;
-					var img = $('<img width="'+imgWidth+'" height="'+imgHeight+'" class="'+categories[k]+(emoteCount)+'"/>');
+					var img = $('<div class="image" style="width:'+imgWidth+'px; height:'+imgHeight+'px" class="'+categories[k]+(emoteCount)+'"/>');
 					//img.attr('src', path + currentEmotes[i][j]);  don't bother loading images until div is shown
 					img.data('url', path + currentEmotes[i][j]);
 					img.attr('title', categories[k]+(emoteCount));
@@ -654,7 +656,7 @@ var makeEmotePanel = function(className, path, emotes, imgWidth, imgHeight) {
 	button.find('.editor-action').click(function(){
 		if ($(this).closest('.editor-dropdown').find('.emotes-dialog').length == 0)
 			$(this).closest('.editor-dropdown').append(lazyLoad());
-		$("."+className+" ."+pweEnhanceSettings.emotes[className].category+"-emotes img").each(function(){$(this).attr('src', $(this).data('url'));});
+		$("."+className+" ."+pweEnhanceSettings.emotes[className].category+"-emotes .image").each(function(){$(this).css({'background-image': 'url('+$(this).data('url')+')'});});
 	});
 	button.find('.icon-emote').css('background-image', "url('"+path+emotes[pweEnhanceSettings.emotes[className].category][0][0]+"')");
 	return button;//.append(container);
@@ -775,6 +777,45 @@ var makeFWEmotes = function() {
 		emotes,
 		32, 
 		32);
+};
+var TWITCH_EMOTES = ["4Head", "ANELE", "ArgieB8", "ArsonNoSexy", "AsianGlow", "AtGL", "AthenaPMS", "AtIvy", "AtWW", 
+		"BabyRage", "BatChest", "BCWarrior", "BibleThump", "BigBrother", "BionicBunion", "BlargNaut", "BloodTrail", "BORT", 
+		"BrainSlug", "BrokeBack", "BuddhaBar", "CorgiDerp", "CougarHunt", "DAESuppy", "DansGame", "DatHass", "DatSheffy", 
+		"DBstyle", "deExcite", "deIlluminati", "DogFace", "DOOMGuy", "EagleEye", "EleGiggle", "EvilFetus", "FailFish", 
+		"FPSMarksman", "FrankerZ", "FreakinStinkin", "FUNgineer", "FunRun", "FuzzyOtterOO", "GasJoker", "GingerPower", 
+		"GrammarKing", "HassanChop", "HeyGuys", "HeyyyLulu", "HotPokket", "HumbleLife", "ItsBoshyTime", "Jebaited", "JKanStyle", 
+		"JonCarnage", "KAPOW", "Kappa", "KappaPride", "Keepo", "KevinTurtle", "Kippa", "Kreygasm", "KZskull", "Mau5", "mcaT", 
+		"MechaSupes", "MrDestructoid", "MVGame", "NightBat", "NinjaTroll", "NoNoSpot", "NotAtk", "OMGScoots", "OneHand", "OpieOP", 
+		"OptimizePrime", "OSbeaver", "OSbury", "OSdeo", "OSfrog", "OSkomodo", "OSrob", "OSsloth", "panicBasket", "PanicVis", 
+		"PazPazowitz", "PeoplesChamp", "PermaSmug", "PicoMause", "PipeHype", "PJHarley", "PJSalt", "PMSTwin", "PogChamp",
+		"Poooound", "PraiseIt", "PRChase", "PunchTrees", "RaccAttack", "RalpherZ", "RedCoat", "ResidentSleeper", "RitzMitz", 
+		"RuleFive", "Shazam", "shazamicon", "ShazBotstix", "ShibeZ", "SMOrc", "SMSkull", "SoBayed", "SoonerLater", "SriHead", 
+		"SSSsss", "StoneLightning", "StrawBeary", "SuperVinlin", "SwiftRage", "tbBaconBiscuit", "tbChickenBiscuit", "tbQuesarito", 
+		"tbSausageBiscuit", "tbSpicy", "tbSriracha", "TF2John", "TheKing", "TheRinger", "TheTarFu", "TheThing", "ThunBeast", 
+		"TinyFace", "TooSpicy", "TriHard", "TTours", "UleetBackup", "UncleNox", "UnSane", "VaultBoy", "Volcania", "WholeWheat", 
+		"WinWaker", "WTRuck", "WutFace", "YouWHY"];
+		
+var makeTwitchEmotes = function() {
+	var emotes = {'twitch': []};
+	var cols = 10;
+	var rows = Math.ceil(TWITCH_EMOTES.length/cols);
+	for (var i = 0; i < rows; i++) {
+		emotes.twitch[i] = new Array(Math.min(cols, TWITCH_EMOTES.length - i*cols));
+		for (var j = 0; j < cols; j++) {
+			if (cols*i+j < TWITCH_EMOTES.length) {
+				emotes.twitch[i][j] = TWITCH_EMOTES[cols*i + j] + '.png';
+			}
+		}
+	}
+	var panel = makeEmotePanel('twitchEmotes', 
+		'http://cdn.rawgit.com/asterpw/e/m/twitch/',
+		emotes, 28, 28);
+	var count = 0;
+	panel.click(function(){$('.image', $(this)).each(function(){
+			$(this).attr('title', TWITCH_EMOTES[count++]);
+		});
+	});
+	return panel;
 };
 
 var generateEmoteArray = function(name, cols, max, start, ext) {
@@ -955,6 +996,14 @@ var initSubmitButton = function(container) {
 		var text = textArea.val();
 		if (text.indexOf(ENHANCE_IDENTIFIER) != 0)
 			textArea.val(text + ENHANCE_IDENTIFIER);
+	};	
+	var addTwitchEmotes = function(textArea) {
+		var text = textArea.val();
+		for (var i = 0; i < TWITCH_EMOTES.length; i++) {
+			text = text.replace(new RegExp(TWITCH_EMOTES[i] + "(?!\\.png)", "g"), 
+				"[img]http://cdn.rawgit.com/asterpw/e/m/twitch/"+TWITCH_EMOTES[i]+".png[/img]");
+		}
+		textArea.val(text);
 	};
 
 	container.find("input.CommentButton, #Form_SendMessage, #Form_Share, #Form_AddComment").click(function(){
@@ -968,6 +1017,10 @@ var initSubmitButton = function(container) {
 		}
 		if (pweEnhanceSettings.options.showEnhanceTitle)
 			addIdentifier(form.find(".BodyBox"));
+			
+		if (pweEnhanceSettings.emotes.twitchEmotes.enabled) {
+			addTwitchEmotes(form.find(".BodyBox"));
+		}
 	});
 };
 
@@ -1045,7 +1098,7 @@ var hideBlockedUsers = function() {
 		$(".blockUser", blocked).hide();
 		blocked.before(unhideControl);
 	}
-}
+};
 
 var makeBlockUser = function(container) {
 	this.positionMethod = 'before';
@@ -1189,6 +1242,7 @@ var features = [
 	new EmoteFeature("MLP Emotes", "mlpEmotes", "Friendship is Magic", makeMLPEmotes, {category: "twilight", enabled: false}, "http://i.imgur.com/RM8GEJh.png"),
 	new EmoteFeature("Star Trek Emotes", "trekEmotes", "\u00A9 irvinis.deviantart.com", makeStarTrekEmotes, {category: "trek"}, "http://i.imgur.com/vQTD03D.png"),
 	new EmoteFeature("Dino Emotes", "dinoEmotes", "Qoobee Agapi!", makeDinoEmotes, {category: "dino1", enabled: false}, "http://cdn.rawgit.com/asterpw/e/m/dino/dino1-1.gif"),
+	new EmoteFeature("Twitch Emotes", "twitchEmotes", "Kappa Kreygasm \u00A9 Twitch", makeTwitchEmotes, {category: "twitch", enabled: false}, "http://cdn.rawgit.com/asterpw/e/m/twitch/Kappa.png"),
 	new LinkFeature("Show/Hide All Categories", "showHideAllCategories", "Add show/hide all categories links to Account Options Menu", makeShowHideAllCategories),
 	new LinkFeature("Show Draft Link", "draftLink", "Add manage drafts link to Account Options Menu", makeDraftsLink),
 	new LinkFeature("Show/Hide Game Links", "gameLinks", "Add Game-specific links", makeGameLinks, {enabled: false}),
@@ -1197,7 +1251,7 @@ var features = [
 
 var installFeatures = function(container) {
 	for (var i = 0; i < features.length; i++) {
-		if (container.find(features[i].target)) {
+		if (container.find(features[i].target).length > 0) {
 			features[i].install(container);	
 		}
 	}
@@ -1244,17 +1298,11 @@ var getSettings = function() {
 	var savedSettingsJSON = localStorage["pweEnhancementSettings"];
 	if (savedSettingsJSON) {
 		var savedSettings = JSON.parse(savedSettingsJSON);
-		if (savedSettings.version && savedSettings.version >= "0.6.0") {
+		if (savedSettings.version && savedSettings.version >= "0.9.0") {
 			mergeData(pweEnhanceSettings, savedSettings, false); // dont merge in discarded features
-			if (savedSettings.version < "0.8.3") {
-				pweEnhanceSettings.lastThemeUpdateTime = 0; // force theme update
-			}
-			mergeData(pweEnhanceSettings.blockedUsers, savedSettings.blockedUsers, true)
-			if (savedSettings.themes && savedSettings.version >= "0.8.5") {// allow cached themes
-				mergeData(pweEnhanceSettings.themes, savedSettings.themes, true);
-			} else {
-				pweEnhanceSettings.lastThemeUpdateTime = 0; // force theme update
-			}
+			mergeData(pweEnhanceSettings.blockedUsers, savedSettings.blockedUsers, true);
+			mergeData(pweEnhanceSettings.themes, savedSettings.themes, true);
+			
 			if (pweEnhanceSettings.version > VERSION) {// shouldnt happen
 				pweEnhanceSettings.version = VERSION;
 			}
@@ -1265,7 +1313,7 @@ var getSettings = function() {
 
 preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/d8e5cd332967341c2b721be97dac7a1433458ba2/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/8732075d7f2c4744eacc74caadaa16a8981bf534/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
 
