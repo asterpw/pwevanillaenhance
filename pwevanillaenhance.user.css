@@ -180,6 +180,11 @@
 	margin: 0px;
 }
 
+.mlpEmotes .emote-category img {
+	height: 32px;
+	width: 32px;
+}
+
 .editor-dropdown .editor-action .icon-emote {
 	background-size: contain;
     background-color: transparent !important;
