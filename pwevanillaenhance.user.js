@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.9
+// @version    0.9.9.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -101,6 +101,7 @@ var preloadThemes = function() { //loads before jquery
 		var name = keys[i];
 		
 		enabled = 'enabled' in pweEnhanceSettings.themes[name] ? pweEnhanceSettings.themes[name].enabled : false;
+		enabled |= pweEnhanceSettings.themes[name].category == 'Default';
 		if (enabled) {
 			var theme = pweEnhanceSettings.themes[name];
 			loadCSS(buildCSSThemeURL(theme));
@@ -113,6 +114,7 @@ var applyThemes = function() {
 	for (var i = 0; i < keys.length; i++) { 
 		var name = keys[i];
 		enabled = 'enabled' in pweEnhanceSettings.themes[name] ? pweEnhanceSettings.themes[name].enabled : false; 
+		enabled |= pweEnhanceSettings.themes[name].category == 'Default';
 		setThemeEnabled(name, enabled);
 	}
 };
@@ -224,7 +226,8 @@ var makeThemeMenu = function() {
 	var keys = getSortedThemeNames();
 	for (var i = 0; i < keys.length; i++) { 
 		var name = keys[i];
-		if (pweEnhanceSettings.themes[name].category == "Theme")
+		if (pweEnhanceSettings.themes[name].category == "Theme" ||
+			pweEnhanceSettings.themes[name].category == "Default")
 			continue;
 		
 		var themeContainer = $("<div class='theme'></div>");
@@ -1313,7 +1316,7 @@ var getSettings = function() {
 
 preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/8732075d7f2c4744eacc74caadaa16a8981bf534/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/04d282868c86161a4d7dd41bf71c7c05fc49eb8d/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
 
