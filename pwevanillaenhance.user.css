@@ -137,8 +137,8 @@
 .emotes-dialog .image {
 	margin: 2px;	
 	cursor: pointer;
- 	display: inline-block;
-    background-size: contain;
+	display: inline-block;
+	background-size: contain;
 	background-position: center;
 	background-repeat: no-repeat;
 }
@@ -146,7 +146,7 @@
 .emotes-dialog .image:hover {
 	background-color: #CCCCCC;
 	border-radius: 2px;
-    box-shadow: 0px 0px 0px 3px #CCCCCC;;
+	box-shadow: 0px 0px 0px 3px #CCCCCC;;
 }
 
 .emote-category {
@@ -187,7 +187,7 @@
 
 .editor-dropdown .editor-action .icon-emote {
 	background-size: contain;
-    background-color: transparent !important;
+	background-color: transparent !important;
 	background-position: center;
 	background-repeat: no-repeat;
 	width: 20px;
@@ -382,17 +382,6 @@
 	color: #69CAFE !important;
 }
 
-
-.themeManager .title {
-	display: none;
-	background-color: #69CCFF;
-	font-size: 15px;
-	padding: 10px;
-	margin: 0px;
-	color: #000000;
-	font-weight: bold;
-}
-
 .close {
 	background-color: white;
 	display: inline;
@@ -463,27 +452,13 @@
 
 
 @keyframes colorRotate {
-	from {
-		color: rgb(255, 128, 128);
-	}
-	16.6% {
-		color: rgb(255, 128, 255);
-	}
-	33.3% {
-		color: rgb(128, 128, 255);
-	}
-	50% {
-		color: rgb(128, 255, 255);
-	}
-	66.6% {
-		color: rgb(128, 255, 128);
-	}
-	83.3% {
-		color: rgb(255, 255,128);
-	}
-	to {
-		color: rgb(255, 128, 128);
-	}
+	from {color: rgb(255, 128, 128);}
+	16.6% {color: rgb(255, 128, 255);}
+	33.3% {color: rgb(128, 128, 255);}
+	50% {color: rgb(128, 255, 255);}
+	66.6% {color: rgb(128, 255, 128);}
+	83.3% {color: rgb(255, 255,128);}
+	to {color: rgb(255, 128, 128);}
 }
 
 .themeManager .content {
@@ -557,7 +532,7 @@
 }
 
 .ReactReject {
-    background-position: -341px -5px !important;
+	background-position: -341px -5px !important;
 }
 
 .ReactButton, .ReactButton-Flag {
@@ -610,3 +585,77 @@ a:hover .tooltip-me-left, a:hover .tooltip-me-right {
 	max-height: 240px;
 }
 
+/************
+ Addon Menu
+*************/
+
+.enhance-dropdown h1:hover {
+	box-shadow: 0px 0px 10px  #FFFFFF;
+}
+
+.enhance-dropdown h1 {
+	cursor: pointer;
+	margin-right: 10px;	
+	margin-left: 10px;
+	margin-bottom: 10px;
+	background: rgba(0, 0, 0, 0.3);
+	padding: 10px 10px 10px 0px;
+	position: relative;
+	box-shadow: 0px 0px 10px 0px  rgba(255,255,255,0.3);
+	font-size: 15px;
+	z-index: 1;
+}
+
+.enhance-dropdown .content {
+	position: relative;
+	top: -10px;
+	padding: 0px 0px 0px 0px;
+	margin: 0px 10px 0px 10px;
+	background: rgba(0, 0, 0, 0.3);
+	z-index: 0;
+	border-top: 0;
+}
+
+.enhance-dropdown .addon {
+	float: left;
+	width: 275px;
+	padding: 5px 8px;
+	margin-right: 10px;
+	margin-left: 0px;
+	margin-top: 5px;   
+}
+.enhance-dropdown .addon .label {
+	display: inline-block;
+	width: 100%;   
+	height: 40px;
+	vertical-align: top;
+}
+.enhance-dropdown .addon .name {
+	display: block;
+	font-size: 15px;
+	margin-bottom: -5px;
+}
+
+.enhanceDialog > .title {
+	display: block;
+	text-align: right;
+	font-size: 15px;
+	background: rgba(0, 0, 0, 0.3);
+	box-shadow: 0px 0px 10px 0px  rgba(255,255,255,0.3);
+	padding: 5px 10px;
+	margin: 10px 10px 0px 10px;
+	height: auto;
+	width: auto;
+}
+
+.enhanceDialog .title h1 {
+	margin-left: 0px;
+	text-align: left;
+	width: auto;
+	display: block;
+}
+
+.themeManager .title .feature {
+	float: right;
+	margin: 5px;
+}
