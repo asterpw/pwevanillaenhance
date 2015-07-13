@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    0.9.9.1
+// @version    1.0.0
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "0.9.9";  //what we store when we should display what's new dialog
+var VERSION = "1.0.0";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v1.0.0</div> - Theme Addons moved to Theme Manager \
 	<div class='change-ver'>v0.9.9</div> - Added Twitch Emotes \
 	<div class='change-ver'>v0.9.8</div> - Previews don't mark a thread as read (proxied api) \
 	<div class='change-ver'>v0.9.7</div> - Added User Blocking<br>- Redirect embedded urls to native urls \
@@ -68,7 +69,7 @@ var pweEnhanceSettings = {
 	themes: { //autoadded from remote
 	},
 	options: {
-		collapseThemes: false,
+		collapseThemes: true,
 		showEnhanceTitle: true
 	},
 	blockedUsers: {
@@ -121,7 +122,7 @@ var applyThemes = function() {
 
 var handleThemes = function() {
 	var currentTime = new Date().getTime();
-	if (currentTime - pweEnhanceSettings.lastThemeUpdateTime > 3*3600*1000) {
+	if (currentTime - pweEnhanceSettings.lastThemeUpdateTime > 4*3600*1000) {
 		$.getJSON("https://rawgit.com/Goodlookinguy/pwvnrg/master/files.json", function(json){
 			$.extend(true, pweEnhanceSettings, json);
 			for (var i in pweEnhanceSettings.themes) {
@@ -203,6 +204,7 @@ var setThemeEnabled = function(name, enabled) {
 		}
 	} else {
 		$('.themeManager img[title="'+name+'"]').closest(".theme").removeClass("selected");
+		$('.themeManager input[title="'+name+'"]').prop("checked", false);
 		$("head link[href='"+url+"']").remove();
 	}
 };
@@ -221,8 +223,14 @@ var getSortedThemeNames = function() {
 	return keys;
 };
 
-var makeThemeMenu = function() {
-	var menu = $("<div><h1>Add-ons</h1></div>");
+var makeAddonMenu = function() {
+	var menu = $("<div class='addonMenu enhance-dropdown'></div>");
+	var title = $("<h1><span class='icon icon-chevron-sign-right' style='margin: 0px 5px 0px 10px;'></span>Add-ons</h1>");
+	var content = $("<div class='content' style='display:none'>");
+	title.click(function(){content.slideToggle();
+		$('.icon', this).toggleClass("icon-chevron-sign-right");
+		$('.icon', this).toggleClass("icon-chevron-sign-down");});
+	
 	var keys = getSortedThemeNames();
 	for (var i = 0; i < keys.length; i++) { 
 		var name = keys[i];
@@ -230,21 +238,30 @@ var makeThemeMenu = function() {
 			pweEnhanceSettings.themes[name].category == "Default")
 			continue;
 		
-		var themeContainer = $("<div class='theme'></div>");
+		var themeContainer = $("<div class='addon'></div>");
 		var checked = pweEnhanceSettings.themes[name].enabled ? 'checked' : '';
-		themeContainer.append('<input type="checkbox" class="option" '+checked+'></input><span class="label">' +
-			'<span class="name">' + name + '</span>: ' +
-			pweEnhanceSettings.themes[name].description+'</span>');
+		themeContainer.append('<input type="checkbox" class="option" '+checked+' title="'+name+'"></input><span class="label">' +
+			'<span class="name">' + name + '</span><span class="description">' +
+			pweEnhanceSettings.themes[name].description+'</span></span>');
 		$('.option', themeContainer).click( (function(name) {
 				return function(){
 					setThemeEnabled(name, $(this).is(":checked"));
+					if (pweEnhanceSettings.themes[name].variant && pweEnhanceSettings.themes[name].enabled) {
+						for (var theme in pweEnhanceSettings.themes) {
+							if (theme != name && 
+								pweEnhanceSettings.themes[theme].enabled && 
+								pweEnhanceSettings.themes[theme].variant == pweEnhanceSettings.themes[name].variant)
+								setThemeEnabled(theme, false);
+						}
+					}
 					update();
 				};
 			})(name)
 		);
-		menu.append(themeContainer);
+		content.append(themeContainer);
 	}
-	return menu;
+	
+	return menu.append(title).append(content);
 };
 
 var getNameForVariantGroup = function (variantName) { 
@@ -321,8 +338,7 @@ var makeThemeManager = function() {
 	$(".themeManager, .enhance-themes").remove();
 	var collapseEnabled = pweEnhanceSettings.options.collapseThemes ? 'collapseEnabled' : '';
 	var dialog = $("<div class='themeManager enhanceDialog "+collapseEnabled+"' style='margin: 0px auto; display: none;'></div>");
-	dialog.append($("<div class='title'><div class='close'>X</div>PWE Vanilla Enhancement Theme Manager</div>"));
-	$(".close", dialog).click(function(){ $(this).closest('.enhanceDialog').fadeOut();});
+	dialog.append($("<div class='title'><h1>Themes<h1></div>"));
 	var content = $("<div class='content'></div>");
 	var encounteredVariantGroup = {};
 	
@@ -347,7 +363,10 @@ var makeThemeManager = function() {
 			}
 		}
 	}
+	$(".title", dialog).prepend(makeFeatureOption("collapseThemes", 'Grouped View', collapseThemesHandler));
 	dialog.append(content);
+	dialog.append(makeAddonMenu());
+
 	$(".SiteMenu").append(dialog);
 	
 	var button = $('<a href="#" class="MeButton FlyoutButton" title="Themes"><span class="Sprite Sprite16 SpOptions"></span></a>');
@@ -362,6 +381,7 @@ var makeThemeManager = function() {
 var makeEmoteManager = function() {
 	$(".emoteManager, .enhance-emotes").remove();
 	var dialog = $("<div class='emoteManager enhanceDialog' style='margin: 0px auto; display: none;'></div>");
+	dialog.append($("<div class='title'><h1>Emotes<h1></div>"));
 	var content = $("<div class='content'></div>");	
 	for (var i = 0; i < features.length; i++) { 
 		if (features[i].type != 'emotes')
@@ -568,8 +588,8 @@ var makeFeatureMenu = function() {
 		);
 		menu.append(featureContainer);
 	}
-	menu.append($("<h1>Options</h1>"));
-	menu.append(makeFeatureOption("collapseThemes", 'Group together versions of the same theme', collapseThemesHandler));
+	//menu.append($("<h1>Options</h1>"));
+	//menu.append(makeFeatureOption("collapseThemes", 'Group together versions of the same theme', collapseThemesHandler));
 	//menu.append(makeFeatureOption("showEnhanceTitle", "Use 'Enhance User' title"));
 	return menu;
 };
@@ -584,7 +604,7 @@ var makeEnhancePreferencesMenu = function() {
 	preferencesMenu.append($('<div class="title">PWE Vanilla Enhancement v'+getFullVersion()+'</div>'));
 	var content = $('<div class="menu-content" ></div>');
 	content.append(makeFeatureMenu());
-	content.append(makeThemeMenu());
+	//content.append(makeThemeMenu());
 	preferencesMenu.append(content);
 	preferencesMenu.click(function(e){e.stopPropagation();}); // stop menu from autoclose on click
 	preferencesControl.append(preferencesMenu);
@@ -1316,7 +1336,7 @@ var getSettings = function() {
 
 preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/04d282868c86161a4d7dd41bf71c7c05fc49eb8d/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/3236f6e3c0797017b9ee0bb10f3d20877ccafae9/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
 
