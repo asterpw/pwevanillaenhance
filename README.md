@@ -1,5 +1,7 @@
 # pwevanillaenhance
-PWE Vanilla Forums Enhancement - Adds useful tools to the pwe vanilla forums
+PWE Vanilla Forums Enhancement - Adds useful tools to the pwe vanilla forums<br>
+<a href="http://perfectworld.vanillaforums.com/discussion/1195098">Click here for Discussion and Feature requests.</a>
+<br>
 <h1>Features</h1>
 <b>Full editor options</b>
 Did you miss being able to set your font size or color without having to remember hard to use BBcode?  The new editor options do that for you automatically!<br>
