@@ -545,17 +545,19 @@
 
 .tooltip-comment {
 	white-space:normal; 
-	line-height: 1em; 
+	line-height: 110%; 
 	padding: 7px;	
 	background: black;	
 	color: white;
-	font-size: 12px;	
+	font-size: 13px;	
 	font-weight: normal !important; 
-	white-space: normal;
-    max-width: 400px;
+	display: inline-block;
+	width: auto;
+	max-width: 400px;
 	opacity: 0.9;
-    border: solid #69CAFE 1px;
-    border-radius: 4px;
+	border: solid #555555 1px;
+	border-radius: 4px;
+	z-index: 1000;
 }
 
 /****************
