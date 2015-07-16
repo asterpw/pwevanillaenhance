@@ -543,14 +543,8 @@
  Comment Preview Tooltips
 ***********************/
 
-.tooltip-me-left, .tooltip-me-right {
-	position: absolute;	
-	display: none;
-}
-a:hover .tooltip-me-left, a:hover .tooltip-me-right {	
-	display: inline;
+.tooltip-comment {
 	white-space:normal; 
-	z-index:10; 
 	line-height: 1em; 
 	padding: 7px;	
 	background: black;	
@@ -558,20 +552,10 @@ a:hover .tooltip-me-left, a:hover .tooltip-me-right {
 	font-size: 12px;	
 	font-weight: normal !important; 
 	white-space: normal;
+    max-width: 400px;
 	opacity: 0.9;
-}
-	
-.tooltip-contain-left {
-	position: absolute;
-	width: 400px;
-	right: 0px;
-}
-
-.tooltip-contain-right {
-	position: absolute;
-	width: 400px;
-	left: 30px;
-	top: 30px;
+    border: solid #69CAFE 1px;
+    border-radius: 4px;
 }
 
 /****************
