@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.0.0
+// @version    1.0.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.0.0";  //what we store when we should display what's new dialog
+var VERSION = "1.0.1";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v1.0.1</div> - Added message previews to Notifications and popups <br> - better redirect prevention in Chrome \
 	<div class='change-ver'>v1.0.0</div> - Theme Addons moved to Theme Manager \
 	<div class='change-ver'>v0.9.9</div> - Added Twitch Emotes \
 	<div class='change-ver'>v0.9.8</div> - Previews don't mark a thread as read (proxied api) \
@@ -459,6 +460,7 @@ var bbcodeToText = function(bbcode) {
 	var text = stripBlockTags('quote', bbcode);
 	text = stripBlockTags('code', text);
 	text = stripBlockTags('img', text);
+	text = text.replace(new RegExp(ENHANCE_IDENTIFIER, 'g'), '');
 	text = stripTags(text).trim();
 	return text;
 	//return insertWrapping(text);
@@ -477,61 +479,97 @@ var insertWrapping = function(text) {
 var addPreviews = function() {
 	var yql = 'https://query.yahooapis.com/v1/public/yql?format=json&q=';
 	var base = 'select * from json where url="';
-	var apiBaseUrl = 'http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=';
-	
-	$(".LastUser .CommentDate, .LatestPost .CommentDate").mouseover(function() {
-		var url = $(this).attr('href');
-		var match = /discussion\/([0-9]+)\/[^\/]*(?:\/p([0-9]+))?/g.exec(url);
-		if (!($(this).data('call-issued'))) {
-			$(this).data('call-issued', true);
-			var link = $(this);
-			var apiCall = apiBaseUrl + match[1];
-			if (typeof match[2] != 'undefined')
-				apiCall += "&Page=p" + match[2];
-			//console.log("making API call " + apiCall);
-			//$.getJSON("http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=" + match[1],
-			$.getJSON(yql+encodeURIComponent(base+apiCall+'"'),			
-				function(data) {
+	var apiBaseUrlDiscussion = 'http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=';
+	var apiBaseUrlComment = 'http://perfectworld.vanillaforums.com/api/v1/discussion/comment.json?CommentId=';
+		
+	var issueAjax = function(link, type) {
+		if (!(link.data('call-issued'))) {
+			link.data('call-issued', true);
+			var url = link.attr('href');
+			var match;
+			var apiCall = '';
+			if (type == 'comment') {
+				match = /discussion\/comment\/([0-9]+)/.exec(url);
+				apiCall = apiBaseUrlComment + match[1];
+			} else {
+				match = /discussion\/([0-9]+)\/[^\/]*(?:\/p([0-9]+))?/.exec(url);
+				apiCall = apiBaseUrlDiscussion + match[1];
+				if (typeof match[2] != 'undefined') {
+					apiCall += "&Page=p" + match[2];
+				}
+			}
+			
+			$.getJSON(yql+encodeURIComponent(base+apiCall+'"'), function(data) {	
+				try {
 					var json = data.query.results.json;
 					var text = json.Discussion.Body;
 					var format = json.Discussion.Format;
-					if (json.Comments && json.Comments.length) {
+					if (type == 'lastcomment' && json.Comments && json.Comments.length) {
 						text = json.Comments[json.Comments.length - 1].Body;
 						format = json.Comments[json.Comments.length - 1].Format;
+					} else if (type == 'comment' && json.Comments) {
+						if (typeof json.Comments.Body != 'undefined') { 
+							// uhh... if the page has only 1 comment there is no array
+							// wtf.. there should be an array of length 1.  Stupid.
+							text = json.Comments.Body;
+							format = json.Comments.Format;
+						} else {
+							for (var i = 0; i < json.Comments.length; i++) {
+								if (json.Comments[i].CommentID == match[1]) {
+									text = json.Comments[i].Body;
+									format = json.Comments[i].Format;
+									break;
+								}
+							}
+						}
 					}
 					if (format == 'BBCode') {
-						var tooltip = $('<div class="tooltip-me-left"></div>');
-						tooltip.html(bbcodeToText(text).replace(/\n/g, "<p><p>"));
-						var container = $('<div class="tooltip-contain-left"></div>').append(tooltip);
-						link.append($('<span style="position:relative; width: 0px; height: 0px"></span>').append(container));
+						var html = bbcodeToText(text).replace(/\n/g, "<p><p>");
+						link.attr('title', 'Some bug makes me do this?');
+						link.tooltip({
+							content: html,
+							tooltipClass: "tooltip-comment",
+							options: {
+								autoShow: false, //some bug if i init tooltip during mouse over
+								autoHide: true
+							},
+							position: {
+								my: 'left top',
+								at: 'bottom',
+								collision: 'flipfit flipfit'
+							},
+							// The animations are really buggy :(
+							show: false, //{ effect: "fade", duration: 300 }
+							hide: false //{ effect: "fade", duration: 300 }
+						});
+						
+						if (link.is(":hover")) 
+							link.tooltip( "open" );
+						link.tooltip({options: {autoShow: true}});
 					}
+				} catch(err) {
+					link.data('call-issued', false);
 				}
-			);
+			});
 		}
-	});
-	$(".DiscussionName .Title, .LatestPost .LatestPostTitle").mouseover(function() {
-		var url = $(this).attr('href');
-		var match = /discussion\/([0-9]+)\/[^\/]*(?:\/p([0-9]+))?/g.exec(url);
-		if (!($(this).data('call-issued'))) {
-			$(this).data('call-issued', true);
-			var link = $(this);
-			var apiCall = apiBaseUrl + match[1];
-			//$.getJSON("http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=" + match[1],
-			$.getJSON(yql+encodeURIComponent(base+apiCall+'"'),	
-				function(data) {					
-					var json = data.query.results.json;
-					var text = json.Discussion.Body;
-					if (json.Discussion.Format == 'BBCode') {
-						//link.attr('title', bbcodeToText(text));
-						var tooltip = $('<div class="tooltip-me-right"></div>');
-						tooltip.html(bbcodeToText(text).replace(/\n/g, "<p><p>"));
-						var container = $('<div class="tooltip-contain-right"></div>').append(tooltip);
-						link.prepend($('<span style="position:relative; width: 0px; height: 0px"></span>').append(container));
-					}
-				}
-			);
-		}
-	});
+	};
+	
+	var lastCommentPreview = function() {issueAjax($(this), 'lastcomment');};
+	var commentPreview = function() {issueAjax($(this), 'comment');};
+	var discussionPreview = function() {issueAjax($(this), 'discussion');};
+	$("#Body").on('mouseover', 
+		".LastUser .CommentDate, .LatestPost .CommentDate",
+		lastCommentPreview);
+	$("#Body").on('mouseover', 
+		".DiscussionName .Title, .LatestPost .LatestPostTitle",
+		discussionPreview);
+	$('.MeMenu, .Notifications').on('mouseover', 
+		'.ItemContent.Activity a[href^="http://perfectworld.vanillaforums.com/discussion/comment/"]',
+		commentPreview);
+	$('body').on('mouseover', 
+		'.InformMessages a[href^="http://perfectworld.vanillaforums.com/discussion/comment/"]',
+		commentPreview);	
+
 };
 
 var mergeData = function(to, from, allowAddKeys) {
@@ -1285,8 +1323,22 @@ var installFeatures = function(container) {
 
 var preventEmbed = function() {
 	document.getElementsByTagName('html')[0].setAttribute('class', 'is-embedded');
-	if (typeof gdn != 'undefined')
+	if (typeof gdn != "undefined") 
 		gdn.meta.ForceEmbedForum = "0";
+	// being stupidly redundant since Chrome can't make up its mind on when to execute script...
+	scripts = document.getElementsByTagName('script');
+	for (var i = 0; i < scripts.length; i++) {
+		if (scripts[i].src.length == 0 && scripts[i].innerHTML.indexOf('gdn') == 0) {
+			scripts[i].innerHTML += ' gdn.meta.ForceEmbedForum = "0";';
+			var inject = document.createElement('script');
+			inject.type = "text/javascript";
+			inject.innerHTML = 'if(typeof gdn != "undefined"){gdn.meta.ForceEmbedForum = "0";}';
+			scripts[i].parentNode.insertBefore(inject, scripts[i].nextSibling);
+		} else if (scripts[i].src.indexOf('embed_local.js') != -1) {
+			scripts[i].defer = true;
+		}
+	}
+	window.onbeforeunload = function(){ return "The page is attempting to redirect to arc despite my best efforts to stop it, are you ok with that?";};
 };
 
 /* loadCSS = function(href) {
@@ -1329,20 +1381,19 @@ var getSettings = function() {
 			if (pweEnhanceSettings.version > VERSION) {// shouldnt happen
 				pweEnhanceSettings.version = VERSION;
 			}
-				
 		}
 	}
 };
-
 preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/3236f6e3c0797017b9ee0bb10f3d20877ccafae9/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/261c88cb0670a9ef0f5904d01ebd75454521ae2f/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
 
 var jQueryLoaded = function() {
 //$(document).ready(function() {
 	preventEmbed();
+	window.onbeforeunload = null;
 	if (pweEnhanceSettings.version < VERSION) {
 		showWhatsNewDialog();
 	}
