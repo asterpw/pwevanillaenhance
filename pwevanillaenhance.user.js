@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.0.1
+// @version    1.0.1.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -481,7 +481,16 @@ var addPreviews = function() {
 	var base = 'select * from json where url="';
 	var apiBaseUrlDiscussion = 'http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=';
 	var apiBaseUrlComment = 'http://perfectworld.vanillaforums.com/api/v1/discussion/comment.json?CommentId=';
-		
+	
+	var truncate = function(text, limit) {
+		var regexp = new RegExp("([\\s\\S]{"+limit+"}[^\\s]*?)\\s");
+		var match = regexp.exec(text);
+		if (match)
+			text = match[1] + " ...";
+		console.log(text);
+		return text;
+	};
+	
 	var issueAjax = function(link, type) {
 		if (!(link.data('call-issued'))) {
 			link.data('call-issued', true);
@@ -1386,7 +1395,7 @@ var getSettings = function() {
 };
 preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/261c88cb0670a9ef0f5904d01ebd75454521ae2f/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/e15d613593caa594ae3efd885ff2dd64aad11b56/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
 
