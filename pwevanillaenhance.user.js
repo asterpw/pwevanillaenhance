@@ -75,6 +75,12 @@ var pweEnhanceSettings = {
 	},
 	blockedUsers: {
 	},
+	wallpapers: {
+		selected: "",
+		list: ["http://i.imgur.com/UieUlMQb.jpg", "http://i.imgur.com/utPRH0Bb.jpg", "http://i.imgur.com/UBrWpyXb.jpg", 
+		"http://i.imgur.com/e6YnACmb.png", "http://i.imgur.com/zkB4Xczb.jpg", "http://i.imgur.com/83kgoGeb.jpg", "http://i.imgur.com/msPYyURb.png", "http://i.imgur.com/f9fNdKSb.png", "http://i.imgur.com/G6lV3Pkb.jpg", "http://i.imgur.com/1PwZ8s0b.png", "http://i.imgur.com/Iammqeib.jpg", "http://i.imgur.com/KtQpK6xb.jpg"],
+		page: 0
+	},
 	lastThemeUpdateTime: 0,
 	version: "0"
 };
@@ -224,6 +230,57 @@ var getSortedThemeNames = function() {
 	return keys;
 };
 
+var makeWallpaperPicker = function(index) {
+	var container = $("<div class='wallpaper picker'></div>");
+	var url = pweEnhanceSettings.wallpapers.list[index];
+	var removeControl = $("<div class='remove'></div>");
+	container.append(removeControl);
+	container.append($('<img src="'+url+'"></img>'));
+	return container;
+}; 
+
+var populateWallpapers = function() {
+	pweEnhanceSettings.wallpapers.list = ["http://i.imgur.com/UieUlMQb.jpg", "http://i.imgur.com/utPRH0Bb.jpg", "http://i.imgur.com/UBrWpyXb.jpg", 
+		"http://i.imgur.com/e6YnACmb.png", "http://i.imgur.com/zkB4Xczb.jpg", "http://i.imgur.com/83kgoGeb.jpg", "http://i.imgur.com/msPYyURb.png", "http://i.imgur.com/f9fNdKSb.png", "http://i.imgur.com/G6lV3Pkb.jpg", "http://i.imgur.com/1PwZ8s0b.png", "http://i.imgur.com/Iammqeib.jpg", "http://i.imgur.com/KtQpK6xb.jpg"];
+	var pageSize = 8;
+	var start = pweEnhanceSettings.wallpapers.page * pageSize;
+	if (start >= pweEnhanceSettings.wallpapers.list.length) {
+		start = 0;
+		pweEnhanceSettings.wallpapers.page = 0;
+	}
+	if (pweEnhanceSettings.wallpapers.list.length - start > 1)
+		$('.wallpaper-content').empty();
+	for (var i = start; i < start + pageSize && i < pweEnhanceSettings.wallpapers.list.length; i++) {
+		$('.wallpaper-content').append(makeWallpaperPicker(i));
+	}
+};
+
+
+var makeWallpaperMenu = function() {
+	var menu = $("<div class='wallpaperMenu enhance-dropdown'></div>");
+	var title = $("<h1><span class='icon icon-chevron-sign-right' style='margin: 0px 5px 0px 10px;'></span>Wallpapers</h1>");
+	var content = $("<div class='content' style='display:none'>");
+	title.click(function(){
+		populateWallpapers();
+		content.slideToggle();
+		$('.icon', this).toggleClass("icon-chevron-sign-right");
+		$('.icon', this).toggleClass("icon-chevron-sign-down");
+		});
+	var inputField = $('<input id="WallpaperUrl" name="Name" value="" maxlength="100" class="InputBox" type="text" placeholder="imgur image or gallery url to load" ></input>');	
+	var loadButton = $('<a class="NavButton LoadWallpaper">Load</a>');
+	var pageLeftButton = $('<a class="NavButton PageLeft">&nbsp;&laquo;&nbsp;</a>');
+	var pageLabel = $('<span class="pagelabel">1/1</span>');
+	var pageRightButton = $('<a class="NavButton PageRight">&nbsp;&raquo;&nbsp;</a>');
+	var removeButton = $('<a class="NavButton RemoveAll">Remove All</a>');
+	var itemContent = $("<div class='wallpaper-content'>No wallpapers added.<div>");
+	var panel = $("<div class='panel'></div>");
+	panel.append(inputField).append(loadButton).append('<a href="http://imgur.com">Go to Imgur to upload a wallpaper</a>');
+	var pagination = $("<div class='panel'></div>");
+	pagination.append(pageLeftButton).append(pageLabel).append(pageRightButton).append(removeButton);
+	content.append(panel).append(pagination).append(itemContent);
+	return menu.append(title).append(content);
+};
+
 var makeAddonMenu = function() {
 	var menu = $("<div class='addonMenu enhance-dropdown'></div>");
 	var title = $("<h1><span class='icon icon-chevron-sign-right' style='margin: 0px 5px 0px 10px;'></span>Add-ons</h1>");
@@ -366,6 +423,7 @@ var makeThemeManager = function() {
 	}
 	$(".title", dialog).prepend(makeFeatureOption("collapseThemes", 'Grouped View', collapseThemesHandler));
 	dialog.append(content);
+	dialog.append(makeWallpaperMenu());
 	dialog.append(makeAddonMenu());
 
 	$(".SiteMenu").append(dialog);
