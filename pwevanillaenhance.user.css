@@ -347,11 +347,14 @@
 	color: #69CAFE !important;
 }
 
-.emoteManager .picker img {
+.emoteManager .picker .image {
 	width: 50px;
 	height: 50px;
 	margin: 0px;
 	position: absolute;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
 }
 
 .emoteManager .picker {
@@ -422,7 +425,7 @@
 	font-size: 20px;
 }
 
-.themeManager .theme img {
+.themeManager .theme .theme-preview {
 	width: 275px;
 	height: 137px;
 	cursor: pointer;
@@ -672,6 +675,12 @@
 
 .enhanceDialog .NavButton {
 	margin: 0px 10px 0px 10px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 	
 .enhanceDialog .NavButton:hover {
@@ -713,6 +722,11 @@
 	transition: opacity 0.5s;
 	font-size: 30px;
 	text-shadow: 2px 2px 5px #000000;
+}
+
+.wallpaper .image {
+	height: 160px;
+	width: 160px;
 }
 	
 .wallpaper-content .picker:hover .remove {
