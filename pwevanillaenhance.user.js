@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.1.0
+// @version    1.1.0.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -203,7 +203,7 @@ var setThemeEnabled = function(name, enabled) {
 			$("head link[href='"+url+"']")[0].remove();
 		}
 		if (theme.category == "Theme") { //only one theme allowed with category == Theme
-			$('.themeManager img[title="'+name+'"]').closest(".theme").addClass("selected");
+			$('.themeManager .theme-preview[title="'+name+'"]').closest(".theme").addClass("selected");
 			for (var i in pweEnhanceSettings.themes) {
 				if (pweEnhanceSettings.themes[i].category == "Theme"  && i != name) { 
 					setThemeEnabled(i, false);
@@ -211,7 +211,7 @@ var setThemeEnabled = function(name, enabled) {
 			}
 		}
 	} else {
-		$('.themeManager img[title="'+name+'"]').closest(".theme").removeClass("selected");
+		$('.themeManager .theme-preview[title="'+name+'"]').closest(".theme").removeClass("selected");
 		$('.themeManager input[title="'+name+'"]').prop("checked", false);
 		$("head link[href='"+url+"']").remove();
 	}
@@ -280,7 +280,7 @@ var makeWallpaperPicker = function(index) {
 	container.append(removeControl);
 	if (url == pweEnhanceSettings.wallpapers.selected)
 		container.addClass('selected');
-	container.append($('<img src="'+thumbnail+'"></img>'));
+	container.append($('<div class="image" style="background-image: url(\''+thumbnail+'\')"></div>'));
 	container.click(function(){
 		$(this).toggleClass('selected').siblings('.wallpaper').removeClass('selected');
 		if ($(this).is('.selected')) {
@@ -382,6 +382,7 @@ var makeWallpaperMenu = function() {
 		pweEnhanceSettings.wallpapers.selected = '';
 		pweEnhanceSettings.wallpapers.list = [];
 		populateWallpapers();
+		setWallpaper();
 		update();
 	});
 	var itemContent = $("<div class='wallpaper-content'>No wallpapers added.<div>");
@@ -463,7 +464,7 @@ var makeThemePicker = function(name) {
 	}
 	
 	var authorName =  theme["author-alias"] ? theme["author-alias"] : theme.author;
-	container.append($('<img class="theme-preview" title="'+name+'" src="'+screenshotUrl+'">'));
+	container.append($('<div class="theme-preview" title="'+name+'" style="background-image: url(\''+screenshotUrl+'\')">'));
 	container.append($('<div class="theme-created '+(theme.updated != theme.created?'Hidden':'')+'">'+theme.created+'</div>'));
 	container.append($('<div class="theme-updated '+(theme.updated == theme.created?'Hidden':'')+'">'+theme.updated+'</div>'));
 	
@@ -473,7 +474,7 @@ var makeThemePicker = function(name) {
 
 	
 	
-	$("img", container).click(function(){
+	$(".theme-preview", container).click(function(){
 		if ($(this).closest(".collapsed").length) {
 			var delayedUncollapse = function(themename) { 
 				var variantName = pweEnhanceSettings.themes[themename].variant;
@@ -1452,7 +1453,7 @@ ActionFeature.prototype.positionMethod = 'append';
 
 EmoteFeature.prototype.optionPicker = function() {
 	var container = $('<div class="picker"></div>');
-	container.append($('<img src="'+this.thumbnail+'">'));
+	container.append($('<div class="image" style="background-image: url(\''+this.thumbnail+'\')">'));
 	container.append($('<span class="title">'+this.name+'</span>'));
 	container.append($('<span class="description">'+this.description+'</span>'));
 	if (pweEnhanceSettings[this.type][this.id].enabled) {
@@ -1566,7 +1567,7 @@ var getSettings = function() {
 };
 preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/3e7b18a1fc36fcf72f74139dbe0f0a5ccce9567d/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/680669152bac4668c18a5bb5e9893c9d670070cc/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
 setWallpaper();
