@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.1.0.1
+// @version    1.1.0.2
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -343,7 +343,7 @@ var addGallery = function(galleryId) {
 var handleWallpaperLoad = function() {
 	var urlText = $('#WallpaperUrl').val().trim();
 	var imgMatch = new RegExp("https?://(?:i\\.)?imgur\\.com/([^.]+)\\..+").exec(urlText);
-	var galleryMatch = new RegExp("https?://imgur\\.com/(?:a|gallery)/(.+)").exec(urlText);
+	var galleryMatch = new RegExp("https?://imgur\\.com/(?:a|gallery)/([^?#]+)").exec(urlText);
 	if (imgMatch) {
 		pweEnhanceSettings.wallpapers.list.push('http://i.imgur.com/' + imgMatch[1] + '.jpg');
 		pweEnhanceSettings.wallpapers.page = Math.ceil(pweEnhanceSettings.wallpapers.list.length / pweEnhanceSettings.wallpapers.pageSize) - 1;
