@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.0.1.1
+// @version    1.1.0
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.0.1";  //what we store when we should display what's new dialog
+var VERSION = "1.1.0";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v1.1.0</div> - Added custom wallpaper support in Themes window \
 	<div class='change-ver'>v1.0.1</div> - Added message previews to Notifications and popups <br> - better redirect prevention in Chrome \
 	<div class='change-ver'>v1.0.0</div> - Theme Addons moved to Theme Manager \
 	<div class='change-ver'>v0.9.9</div> - Added Twitch Emotes \
@@ -295,6 +296,8 @@ var makeWallpaperPicker = function(index) {
 
 var populateWallpapers = function() {
 	var getPageText = function() {
+		if (pweEnhanceSettings.wallpapers.list.length == 0) 
+			return "0 / 1";
 		return (pweEnhanceSettings.wallpapers.page+1) + " / " + Math.ceil(pweEnhanceSettings.wallpapers.list.length/pweEnhanceSettings.wallpapers.pageSize);
 	};
 	
@@ -330,8 +333,8 @@ var addGallery = function(galleryId) {
 				var imgUrl = recievedImages[i].link;
 				pweEnhanceSettings.wallpapers.list.push(imgUrl);
 			};
-			pweEnhanceSettings.wallpapers.page = Math.ceil(pweEnhanceSettings.wallpapers.list.length / pweEnhanceSettings.wallpapers.pageSize) - 1;
 			populateWallpapers();
+			update();
 		},
 	  error: function() { /* I dun know? */ }
 	});
@@ -366,11 +369,13 @@ var makeWallpaperMenu = function() {
 	var pageLeftButton = $('<a class="NavButton PageLeft">&nbsp;&laquo;&nbsp;</a>').click(function(){
 		pweEnhanceSettings.wallpapers.page = Math.max(0, pweEnhanceSettings.wallpapers.page - 1);
 		populateWallpapers();
+		update();
 	});
 	var pageLabel = $('<span class="pagelabel">1/1</span>');
 	var pageRightButton = $('<a class="NavButton PageRight">&nbsp;&raquo;&nbsp;</a>').click(function(){
 		pweEnhanceSettings.wallpapers.page = Math.min(Math.ceil(pweEnhanceSettings.wallpapers.list.length/pweEnhanceSettings.wallpapers.pageSize) - 1, pweEnhanceSettings.wallpapers.page + 1);
-		populateWallpapers();
+		populateWallpapers();		
+		update();
 	});
 	var removeButton = $('<a class="NavButton RemoveAll">Remove All</a>').click(function(){
 		pweEnhanceSettings.wallpapers.page = 0;
@@ -752,7 +757,7 @@ var mergeData = function(to, from, allowAddKeys) {
 		return;
 	}
 	for (var key in from) {
-		if (typeof from[key] == 'object' && key in to) 
+		if (typeof from[key] == 'object' && key in to && !Array.isArray(from[key])) 
 			mergeData(to[key], from[key]);
 		else if (key in to || allowAddKeys) 
 			to[key] = from[key];
@@ -1561,7 +1566,7 @@ var getSettings = function() {
 };
 preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/e15d613593caa594ae3efd885ff2dd64aad11b56/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/3e7b18a1fc36fcf72f74139dbe0f0a5ccce9567d/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
 setWallpaper();
