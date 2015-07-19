@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.1.0.2
+// @version    1.1.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.1.0";  //what we store when we should display what's new dialog
+var VERSION = "1.1.1";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v1.1.1</div> - Added random wallpapers and default wallpapers  \
 	<div class='change-ver'>v1.1.0</div> - Added custom wallpaper support in Themes window \
 	<div class='change-ver'>v1.0.1</div> - Added message previews to Notifications and popups <br> - better redirect prevention in Chrome \
 	<div class='change-ver'>v1.0.0</div> - Theme Addons moved to Theme Manager \
@@ -80,7 +81,8 @@ var pweEnhanceSettings = {
 		selected: "",
 		list: [],
 		page: 0,
-		pageSize: 8
+		pageSize: 8,
+		random: false
 	},
 	lastThemeUpdateTime: 0,
 	version: "0"
@@ -234,6 +236,15 @@ var getSortedThemeNames = function() {
 var clearWallpaper = function() {
 	pweEnhanceSettings.wallpapers.selected = '';
 	setWallpaper();
+	if (pweEnhanceSettings.wallpapers.random) 
+		$('.wallpaperMenu .feature.random input').click();
+};
+
+var randomWallpaper = function() { 
+	if (pweEnhanceSettings.wallpapers.random && pweEnhanceSettings.wallpapers.selected != '') {
+		var randIndex = Math.floor(Math.random() * 	pweEnhanceSettings.wallpapers.list.length);
+		pweEnhanceSettings.wallpapers.selected = pweEnhanceSettings.wallpapers.list[randIndex];
+	}
 };
 
 var setWallpaper = function() {
@@ -242,7 +253,7 @@ var setWallpaper = function() {
 	if (wallpaperCss) {
 		head.removeChild(wallpaperCss);
 	}
-
+	
 	if (pweEnhanceSettings.wallpapers.selected) {
 		var style = document.createElement('style');
 		style.innerHTML = 'body.Vanilla {\
@@ -270,9 +281,8 @@ var makeWallpaperPicker = function(index) {
 			pweEnhanceSettings.wallpapers.list.splice(index, 1);
 		}
 		if (pweEnhanceSettings.wallpapers.selected == url) {
-			pweEnhanceSettings.wallpapers.selected = "";
+			pweEnhanceSettings.wallpapers.selected = '';
 		}
-		setWallpaper();
 		populateWallpapers();
 		update();
 		e.stopPropagation();
@@ -286,7 +296,7 @@ var makeWallpaperPicker = function(index) {
 		if ($(this).is('.selected')) {
 			pweEnhanceSettings.wallpapers.selected = url;
 		} else {
-			pweEnhanceSettings.wallpapers.selected = '';
+			clearWallpaper();
 		}
 		setWallpaper();
 		update();
@@ -307,12 +317,22 @@ var populateWallpapers = function() {
 		start = 0;
 		pweEnhanceSettings.wallpapers.page = 0;
 	}
-	if (pweEnhanceSettings.wallpapers.list.length == 0) {
-		$('.wallpaper-content').text('No wallpapers added.');
-	}
+
 	$('.pagelabel').text(getPageText());
 	for (var i = start; i < start + pweEnhanceSettings.wallpapers.pageSize && i < pweEnhanceSettings.wallpapers.list.length; i++) {
 		$('.wallpaper-content').append(makeWallpaperPicker(i));
+	}
+	
+	if (pweEnhanceSettings.wallpapers.list.length > 0) {
+		$('.wallpaperMenu .Default').hide();
+		$('.wallpaperMenu .RemoveAll').show();
+		$('.wallpaperMenu .feature.random input').prop("disabled", false);
+	} else {
+		$('.wallpaperMenu .Default').show();
+		$('.wallpaperMenu .RemoveAll').hide();
+		$('.wallpaper-content').text('No wallpapers added.');
+		clearWallpaper();
+		$('.wallpaperMenu .feature.random input').prop("disabled", true);
 	}
 };
 
@@ -332,7 +352,7 @@ var addGallery = function(galleryId) {
 			for (var i = 0; i < recievedImages.length; i++) {
 				var imgUrl = recievedImages[i].link;
 				pweEnhanceSettings.wallpapers.list.push(imgUrl);
-			};
+			}
 			populateWallpapers();
 			update();
 		},
@@ -342,8 +362,8 @@ var addGallery = function(galleryId) {
 
 var handleWallpaperLoad = function() {
 	var urlText = $('#WallpaperUrl').val().trim();
-	var imgMatch = new RegExp("https?://(?:i\\.)?imgur\\.com/([^.]+)\\..+").exec(urlText);
-	var galleryMatch = new RegExp("https?://imgur\\.com/(?:a|gallery)/([^?#]+)").exec(urlText);
+	var imgMatch = new RegExp("(?:https?://)?(?:i\\.)?imgur\\.com/([^./]+)\\..+").exec(urlText);
+	var galleryMatch = new RegExp("(?:https?://)?imgur\\.com/(?:a|gallery)/([^?#/]+)").exec(urlText);
 	if (imgMatch) {
 		pweEnhanceSettings.wallpapers.list.push('http://i.imgur.com/' + imgMatch[1] + '.jpg');
 		pweEnhanceSettings.wallpapers.page = Math.ceil(pweEnhanceSettings.wallpapers.list.length / pweEnhanceSettings.wallpapers.pageSize) - 1;
@@ -364,7 +384,7 @@ var makeWallpaperMenu = function() {
 		$('.icon', this).toggleClass("icon-chevron-sign-right");
 		$('.icon', this).toggleClass("icon-chevron-sign-down");
 		});
-	var inputField = $('<input id="WallpaperUrl" name="Name" value="" maxlength="100" class="InputBox" type="text" placeholder="image or gallery url to load from imgur" ></input>').change(handleWallpaperLoad);	
+	var inputField = $('<input id="WallpaperUrl" name="Name" value="" maxlength="100" class="InputBox" type="text" placeholder="gallery or image url to load from imgur.com" ></input>').change(handleWallpaperLoad);	
 	var loadButton = $('<a class="NavButton LoadWallpaper">Load</a>').click(handleWallpaperLoad);
 	var pageLeftButton = $('<a class="NavButton PageLeft">&nbsp;&laquo;&nbsp;</a>').click(function(){
 		pweEnhanceSettings.wallpapers.page = Math.max(0, pweEnhanceSettings.wallpapers.page - 1);
@@ -379,17 +399,30 @@ var makeWallpaperMenu = function() {
 	});
 	var removeButton = $('<a class="NavButton RemoveAll">Remove All</a>').click(function(){
 		pweEnhanceSettings.wallpapers.page = 0;
-		pweEnhanceSettings.wallpapers.selected = '';
 		pweEnhanceSettings.wallpapers.list = [];
 		populateWallpapers();
-		setWallpaper();
 		update();
 	});
+	var defaultButton = $('<a class="NavButton Default">Load Default Wallpapers</a>').click(function(){
+		addGallery('IKwve'); // load defaults
+	});
+	
+	var useRandomControl = makeFeatureOption("wallpapers", "random", 'Use Random Wallpaper', function(enabled){
+		if (enabled) {
+			if (pweEnhanceSettings.wallpapers.list.length > 0)
+				pweEnhanceSettings.wallpapers.selected = pweEnhanceSettings.wallpapers.list[0];
+			randomWallpaper();
+			populateWallpapers();
+			setWallpaper();
+			update();
+		}
+	});
+	
 	var itemContent = $("<div class='wallpaper-content'>No wallpapers added.<div>");
 	var panel = $("<div class='panel'></div>");
-	panel.append(inputField).append(loadButton).append('<a href="http://imgur.com">Go to Imgur to upload a wallpaper</a>');
+	panel.append(inputField).append(loadButton).append('<a href="http://imgur.com">Go to Imgur to upload wallpapers</a>');
 	var pagination = $("<div class='panel'></div>");
-	pagination.append(pageLeftButton).append(pageLabel).append(pageRightButton).append(removeButton);
+	pagination.append(pageLeftButton).append(pageLabel).append(pageRightButton).append(removeButton).append(defaultButton).append(useRandomControl);
 	content.append(panel).append(pagination).append(itemContent);
 	return menu.append(title).append(content);
 };
@@ -536,7 +569,7 @@ var makeThemeManager = function() {
 			}
 		}
 	}
-	$(".title", dialog).prepend(makeFeatureOption("collapseThemes", 'Grouped View', collapseThemesHandler));
+	$(".title", dialog).prepend(makeFeatureOption("options", "collapseThemes", 'Grouped View', collapseThemesHandler));
 	dialog.append(content);
 	dialog.append(makeWallpaperMenu());
 	dialog.append(makeAddonMenu());
@@ -765,15 +798,15 @@ var mergeData = function(to, from, allowAddKeys) {
 	}
 };
 
-var makeFeatureOption = function(option, description, handler) {
+var makeFeatureOption = function(type, option, description, handler) {
 	var closureOption = option;
-	var checked = pweEnhanceSettings.options[option] ? 'checked' : '';
-	var optioninput = $('<div class="feature"><input type="checkbox" '+checked+'></input><span class="label">'+description+'</span></div>');
+	var checked = pweEnhanceSettings[type][option] ? 'checked' : '';
+	var optioninput = $('<div class="feature '+option+'"><input type="checkbox" '+checked+'></input><span class="label">'+description+'</span></div>');
 	$('input', optioninput).click(function(){ 
-		pweEnhanceSettings.options[closureOption] = $(this).is(":checked");
+		pweEnhanceSettings[type][closureOption] = $(this).is(":checked");
 		update();
 		if (handler)
-			handler(pweEnhanceSettings.options[closureOption]);
+			handler(pweEnhanceSettings[type][closureOption]);
 	});
 	return optioninput;
 };
@@ -1567,9 +1600,10 @@ var getSettings = function() {
 };
 preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/680669152bac4668c18a5bb5e9893c9d670070cc/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/45980a548ed466db9bce5dea84d47bd20285156b/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
+randomWallpaper();
 setWallpaper();
 
 var jQueryLoaded = function() {
