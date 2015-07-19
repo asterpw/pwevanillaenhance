@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.1.2.2
+// @version    1.1.2.3
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -282,7 +282,7 @@ var makeWallpaperPicker = function(index) {
 			pweEnhanceSettings.wallpapers.list.splice(index, 1);
 		}
 		if (pweEnhanceSettings.wallpapers.selected == url) {
-			pweEnhanceSettings.wallpapers.selected = '';
+			clearWallpaper();
 		}
 		populateWallpapers();
 		update();
