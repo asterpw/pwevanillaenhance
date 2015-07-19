@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.1.2
+// @version    1.1.2.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -423,7 +423,7 @@ var makeWallpaperMenu = function() {
 	var panel = $("<div class='panel'></div>");
 	panel.append(inputField).append(loadButton).append('<a href="http://imgur.com">Go to Imgur to upload wallpapers</a>');
 	var pagination = $("<div class='panel'></div>");
-	pagination.append(pageLeftButton).append(pageLabel).append(pageRightButton).append(removeButton).append(defaultButton).append(useRandomControl);
+	pagination.append(useRandomControl).append(pageLeftButton).append(pageLabel).append(pageRightButton).append(removeButton).append(defaultButton);
 	content.append(panel).append(pagination).append(itemContent);
 	return menu.append(title).append(content);
 };
