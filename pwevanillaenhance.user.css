@@ -675,12 +675,12 @@
 
 .enhanceDialog .NavButton {
 	margin: 0px 10px 0px 10px;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 	
 .enhanceDialog .NavButton:hover {
@@ -734,6 +734,12 @@
 }
 
 .wallpaperMenu .selected::before {
-  top: 140px;
+	top: 140px;
 	left: 140px;
+}
+
+.wallpaperMenu  .feature.random {
+	display: inline-block;
+	float: right;
+	margin-right: 20px;
 }
