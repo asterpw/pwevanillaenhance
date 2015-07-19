@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.1.1.1
+// @version    1.1.2
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.1.1";  //what we store when we should display what's new dialog
+var VERSION = "1.1.2";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v1.1.2</div> - Added admin posts link for STO and CO game links \
 	<div class='change-ver'>v1.1.1</div> - Added random wallpapers and default wallpapers  \
 	<div class='change-ver'>v1.1.0</div> - Added custom wallpaper support in Themes window \
 	<div class='change-ver'>v1.0.1</div> - Added message previews to Notifications and popups <br> - better redirect prevention in Chrome \
@@ -1336,12 +1337,15 @@ var makeGameLinks = function(container) {
 		"stronghold-kingdoms|SK on ARC|http://www.arcgames.com/en/games/Stronghold_Kingdoms",
 		"Swordsman|Swordsman on ARC|http://www.arcgames.com/en/games/swordsman",
 		"waroftheimmortals|WOI on ARC|http://www.arcgames.com/en/games/war-of-the-immortals",
+		"startrekonline|Admin Posts|http://perfectworld.vanillaforums.com/search?adv=1&search=&title=&author=tacofangs%2Cborticuscryptic%2Cpwlaughingtrendy%2Ccrypticfrost%2Ccrypticjoejing&cat=all&tags=&discussion_d=1&discussion_question=1&discussion_poll=1&comment_c=1&comment_answer=1&within=1+year&date=",
 		"startrekonline|Wiki|http://sto.gamepedia.com/",
 		"startrekonline|Lore|http://sto.gamepedia.com/Lore",
 		"startrekonline|Commodities|http://sto.gamepedia.com/Commodities",
+		"championsonline|Admin Posts|http://perfectworld.vanillaforums.com/search?adv=1&search=&title=&author=crypticarkayne%2Cladygadfly%2Ctrailturtle%2Csplosions&cat=all&tags=&discussion_d=1&discussion_question=1&discussion_poll=1&comment_c=1&comment_answer=1&within=1+year&date=",
 		"championsonline|Wiki|http://www.championswiki.com/index.php?title=Main_Page",
 		"championsonline|PDB|http://primusdatabase.com",
 		"championsonline|Reddit|http://www.reddit.com/r/ChampionsOnlineFFA/",
+		"championsonline|Wiki|http://www.championswiki.com/index.php?title=Main_Page",
 		"startrekonline|Reddit|http://www.reddit.com/r/sto/"];
 		
 	for (var i=0; i < gamelinks.length; i++) {
