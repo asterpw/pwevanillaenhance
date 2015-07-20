@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.1.3.1
+// @version    1.1.3.2
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -262,7 +262,6 @@ var setWallpaper = function() {
 				background-size: cover !important;\
 				background-position: center !important;\
 				background-repeat: no-repeat !important;\
-				background-color: black !important;\
 				background-attachment: fixed !important;\
 				background-image: url("'+pweEnhanceSettings.wallpapers.selected+'") !important;\
 			}';
@@ -1326,9 +1325,10 @@ var makeGameLinks = function(container) {
 		"forsakenworld|FW on ARC|http://www.arcgames.com/en/games/forsaken-world",
 		"jadedynasty|JD on ARC|http://www.arcgames.com/en/games/jade-dynasty",
 		"neverwinter|NW on ARC|http://www.arcgames.com/en/games/neverwinter",
+		"neverwinter|NWcalc|http://nwcalc.com",
 		"prime-world|PW on ARC|http://www.arcgames.com/en/games/Prime_World",
 		"pwi|PWI on ARC|http://www.arcgames.com/en/games/pwi",
-		"pwi|Calc|http://mypers.pw/1.8/",
+		"pwi|Calc|http://mypers.pw/1.9/",
 		"pwi|PWDB|http://pwdatabase.com",
 		"pwi|Aster Tools|http://aster.ohmydays.net/pw",
 		"raiderz|Raiderz on ARC|http://www.arcgames.com/en/games/raiderz",
