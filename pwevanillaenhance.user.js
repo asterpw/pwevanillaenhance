@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.1.3
+// @version    1.1.3.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -609,7 +609,7 @@ var makeEmoteManager = function() {
 };
 
 var ENHANCE_IDENTIFIER = '\u200B\u200B'; //It's invisible... spooky
-var applyTitles = function() {
+var applyTitles = function(page) {
 	var titles = { 
 		'asterelle': {'developer': 'Enhance Developer'},
 		'nrglg': {'developer': 'Enhance Contributor'},
@@ -621,7 +621,7 @@ var applyTitles = function() {
 		titles[author].themeauthor = 'Theme Author';
 	}
 	
-	$(".Message").filter(function () { var text = $(this).text().trim();
+	$(".Message", page).filter(function () { var text = $(this).text().trim();
 			return text.lastIndexOf(ENHANCE_IDENTIFIER) == (text.length - ENHANCE_IDENTIFIER.length);
 		}).closest(".Item-BodyWrap").siblings(".Item-Header").find('.PhotoWrap').each(function(){
 			var name = $(this).attr('title');
@@ -631,7 +631,7 @@ var applyTitles = function() {
 		});
 	
 	for (var name in titles) {
-		var container = $('.Username[href$="'+name+'"]').closest(".AuthorWrap").find(".AuthorInfo");
+		var container = $('.Username[href$="'+name+'"]', page).closest(".AuthorWrap").find(".AuthorInfo");
 		for (var title in titles[name]) {
 			container.append($('<span class="Rank MItem enhance-title '+title+'">'+titles[name][title]+'</span>'));
 			$('span[title="Arc User"]', container).remove();
@@ -1357,14 +1357,14 @@ var makeGameLinks = function(container) {
 	return $(links);
 };
 
-var hideBlockedUsers = function() {
-	$(".Comment, .Discussion, td .Block.Wrap").show();
-	$(".unhideComment").remove();
-	$(".unblockUser").hide();
+var hideBlockedUsers = function(page) {
+	$(".Comment, .Discussion, td .Block.Wrap", page).show();
+	$(".unhideComment", page).remove();
+	$(".unblockUser", page).hide();
 	if (pweEnhanceSettings.links.blockUser.enabled)
-		$(".blockUser").show();
-	$(".Mine .blockUser").hide();
-	$(".EditDiscussion").closest(".PageTitle").siblings(".ItemDiscussion").find(".blockUser").hide();
+		$(".blockUser", page).show();
+	$(".Mine .blockUser", page).hide();
+	$(".EditDiscussion", page).closest(".PageTitle").siblings(".ItemDiscussion").find(".blockUser").hide();
 	for (var user in pweEnhanceSettings.blockedUsers) {
 		var unhideControl = $("<div class='unhideComment'>Show blocked comment</div>").click(function(){
 			$(this).siblings(".Comment, .Discussion").show();
@@ -1373,7 +1373,7 @@ var hideBlockedUsers = function() {
 			$(this).remove();
 		});
 		$('.PhotoWrap[title="'+user+'"]').closest(".Block.Wrap").hide();
-		var blocked = $('.PhotoWrap[title="'+user+'"]').closest(".Comment, .Discussion").hide();
+		var blocked = $('.PhotoWrap[title="'+user+'"]', page).closest(".Comment, .Discussion").hide();
 		$(".unblockUser", blocked).show();
 		$(".blockUser", blocked).hide();
 		blocked.before(unhideControl);
@@ -1625,15 +1625,21 @@ var jQueryLoaded = function() {
 	makeThemeManager();
 	makeEmoteManager();
 	makeEnhancePreferencesMenu();
-	applyTitles();
-	addPreviews();
 	redirectUrls();
-	hideBlockedUsers();
+	applyTitles($("#Body"));
+	hideBlockedUsers($("#Body"));
+	addPreviews();
 	$.getScript("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.js").done(function() {
 		initColorPicker($('.fontColorPicker'));
 	});
 	$(document).on( "EditCommentFormLoaded", function(event, container) {
 		installFeatures(container);
+	});
+	$(document).on( "PageLoaded", function(event, container) {
+		redirectUrls();
+		installFeatures(container);
+		applyTitles(container);
+		hideBlockedUsers(container);
 	});
 };
 
