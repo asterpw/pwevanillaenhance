@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.1.2.3
+// @version    1.1.3
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.1.2";  //what we store when we should display what's new dialog
+var VERSION = "1.1.3";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v1.1.3</div> - Enabled fade animation in comment previews \
 	<div class='change-ver'>v1.1.2</div> - Added admin posts link for STO and CO game links \
 	<div class='change-ver'>v1.1.1</div> - Added random wallpapers and default wallpapers  \
 	<div class='change-ver'>v1.1.0</div> - Added custom wallpaper support in Themes window \
@@ -754,8 +755,8 @@ var addPreviews = function() {
 								collision: 'flipfit flipfit'
 							},
 							// The animations are really buggy :(
-							show: false, //{ effect: "fade", duration: 300 }
-							hide: false //{ effect: "fade", duration: 300 }
+							show: { effect: "fade", duration: 200, delay: 200 },
+							hide: { effect: "fade", duration: 200, delay: 0 }
 						});
 						
 						if (link.is(":hover")) 
@@ -773,7 +774,7 @@ var addPreviews = function() {
 	var commentPreview = function() {issueAjax($(this), 'comment');};
 	var discussionPreview = function() {issueAjax($(this), 'discussion');};
 	$("#Body").on('mouseover', 
-		".LastUser .CommentDate, .LatestPost .CommentDate",
+		".LastUser .CommentDate",  //.LatestPost .CommentDate
 		lastCommentPreview);
 	$("#Body").on('mouseover', 
 		".DiscussionName .Title, .LatestPost .LatestPostTitle",
