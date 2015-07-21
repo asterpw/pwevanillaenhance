@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.1.3.2
+// @version    1.1.3.3
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -251,6 +251,7 @@ var randomWallpaper = function() {
 
 var setWallpaper = function() {
 	var head = document.getElementsByTagName('head')[0];
+	var html = document.getElementsByTagName('html')[0];
 	var wallpaperCss = document.getElementById('wallpaperCss');
 	if (wallpaperCss) {
 		head.removeChild(wallpaperCss);
@@ -262,12 +263,19 @@ var setWallpaper = function() {
 				background-size: cover !important;\
 				background-position: center !important;\
 				background-repeat: no-repeat !important;\
+				background-color: black;\
 				background-attachment: fixed !important;\
 				background-image: url("'+pweEnhanceSettings.wallpapers.selected+'") !important;\
 			}';
 		style.id = 'wallpaperCss';
 		head.appendChild(style);
-	} 
+		
+		if (html && html.className.indexOf('customWallpaper') == -1)
+			html.className = html.className + " customWallpaper";
+	} else {
+		if (html && html.className.indexOf('customWallpaper') != -1)
+			html.className = html.className.replace(' customWallpaper', '');
+	}
 };
 
 var makeWallpaperPicker = function(index) {
@@ -620,6 +628,16 @@ var applyTitles = function(page) {
 		titles[author].themeauthor = 'Theme Author';
 	}
 	
+	var promoLink = $('.Signature a[href^="http://perfectworld.vanillaforums.com/discussion/1195098"]');
+	promoLink.each(function(){
+		var name = $(this).closest('.Item-BodyWrap').siblings('.Item-Header').find('.PhotoWrap').attr('title');
+		var customTitle = $(this).attr('title');
+		if (!(name in titles)) {
+			titles[name] = {'promoter': customTitle};
+		}
+	});
+	promoLink.hide();
+	
 	$(".Message", page).filter(function () { var text = $(this).text().trim();
 			return text.lastIndexOf(ENHANCE_IDENTIFIER) == (text.length - ENHANCE_IDENTIFIER.length);
 		}).closest(".Item-BodyWrap").siblings(".Item-Header").find('.PhotoWrap').each(function(){
@@ -637,6 +655,28 @@ var applyTitles = function(page) {
 		}
 	}
 	
+};
+
+var insertPromotion = function(desiredTitle) {
+	var inSource = $('.editor.editor-format-wysiwyg').hasClass('wysihtml5-commands-disabled');
+	if (!inSource)
+		$('.editor-toggle-source').click(); 
+	$('#Form_Body').val($('#Form_Body').val() + '\n<br><a href="http://perfectworld.vanillaforums.com/discussion/1195098" title="'+desiredTitle+'"  target="_blank" rel="nofollow"><font color="#69CAFE">Get the Forums Enhancement Extension!</font></a>'); 
+};
+var makePromotionControls = function() {
+	if ($('.SignatureRules').length == 0) 
+		return;
+	var container = $('<div></div>');
+	container.append("<h2 class='H'>Custom Enhance Title</h2><div>To get a custom user title just add a link promoting the PWE Vanilla Enhancement Extension to your signature!  <br>Promo links are only visible to non-Enhanced users so don't worry about it cluttering up your sig.<br><b>Note:</b> If you edit your signature you'll have to insert the link again in HTML mode for it to work.</div>");
+	container.append("Custom Title: <input class='promoTitle' type='text' placeholder='up to 20 characters' maxlength='20'></input>");
+	var button = $("<div class='NavButton' style='margin-left: 10px'>Add Promo Link</div>");
+	button.click(function(){
+		var title = $('input.promoTitle').val();
+		title = title.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+		insertPromotion(title);
+	});
+	container.append(button);
+	$('.SignatureRules').after(container);
 };
 
 var redirectUrls = function() {
@@ -1541,7 +1581,8 @@ var installFeatures = function(container) {
 };
 
 var preventEmbed = function() {
-	document.getElementsByTagName('html')[0].setAttribute('class', 'is-embedded');
+	if (document.getElementsByTagName('html')[0].className.indexOf('is-embedded') == -1)
+		document.getElementsByTagName('html')[0].className += 'is-embedded';
 	if (typeof gdn != "undefined") 
 		gdn.meta.ForceEmbedForum = "0";
 	// being stupidly redundant since Chrome can't make up its mind on when to execute script...

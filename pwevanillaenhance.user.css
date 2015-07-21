@@ -161,6 +161,7 @@
 .emote-category img {
 	padding: 3px;	
 	border: 1px solid transparent;
+	cursor: pointer;
 }
 
 .fwEmotes .emote-category img {
@@ -514,11 +515,17 @@
 	display: block;
 }
 
+.enhance-title.promoter {
+	color: #FFEE88;
+	display: block;
+}
+
 /************************
   User Blocking
 ************************/
 .unhideComment {
-	margin: 2px 10px;
+	margin: 0px;
+	padding: 2px 10px;
 	cursor: pointer;
 	opacity: 0.3;
 }
