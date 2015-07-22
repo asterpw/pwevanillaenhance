@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.1.3.3
+// @version    1.2.0
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.1.3";  //what we store when we should display what's new dialog
+var VERSION = "1.2.0";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v1.2.0</div> - Added custom user titles for <a href='http://perfectworld.vanillaforums.com/profile/signature' style='color:black; text-decoration: bold'>Enhance Promoters</a><br> - Added new links to Enhance Options Menu (cog) \
 	<div class='change-ver'>v1.1.3</div> - Enabled fade animation in comment previews \
 	<div class='change-ver'>v1.1.2</div> - Added admin posts link for STO and CO game links \
 	<div class='change-ver'>v1.1.1</div> - Added random wallpapers and default wallpapers  \
@@ -629,14 +630,15 @@ var applyTitles = function(page) {
 	}
 	
 	var promoLink = $('.Signature a[href^="http://perfectworld.vanillaforums.com/discussion/1195098"]');
-	promoLink.each(function(){
+	promoLink.filter(function(){return $(this).text() == "Get the Forums Enhancement Extension!";}).each(function(){
 		var name = $(this).closest('.Item-BodyWrap').siblings('.Item-Header').find('.PhotoWrap').attr('title');
 		var customTitle = $(this).attr('title');
+		var santize = $("<div>").text(customTitle.substring(0,20)).html();
 		if (!(name in titles)) {
-			titles[name] = {'promoter': customTitle};
+			titles[name] = {'promoter': '<span title="Enhance Promoter">'+santize+'</span>'};
 		}
+		$(this).hide();
 	});
-	promoLink.hide();
 	
 	$(".Message", page).filter(function () { var text = $(this).text().trim();
 			return text.lastIndexOf(ENHANCE_IDENTIFIER) == (text.length - ENHANCE_IDENTIFIER.length);
@@ -661,21 +663,39 @@ var insertPromotion = function(desiredTitle) {
 	var inSource = $('.editor.editor-format-wysiwyg').hasClass('wysihtml5-commands-disabled');
 	if (!inSource)
 		$('.editor-toggle-source').click(); 
-	$('#Form_Body').val($('#Form_Body').val() + '\n<br><a href="http://perfectworld.vanillaforums.com/discussion/1195098" title="'+desiredTitle+'"  target="_blank" rel="nofollow"><font color="#69CAFE">Get the Forums Enhancement Extension!</font></a>'); 
+	$('.editor-toggle-source').remove(); 
+	var promo = '\n<br><a href="http://perfectworld.vanillaforums.com/discussion/1195098" title="'+desiredTitle+'"  target="_blank" rel="nofollow"><font color="#69CAFE">Get the Forums Enhancement Extension!</font></a>';
+	var text = $('#Form_Body').val();
+	text = text.replace(/\s?(?:<br>)?<a href=\"http:\/\/perfectworld\.vanillaforums\.com\/discussion\/1195098\".*Get the Forums Enhancement.*<\/a>/mg, ''); //remove existing promo
+	text = text.trim();
+	var endDiv = "</div>"; //for center justify
+	if (text.substring( text.length - endDiv.length, text.length ) === endDiv) {
+		text = text.substring(0, text.length - endDiv.length) + promo + "</div>";
+	} else {
+		text += promo;
+	}
+	
+	$('#Form_Body').val(text); 
 };
+
 var makePromotionControls = function() {
 	if ($('.SignatureRules').length == 0) 
 		return;
 	var container = $('<div></div>');
-	container.append("<h2 class='H'>Custom Enhance Title</h2><div>To get a custom user title just add a link promoting the PWE Vanilla Enhancement Extension to your signature!  <br>Promo links are only visible to non-Enhanced users so don't worry about it cluttering up your sig.<br><b>Note:</b> If you edit your signature you'll have to insert the link again in HTML mode for it to work.</div>");
-	container.append("Custom Title: <input class='promoTitle' type='text' placeholder='up to 20 characters' maxlength='20'></input>");
+	container.append("<h2 class='H'>Custom Enhance Title</h2><div>Custom User Titles are available for Enhance Promoters!<br>All you have to do is add a link promoting the Enhance Extension using the button below.<br>Promo links are only visible to non-Enhanced users so don't worry about it cluttering up your signature.<br><b>Note:</b> If you edit your signature you'll have to insert the link again with this button for it to work.</div>");
+	container.append("Desired Title: <input class='promoTitle' type='text' placeholder='up to 20 characters' maxlength='20'></input>");
 	var button = $("<div class='NavButton' style='margin-left: 10px'>Add Promo Link</div>");
+	var success = $("<span style='display: none; margin-left: 20px'>Promo link added!</span>");
 	button.click(function(){
-		var title = $('input.promoTitle').val();
+		var title = $('input.promoTitle').val().trim();
 		title = title.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+		if (title.length == 0) 
+			return;
 		insertPromotion(title);
+		success.show();
 	});
 	container.append(button);
+	container.append(success);
 	$('.SignatureRules').after(container);
 };
 
@@ -780,7 +800,7 @@ var addPreviews = function() {
 					}
 					if (format == 'BBCode') {
 						var html = bbcodeToText(text).replace(/\n/g, "<p><p>");
-						link.attr('title', 'Some bug makes me do this?');
+						link.attr('title', ' ');
 						link.tooltip({
 							content: html,
 							tooltipClass: "tooltip-comment",
@@ -815,6 +835,9 @@ var addPreviews = function() {
 	$("#Body").on('mouseover', 
 		".LastUser .CommentDate",  //.LatestPost .CommentDate
 		lastCommentPreview);
+	$("#Body").on('mouseover', 
+		".LastUser .CommentDate time",  // we're better off if we remove the native time title
+		function(){$(this).attr('title', '');});
 	$("#Body").on('mouseover', 
 		".DiscussionName .Title, .LatestPost .LatestPostTitle",
 		discussionPreview);
@@ -896,12 +919,15 @@ var makeEnhancePreferencesMenu = function() {
 	var preferencesMenu = $('<div class="Flyout MenuItems" ></div>');
 	preferencesMenu.append($('<div class="title">PWE Vanilla Enhancement v'+getFullVersion()+'</div>'));
 	var content = $('<div class="menu-content" ></div>');
+
 	content.append(makeFeatureMenu());
 	//content.append(makeThemeMenu());
+	content.append($('<a href="http://perfectworld.vanillaforums.com/discussion/1195098">Discussion and Requests</a>'));
+	content.append($('<a href="#">Recent Changes</a>').click(function(){showWhatsNewDialog();}));
 	preferencesMenu.append(content);
 	preferencesMenu.click(function(e){e.stopPropagation();}); // stop menu from autoclose on click
 	preferencesControl.append(preferencesMenu);
-	
+
 	$('.MeMenu').append(preferencesControl);
 };
 
@@ -1646,7 +1672,7 @@ var getSettings = function() {
 };
 preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/45980a548ed466db9bce5dea84d47bd20285156b/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/7a6116fd9688832393e9e3ee6d2e9812985f3a33/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
 randomWallpaper();
@@ -1666,6 +1692,7 @@ var jQueryLoaded = function() {
 	makeThemeManager();
 	makeEmoteManager();
 	makeEnhancePreferencesMenu();
+	makePromotionControls();
 	redirectUrls();
 	applyTitles($("#Body"));
 	hideBlockedUsers($("#Body"));
