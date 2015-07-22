@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.2.0.1
+// @version    1.2.0.2
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.2.0";  //what we store when we should display what's new dialog
+var VERSION = "1.2.0.2";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,7 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
-	<div class='change-ver'>v1.2.0</div> - Added custom user titles for <a href='http://perfectworld.vanillaforums.com/profile/signature' style='color:black; text-decoration: bold'>Enhance Promoters</a> (DISABLED)<br> - Added new links to Enhance Options Menu (cog) \
+	<div class='change-ver'>v1.2.0</div> - (ENABLED) Added custom user titles for <a href='http://perfectworld.vanillaforums.com/profile/signature' style='color:black; text-decoration: bold'>Enhance Promoters</a><br> - Added new links to Enhance Options Menu (cog) \
 	<div class='change-ver'>v1.1.3</div> - Enabled fade animation in comment previews \
 	<div class='change-ver'>v1.1.2</div> - Added admin posts link for STO and CO game links \
 	<div class='change-ver'>v1.1.1</div> - Added random wallpapers and default wallpapers  \
@@ -632,12 +632,14 @@ var applyTitles = function(page) {
 	var promoLink = $('.Signature a[href^="http://perfectworld.vanillaforums.com/discussion/1195098"]');
 	promoLink.filter(function(){return $(this).text() == "Get the Forums Enhancement Extension!";}).each(function(){
 		var name = $(this).closest('.Item-BodyWrap').siblings('.Item-Header').find('.PhotoWrap').attr('title');
-		var customTitle = $(this).attr('title');
-		var santize = $("<div>").text(customTitle.substring(0,20)).html();
+		var customTitle = $(this).prev('a[href^="title-"]').attr('href').substring("title-".length);
+		var sanitize = escapeHTML(customTitle.substring(0,20));
 		if (!(name in titles)) {
-			titles[name] = {'promoter': '<span title="Enhance Promoter">'+santize+'</span>'};
+			titles[name] = {'promoter': '<span title="Enhance Promoter">'+sanitize+'</span>'};
 		}
 		$(this).hide();
+		$(this).prev('a[href^="title-"]').hide();
+		$(this).prev('a[href^="title-"]').prev('br').remove();
 	});
 	
 	$(".Message", page).filter(function () { var text = $(this).text().trim();
@@ -664,17 +666,30 @@ var insertPromotion = function(desiredTitle) {
 	if (!inSource)
 		$('.editor-toggle-source').click(); 
 	$('.editor-toggle-source').remove(); 
-	var promo = '\n<br><a href="http://perfectworld.vanillaforums.com/discussion/1195098" title="'+desiredTitle+'"  target="_blank" rel="nofollow"><font color="#69CAFE">Get the Forums Enhancement Extension!</font></a>';
 	var text = $('#Form_Body').val();
-	text = text.replace(/\s?(?:<br>)?<a href=\"http:\/\/perfectworld\.vanillaforums\.com\/discussion\/1195098\".*Get the Forums Enhancement.*<\/a>/mg, ''); //remove existing promo
+	
+	var htmlPromoBase = '<a href="title-'+desiredTitle+'"></a><a href="http://perfectworld.vanillaforums.com/discussion/1195098" target="_blank" rel="nofollow"><font color="#69CAFE">Get the Forums Enhancement Extension!</font></a>';
+	var promo = '\n' + htmlPromoBase;
+	text = text.replace(/\s?(?:<br>)?<a href=\"title-[^\"]*\"[^>]*><\/a><a href=\"http:\/\/perfectworld\.vanillaforums\.com\/discussion\/1195098\".*Get the Forums Enhancement.*<\/a>/mgi, ''); //remove existing promo
 	text = text.trim();
-	var endDiv = "</div>"; //for center justify
-	if (text.substring( text.length - endDiv.length, text.length ) === endDiv) {
-		text = text.substring(0, text.length - endDiv.length) + promo + "</div>";
-	} else {
-		text += promo;
+	
+	if ($("#Form_Format").attr('value').toLowerCase() === 'bbcode') {
+		promo = '\n[url="title-'+desiredTitle+'"][/url][url="http://perfectworld.vanillaforums.com/discussion/1195098"][color="#69CAFE"]Get the Forums Enhancement Extension![/color][/url]';
+		text = text.replace(/\s?\[url=\"title-[^"]*\"\]\[\/url\]\[url=\"http:\/\/perfectworld\.vanillaforums\.com\/discussion\/1195098\"\]\[color=\"#69CAFE\"\]Get the Forums Enhancement Extension\!\[\/color\]\[\/url\]/mgi, '');
+	} else if ($("#Form_Format").attr('value').toLowerCase() === 'wysiwyg') {
+		promo = '\n<br>'+htmlPromoBase;
 	}
 	
+	var endTag = '';
+	var endJustify = ['[/right]', '[/left]', '[/center]', '</div>'];
+	for (var i = 0; i < endJustify.length; i++) {
+		if (text.substring( text.length - endJustify[i].length, text.length ) === endJustify[i]) {
+			endTag = endJustify[i];
+			break;
+		}
+	}
+	text = text.substring(0, text.length - endTag.length) + promo + endTag;
+
 	$('#Form_Body').val(text); 
 };
 
@@ -682,13 +697,13 @@ var makePromotionControls = function() {
 	if ($('.SignatureRules').length == 0) 
 		return;
 	var container = $('<div></div>');
-	container.append("<h2 class='H'>Custom Enhance Title</h2><div>Custom User Titles are available for Enhance Promoters!<br>All you have to do is add a link promoting the Enhance Extension using the button below.<br>Promo links are only visible to non-Enhanced users so don't worry about it cluttering up your signature.<br><b>Note:</b> If you edit your signature you'll have to insert the link again with this button for it to work.</div>");
+	container.append("<h2 class='H'>Custom Enhance Title</h2><div>Custom User Titles are available for Enhance Promoters!<br>All you have to do is add a link promoting the Enhance Extension using the button below.<br>Promo links are only visible to non-Enhanced users so don't worry about it cluttering up your signature.<br><b>Note:</b> If you edit your signature you may have to link again with this button for it to work.</div>");
 	container.append("Desired Title: <input class='promoTitle' type='text' placeholder='up to 20 characters' maxlength='20'></input>");
 	var button = $("<div class='NavButton' style='margin-left: 10px'>Add Promo Link</div>");
 	var success = $("<span style='display: none; margin-left: 20px'>Promo link added!</span>");
 	button.click(function(){
 		var title = $('input.promoTitle').val().trim();
-		title = title.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+		title = escapeHTML(title);
 		if (title.length == 0) 
 			return;
 		insertPromotion(title);
@@ -723,12 +738,17 @@ var stripTags = function(text) {
 	return text;
 };
 
+var escapeHTML = function(text) {
+	return $("<div>").text(text).html();
+};
+
 var bbcodeToText = function(bbcode) {
 	var text = stripBlockTags('quote', bbcode);
 	text = stripBlockTags('code', text);
 	text = stripBlockTags('img', text);
 	text = text.replace(new RegExp(ENHANCE_IDENTIFIER, 'g'), '');
 	text = stripTags(text).trim();
+	text = escapeHTML(text);
 	return text;
 	//return insertWrapping(text);
 };
@@ -1692,7 +1712,7 @@ var jQueryLoaded = function() {
 	makeThemeManager();
 	makeEmoteManager();
 	makeEnhancePreferencesMenu();
-	//makePromotionControls();
+	makePromotionControls();
 	redirectUrls();
 	applyTitles($("#Body"));
 	hideBlockedUsers($("#Body"));
