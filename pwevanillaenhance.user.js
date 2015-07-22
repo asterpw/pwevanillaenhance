@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.2.0
+// @version    1.2.0.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -23,7 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
-	<div class='change-ver'>v1.2.0</div> - Added custom user titles for <a href='http://perfectworld.vanillaforums.com/profile/signature' style='color:black; text-decoration: bold'>Enhance Promoters</a><br> - Added new links to Enhance Options Menu (cog) \
+	<div class='change-ver'>v1.2.0</div> - Added custom user titles for <a href='http://perfectworld.vanillaforums.com/profile/signature' style='color:black; text-decoration: bold'>Enhance Promoters</a> (DISABLED)<br> - Added new links to Enhance Options Menu (cog) \
 	<div class='change-ver'>v1.1.3</div> - Enabled fade animation in comment previews \
 	<div class='change-ver'>v1.1.2</div> - Added admin posts link for STO and CO game links \
 	<div class='change-ver'>v1.1.1</div> - Added random wallpapers and default wallpapers  \
@@ -1692,7 +1692,7 @@ var jQueryLoaded = function() {
 	makeThemeManager();
 	makeEmoteManager();
 	makeEnhancePreferencesMenu();
-	makePromotionControls();
+	//makePromotionControls();
 	redirectUrls();
 	applyTitles($("#Body"));
 	hideBlockedUsers($("#Body"));
