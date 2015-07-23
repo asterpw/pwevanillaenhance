@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.2.0.2
+// @version    1.2.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.2.0.2";  //what we store when we should display what's new dialog
+var VERSION = "1.2.1";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,7 +23,8 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
-	<div class='change-ver'>v1.2.0</div> - (ENABLED) Added custom user titles for <a href='http://perfectworld.vanillaforums.com/profile/signature' style='color:black; text-decoration: bold'>Enhance Promoters</a><br> - Added new links to Enhance Options Menu (cog) \
+	<div class='change-ver'>v1.2.1</div> - Added option for not hiding promo links in signatures<br> - Enabled Promoter titles for Theme Authors\
+	<div class='change-ver'>v1.2.0</div> - Added custom user titles for <a href='http://perfectworld.vanillaforums.com/profile/signature' style='color:black; text-decoration: bold'>Enhance Promoters</a><br> - Added new links to Enhance Options Menu (cog) \
 	<div class='change-ver'>v1.1.3</div> - Enabled fade animation in comment previews \
 	<div class='change-ver'>v1.1.2</div> - Added admin posts link for STO and CO game links \
 	<div class='change-ver'>v1.1.1</div> - Added random wallpapers and default wallpapers  \
@@ -634,12 +635,14 @@ var applyTitles = function(page) {
 		var name = $(this).closest('.Item-BodyWrap').siblings('.Item-Header').find('.PhotoWrap').attr('title');
 		var customTitle = $(this).prev('a[href^="title-"]').attr('href').substring("title-".length);
 		var sanitize = escapeHTML(customTitle.substring(0,20));
-		if (!(name in titles)) {
-			titles[name] = {'promoter': '<span title="Enhance Promoter">'+sanitize+'</span>'};
+		if (sanitize.length) {
+			titles[name] = titles[name] || {};
+			titles[name].promoter = '<span title="Enhance Promoter">'+sanitize+'</span>';
 		}
-		$(this).hide();
-		$(this).prev('a[href^="title-"]').hide();
-		$(this).prev('a[href^="title-"]').prev('br').remove();
+		var visible = pweEnhanceSettings.links.promoLink.enabled;
+		$(this).addClass('promoLink').toggle(visible);
+		$(this).prev('a[href^="title-"]').addClass('promoLink').toggle(visible);
+		$(this).prev('a[href^="title-"]').prev('br').addClass('promoLink').toggle(visible);
 	});
 	
 	$(".Message", page).filter(function () { var text = $(this).text().trim();
@@ -925,7 +928,6 @@ var makeFeatureMenu = function() {
 		menu.append(featureContainer);
 	}
 	//menu.append($("<h1>Options</h1>"));
-	//menu.append(makeFeatureOption("collapseThemes", 'Group together versions of the same theme', collapseThemesHandler));
 	//menu.append(makeFeatureOption("showEnhanceTitle", "Use 'Enhance User' title"));
 	return menu;
 };
@@ -1498,6 +1500,8 @@ Feature.prototype.init = function(defaults) {
 };
 
 Feature.prototype.install = function(context) {
+	if (this.maker == null)
+		return;
 	var panel = this.maker();
 	var destination = $(this.target, context);
 	destination[this.positionMethod](panel);
@@ -1508,11 +1512,7 @@ Feature.prototype.install = function(context) {
 
 Feature.prototype.setEnabled = function(enabled) {
 	pweEnhanceSettings[this.type][this.id].enabled = enabled;
-	if (!enabled) {
-		$(this.selector).hide();
-	} else {
-		$(this.selector).show();
-	}
+	$(this.selector).toggle(enabled);
 };
 
 Feature.prototype.isEnabled = function() {
@@ -1612,7 +1612,8 @@ var features = [
 	new LinkFeature("Show/Hide All Categories", "showHideAllCategories", "Add show/hide all categories links to Account Options Menu", makeShowHideAllCategories),
 	new LinkFeature("Show Draft Link", "draftLink", "Add manage drafts link to Account Options Menu", makeDraftsLink),
 	new LinkFeature("Show/Hide Game Links", "gameLinks", "Add Game-specific links", makeGameLinks, {enabled: false}),
-	new LinkFeature("Block User action", "blockUser", "Show block user action", makeBlockUser)
+	new LinkFeature("Block User action", "blockUser", "Show block user action", makeBlockUser),
+	new LinkFeature("Promo Links", "promoLink", "Show promo links in signatures", null, {enabled: false})
 ];
 
 var installFeatures = function(container) {
@@ -1709,12 +1710,12 @@ var jQueryLoaded = function() {
 	installFeatures($('.FormWrapper'));
 	installFeatures($('.Head'));
 	installFeatures($('.Item-BodyWrap'));
+	applyTitles($("#Body"));
 	makeThemeManager();
 	makeEmoteManager();
 	makeEnhancePreferencesMenu();
 	makePromotionControls();
 	redirectUrls();
-	applyTitles($("#Body"));
 	hideBlockedUsers($("#Body"));
 	addPreviews();
 	$.getScript("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.js").done(function() {
