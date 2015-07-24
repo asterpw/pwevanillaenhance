@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.2.1
+// @version    1.2.1.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -1426,7 +1426,7 @@ var makeGameLinks = function(container) {
 		"stronghold-kingdoms|SK on ARC|http://www.arcgames.com/en/games/Stronghold_Kingdoms",
 		"Swordsman|Swordsman on ARC|http://www.arcgames.com/en/games/swordsman",
 		"waroftheimmortals|WOI on ARC|http://www.arcgames.com/en/games/war-of-the-immortals",
-		"startrekonline|Admin Posts|http://perfectworld.vanillaforums.com/search?adv=1&search=&title=&author=tacofangs%2Cborticuscryptic%2Cpwlaughingtrendy%2Ccrypticfrost%2Ccrypticjoejing&cat=all&tags=&discussion_d=1&discussion_question=1&discussion_poll=1&comment_c=1&comment_answer=1&within=1+year&date=",
+		"startrekonline|Admin Posts|http://perfectworld.vanillaforums.com/search?adv=1&search=&title=&author=tacofangs%2Cborticuscryptic%2Cpwlaughingtrendy%2Ccrypticfrost%2Ccrypticjoejing%2Ccallevista&cat=all&tags=&discussion_d=1&discussion_question=1&discussion_poll=1&comment_c=1&comment_answer=1&within=1+year&date=",
 		"startrekonline|Wiki|http://sto.gamepedia.com/",
 		"startrekonline|Lore|http://sto.gamepedia.com/Lore",
 		"startrekonline|Commodities|http://sto.gamepedia.com/Commodities",
