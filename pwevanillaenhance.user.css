@@ -505,19 +505,20 @@
   Titles
 ************************/
 
+.enhance-title {
+	display: block;
+}
+
 .enhance-title.developer {
 	color: #69CAFE; 
-	display: block;
 }
 	
 .enhance-title.themeauthor {
 	color: #69FECA; 
-	display: block;
 }
 
 .enhance-title.promoter {
 	color: #FFEE88;
-	display: block;
 }
 
 /************************
