@@ -657,7 +657,7 @@ var applyTitles = function(page) {
 	for (var name in titles) {
 		var container = $('.Username[href$="'+name+'"]', page).closest(".AuthorWrap").find(".AuthorInfo");
 		for (var title in titles[name]) {
-			container.append($('<span class="Rank MItem enhance-title '+title+'">'+titles[name][title]+'</span>'));
+			container.append($('<span class="Rank enhance-title '+title+'">'+titles[name][title]+'</span>'));
 			$('span[title="Arc User"]', container).remove();
 		}
 	}
