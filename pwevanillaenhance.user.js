@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.2.1.4
+// @version    1.2.1.5
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -640,7 +640,7 @@ var applyTitles = function(page) {
 				|| sanitize.toLowerCase().indexOf('developer') != -1
 				|| sanitize.toLowerCase().indexOf('employee') != -1
 				|| sanitize.indexOf('GM') != -1) 
-				sanitize == 'Forbidden Title';
+				sanitize = 'Forbidden Title';
 			
 			titles[name] = titles[name] || {};
 			titles[name].promoter = '<span title="Enhance Promoter">'+sanitize+'</span>';
