@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.2.1.5
+// @version    1.2.1.6
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -491,9 +491,9 @@ var makeThemePicker = function(name) {
 	}
 	var now = new Date().getTime();
 	var day = 24*3600*1000;
-	if (((now - Date.parse(theme.created))/day) < 2) 
+	if (((now - Date.parse(theme.created))/day) < 5) 
 		container.append($('<span class="new">New!</span>'));
-	else if (((now - Date.parse(theme.updated))/day) < 2) 
+	else if (((now - Date.parse(theme.updated))/day) < 5) 
 		container.append($('<span class="updated">Updated!</span>'));
 	var screenshotUrl = ""; // needs some default;
 	if (theme["thumbnail"]) {
@@ -1436,7 +1436,7 @@ var makeGameLinks = function(container) {
 		"startrekonline|Wiki|http://sto.gamepedia.com/",
 		"startrekonline|Lore|http://sto.gamepedia.com/Lore",
 		"startrekonline|Commodities|http://sto.gamepedia.com/Commodities",
-		"championsonline|Admin Posts|http://perfectworld.vanillaforums.com/search?adv=1&search=&title=&author=crypticarkayne%2Cladygadfly%2Ctrailturtle%2Csplosions&cat=all&tags=&discussion_d=1&discussion_question=1&discussion_poll=1&comment_c=1&comment_answer=1&within=1+year&date=",
+		"championsonline|Admin Posts|http://perfectworld.vanillaforums.com/search?adv=1&search=&title=&author=jheinig%2Ccrypticarkayne%2Cladygadfly%2Ctrailturtle%2Csplosions&cat=all&tags=&discussion_d=1&discussion_question=1&discussion_poll=1&comment_c=1&comment_answer=1&within=1+year&date=",
 		"championsonline|Wiki|http://www.championswiki.com/index.php?title=Main_Page",
 		"championsonline|PDB|http://primusdatabase.com",
 		"championsonline|Reddit|http://www.reddit.com/r/ChampionsOnlineFFA/",
