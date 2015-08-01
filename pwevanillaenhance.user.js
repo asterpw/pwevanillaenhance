@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.2.2
+// @version    1.2.2.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -95,7 +95,7 @@ var pweEnhanceSettings = {
 
 var showWhatsNewDialog = function() {
 	var whatsNew = $("<div class='whatsNewDialog' style='display: none;'></div>");
-	whatsNew.append($("<div class='title'>What's new in PWE Vanilla Enhancement v"+getFullVersion()+"<div class='close'>X</div></div>"));
+	whatsNew.append($("<div class='title'>What's new in PWE Vanilla Enhancement v"+getFullVersion()+"<div class='close'>\u00D7</div></div>"));
 	whatsNew.append($(CHANGELOG));
 	$(".close", whatsNew).click(function(){
 		$(".whatsNewDialog").fadeOut();  
@@ -1704,7 +1704,7 @@ var getSettings = function() {
 };
 preventEmbed();
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/11736adb14bac4ead5292272d1d0ffa484125e0b/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/182f727438a0fb36e42d692b601b4abe7b42c5f9/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
 randomWallpaper();
