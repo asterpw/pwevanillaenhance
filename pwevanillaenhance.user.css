@@ -42,6 +42,7 @@
 	text-align: center;
 	background-color: white;
 	border-radius: 3px;
+	line-height: 19px;
 }
 
 .whatsNewDialog .content {
