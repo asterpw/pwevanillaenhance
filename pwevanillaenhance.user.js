@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.2.1.6
+// @version    1.2.2
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.2.1";  //what we store when we should display what's new dialog
+var VERSION = "1.2.2";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
+	<div class='change-ver'>v1.2.2</div> - Removed Font Size Picker (PWE disabled font size)<br> - Switch people stuck in Text mode to BBCode\
 	<div class='change-ver'>v1.2.1</div> - Added option for not hiding promo links in signatures<br> - Enabled Promoter titles for Theme Authors\
 	<div class='change-ver'>v1.2.0</div> - Added custom user titles for <a href='http://perfectworld.vanillaforums.com/profile/signature' style='color:black; text-decoration: bold'>Enhance Promoters</a><br> - Added new links to Enhance Options Menu (cog) \
 	<div class='change-ver'>v1.1.3</div> - Enabled fade animation in comment previews \
@@ -1376,7 +1377,7 @@ var initSubmitButton = function(container) {
 		textArea.val(text);
 	};
 
-	container.find("input.CommentButton, #Form_SendMessage, #Form_Share, #Form_AddComment").click(function(){
+	container.find("input.CommentButton, input.DiscussionButton, #Form_SendMessage, #Form_Share, #Form_AddComment, #Form_PostDiscussion, #Form_StartConversation").click(function(){
 		$(this).closest(".FormWrapper").find(".editor-dropdown-open").removeClass("editor-dropdown-open");
 		
 		var form = $(this).closest(".FormWrapper");
@@ -1604,7 +1605,7 @@ EmoteFeature.prototype.optionPicker = function() {
 
 var features = [
 	new EditorFeature("Font Picker", "fontFacePicker", "Show font picker in editor", makeFontFacePicker),
-	new EditorFeature("Font Size Picker", "fontSizePicker", "Show font size picker in editor", makeFontSizePicker),
+	//new EditorFeature("Font Size Picker", "fontSizePicker", "Show font size picker in editor", makeFontSizePicker),
 	new EditorFeature("Font Color Picker", "fontColorPicker", "Show font color picker in editor", makeFontColorPicker, {selectedColor: "#FFFFFF", autoAddColor: false}),
 	new EmoteFeature("PWI Emotes", "pwiEmotes", "Straight from Pan Gu!", makePWIEmotes, {category: "tiger"}, "http://asterpw.github.io/pwicons/emotes/tiger-3.gif"),
 	new EmoteFeature("Forsaken Emotes", "fwEmotes", "Who remembers these?", makeFWEmotes, {category: "jellyfish", enabled: false}, "http://asterpw.github.io/pwicons/emotes/samurai-4.gif"),
@@ -1652,6 +1653,10 @@ var preventEmbed = function() {
 		}
 	}
 	window.onbeforeunload = function(){ return "The page is attempting to redirect to arc despite my best efforts to stop it, are you ok with that?";};
+};
+
+var forceBBCode = function() {
+	$('#Form_Comment #Form_Format').val('BBCode');
 };
 
 /* loadCSS = function(href) {
@@ -1722,6 +1727,7 @@ var jQueryLoaded = function() {
 	makeEnhancePreferencesMenu();
 	makePromotionControls();
 	redirectUrls();
+	forceBBCode();
 	hideBlockedUsers($("#Body"));
 	addPreviews();
 	$.getScript("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.js").done(function() {

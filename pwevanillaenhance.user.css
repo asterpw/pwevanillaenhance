@@ -507,6 +507,7 @@
 
 .enhance-title {
 	display: block;
+	overflow: hidden;
 }
 
 .enhance-title.developer {
