@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.2.2.1
+// @version    1.2.2.2
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -1414,7 +1414,7 @@ var makeGameLinks = function(container) {
 		"apbreloaded|APB on ARC|http://www.arcgames.com/en/games/APB_Reloaded",
 		"battleoftheimmortals|BOI on ARC|http://www.arcgames.com/en/games/battle-of-the-immortals",
 		"blacklightretribution|BLR on ARC|http://www.arcgames.com/en/games/blacklight-retribution",
-		"championsonline|CO on ARC|http://www.arcgames.com/en/games/champions-online",
+		"championsonline|ARC|http://www.arcgames.com/en/games/champions-online",
 		"elsword|Elsword on ARC|http://www.arcgames.com/en/games/Elsword",
 		"ethersagaodyssey|ESO on ARC|http://www.arcgames.com/en/games/ether-saga-odyssey",
 		"forsakenworld|FW on ARC|http://www.arcgames.com/en/games/forsaken-world",
@@ -1442,6 +1442,7 @@ var makeGameLinks = function(container) {
 		"championsonline|PDB|http://primusdatabase.com",
 		"championsonline|Reddit|http://www.reddit.com/r/ChampionsOnlineFFA/",
 		"championsonline|Wiki|http://www.championswiki.com/index.php?title=Main_Page",
+		"championsonline|PowerHouse|http://powerhouse.nullware.com/powerhouse.html",
 		"startrekonline|Reddit|http://www.reddit.com/r/sto/"];
 		
 	for (var i=0; i < gamelinks.length; i++) {
