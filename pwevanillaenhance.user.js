@@ -4,12 +4,12 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.2.2.3
+// @version    1.2.2.4
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
 // @grant       none
-// @copyright  2015, Asterelle - Sanctuary
+// @copyright  2015, Asterelle 
 // ==/UserScript==
 
 (function() {	
@@ -634,7 +634,11 @@ var applyTitles = function(page) {
 	var promoLink = $('.Signature a[href^="http://perfectworld.vanillaforums.com/discussion/1195098"]');
 	promoLink.filter(function(){return $(this).text() == "Get the Forums Enhancement Extension!";}).each(function(){
 		var name = $(this).closest('.Item-BodyWrap').siblings('.Item-Header').find('.PhotoWrap').attr('title');
-		var customTitle = $(this).prev('a[href^="title-"]').attr('href').substring("title-".length);
+		var customTitle = $(this).prev('a[href^="title-"]').attr('href');
+		if (typeof customTitle != 'undefined')
+			customTitle = customTitle.substring("title-".length);
+		else
+			customTitle = '';
 		var sanitize = escapeHTML(customTitle.substring(0,20));
 		if (sanitize.length) {
 			if ( sanitize.toLowerCase().indexOf('admin') != -1 
@@ -951,8 +955,9 @@ var makeEnhancePreferencesMenu = function() {
 
 	content.append(makeFeatureMenu());
 	//content.append(makeThemeMenu());
-	content.append($('<a href="http://perfectworld.vanillaforums.com/discussion/1195098">Discussion and Requests</a>'));
 	content.append($('<a href="#">Recent Changes</a>').click(function(){showWhatsNewDialog();}));
+	content.append($('<a href="http://perfectworld.vanillaforums.com/profile/signature">Set Custom Promoter Title</a>'));
+	content.append($('<a href="http://perfectworld.vanillaforums.com/discussion/1195098">Discussion and Requests</a>'));
 	preferencesMenu.append(content);
 	preferencesMenu.click(function(e){e.stopPropagation();}); // stop menu from autoclose on click
 	preferencesControl.append(preferencesMenu);
@@ -1366,7 +1371,7 @@ var initSubmitButton = function(container) {
 	var addIdentifier = function(textArea) { 
 		var text = textArea.val();
 		if (text.indexOf(ENHANCE_IDENTIFIER) != 0)
-			textArea.val(text + ENHANCE_IDENTIFIER);
+			textArea.val(text.strip() + ENHANCE_IDENTIFIER);
 	};	
 	var addTwitchEmotes = function(textArea) {
 		var text = textArea.val();
