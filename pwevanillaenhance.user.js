@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.2.2.5
+// @version    1.2.2.6
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -1371,7 +1371,7 @@ var initSubmitButton = function(container) {
 	var addIdentifier = function(textArea) { 
 		var text = textArea.val();
 		if (text.indexOf(ENHANCE_IDENTIFIER) != 0)
-			textArea.val(text.strip() + ENHANCE_IDENTIFIER);
+			textArea.val(text.trim() + ENHANCE_IDENTIFIER);
 	};	
 	var addTwitchEmotes = function(textArea) {
 		var text = textArea.val();
