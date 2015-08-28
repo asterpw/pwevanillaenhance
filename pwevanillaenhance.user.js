@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.2.4
+// @version    1.2.5
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://perfectworld.vanillaforums.com/*
@@ -14,7 +14,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.2.4";  //what we store when we should display what's new dialog
+var VERSION = "1.2.5";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -24,7 +24,8 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = "<div class='content'> \
-	<div class='change-ver'>v1.2.4</div> - Enable extension on new 'hub' forums\
+	<div class='change-ver'>v1.2.5</div> - Fix game specific links<br> - updated automatic URL redirects for browsing without arc frame\
+	<div class='change-ver'>v1.2.4</div> - Enable extension on new forum hubs\
 	<div class='change-ver'>v1.2.3</div> - Font Size Picker is back\
 	<div class='change-ver'>v1.2.2</div> - Removed Font Size Picker (PWE disabled font size)<br> - Switch people stuck in Text mode to BBCode\
 	<div class='change-ver'>v1.2.1</div> - Added option for not hiding promo links in signatures<br> - Enabled Promoter titles for Theme Authors\
@@ -711,7 +712,7 @@ var insertPromotion = function(desiredTitle) {
 };
 
 var makePromotionControls = function() {
-	if ($('.SignatureRules').length == 0) 
+	if ($('h1.H:contains(Signatures)').length == 0) 
 		return;
 	var container = $('<div></div>');
 	container.append("<h2 class='H'>Custom Enhance Title</h2><div>Custom User Titles are available for Enhance Promoters!<br>All you have to do is add a link promoting the Enhance Extension using the button below.<br>Promo links are only visible to non-Enhanced users so don't worry about it cluttering up your signature.<br><b>Note:</b> If you edit your signature you may have to link again with this button for it to work.</div>");
@@ -728,12 +729,15 @@ var makePromotionControls = function() {
 	});
 	container.append(button);
 	container.append(success);
-	$('.SignatureRules').after(container);
+	$('h1.H:contains(Signatures)').after(container);
 };
 
 var redirectUrls = function() {
-	$('a[href^="http://www.arcgames.com/en/forums#"]').each(function(){
-		$(this).attr('href', $(this).attr('href').replace("www.arcgames.com/en/forums#", "perfectworld.vanillaforums.com"));
+	$('a[href^="http://www.arcgames.com/en/forums"]').each(function(){	
+		var url = $(this).attr('href');
+		var match = /http:\/\/www.arcgames.com\/en\/forums\/([^\/]+)\/#(.*)/.exec(url);
+		if (match)
+			$(this).attr('href', "http:\/\/forum.arcgames.com\/" + match[1] + match[2]);
 	});
 };
 
@@ -959,8 +963,10 @@ var makeEnhancePreferencesMenu = function() {
 	content.append(makeFeatureMenu());
 	//content.append(makeThemeMenu());
 	content.append($('<a href="#">Recent Changes</a>').click(function(){showWhatsNewDialog();}));
-	content.append($('<a href="http://perfectworld.vanillaforums.com/profile/signature">Set Custom Promoter Title</a>'));
-	content.append($('<a href="http://perfectworld.vanillaforums.com/discussion/1195098">Discussion and Requests</a>'));
+	var profileUrl = $('.MeButton[title="Account Options"]').attr('href');
+	if (profileUrl)
+		content.append($('<a href="'+profileUrl.replace('edit', 'signature')+'">Set Custom Promoter Title</a>'));
+	content.append($('<a href="http://www.arcgames.com/en/forums/arc/#/discussion/1195098">Discussion and Requests</a>'));
 	preferencesMenu.append(content);
 	preferencesMenu.click(function(e){e.stopPropagation();}); // stop menu from autoclose on click
 	preferencesControl.append(preferencesMenu);
@@ -1454,7 +1460,7 @@ var makeGameLinks = function(container) {
 		
 	for (var i=0; i < gamelinks.length; i++) {
 		linkdata = gamelinks[i].split("|");
-		if($(".CrumbLabel.Category-"+linkdata[0]).length > 0)
+		if($(".CrumbLabel.Category-"+linkdata[0]).length > 0 || window.location.href.indexOf(linkdata[0]) > -1)
 			links += '<li class="'+this.id+'"><a href="'+linkdata[2]+'">'+linkdata[1]+'</a></li>';
 	}
 	return $(links);
