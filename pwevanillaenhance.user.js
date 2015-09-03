@@ -4,17 +4,16 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.2.5
+// @version    1.3.0
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
-// @match      http://perfectworld.vanillaforums.com/*
 // @match      http://forum.arcgames.com/*
 // @grant       none
 // @copyright  2015, Asterelle 
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.2.5";  //what we store when we should display what's new dialog
+var VERSION = "1.3";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,13 +22,14 @@ var getFullVersion = function() { // For version display on the screen;
 	}
 };
 /*jshint multistr: true */
-var CHANGELOG = "<div class='content'> \
+var CHANGELOG = " \
+	<div class='change-ver'>v1.3.0</div> - Help Promoters update their sigs now that the URL has changed.\
 	<div class='change-ver'>v1.2.5</div> - Fix game specific links<br> - updated automatic URL redirects for browsing without arc frame\
 	<div class='change-ver'>v1.2.4</div> - Enable extension on new forum hubs\
 	<div class='change-ver'>v1.2.3</div> - Font Size Picker is back\
 	<div class='change-ver'>v1.2.2</div> - Removed Font Size Picker (PWE disabled font size)<br> - Switch people stuck in Text mode to BBCode\
 	<div class='change-ver'>v1.2.1</div> - Added option for not hiding promo links in signatures<br> - Enabled Promoter titles for Theme Authors\
-	<div class='change-ver'>v1.2.0</div> - Added custom user titles for <a href='http://perfectworld.vanillaforums.com/profile/signature' style='color:black; text-decoration: bold'>Enhance Promoters</a><br> - Added new links to Enhance Options Menu (cog) \
+	<div class='change-ver'>v1.2.0</div> - Added custom user titles for Enhance Promoters<br> - Added new links to Enhance Options Menu (cog) \
 	<div class='change-ver'>v1.1.3</div> - Enabled fade animation in comment previews \
 	<div class='change-ver'>v1.1.2</div> - Added admin posts link for STO and CO game links \
 	<div class='change-ver'>v1.1.1</div> - Added random wallpapers and default wallpapers  \
@@ -67,7 +67,7 @@ var CHANGELOG = "<div class='content'> \
 	<div class='change-ver'>v0.5.3</div> - Some theme preload bugfixes \
 	<div class='change-ver'>v0.5.2</div> - Themes load faster now (before page render)<br> - Allow remote themes to be renamed or deleted \
 	<div class='change-ver'>v0.5.1</div> - Added Forsaken World Emotes<br> - Added What's New Dialog \
-	<div class='change-ver'>v0.5.0</div> - Added auto-loading of themes from @nrglg</div>";
+	<div class='change-ver'>v0.5.0</div> - Added auto-loading of themes from @nrglg";
 
 var pweEnhanceSettings = {
 	editor: {
@@ -97,17 +97,21 @@ var pweEnhanceSettings = {
 	version: "0"
 };
 
+var showDialog = function(classname, titleText, content, delay, closeHandler) {
+	var dialog = $("<div class='enhance-dialog "+classname+"' style='display: none;'></div>");
+	dialog.append($("<div class='title'>"+titleText+"<div class='close'>\u00D7</div></div>"));
+	dialog.append($("<div class='content'>"+content+"</div>"));
+	$(".close", dialog).click(function(){$('.'+classname).fadeOut();});
+	if (closeHandler) $(".close", dialog).click(closeHandler);
+	$(".MeBoxContainer").append(dialog);
+	dialog.delay(delay).fadeIn();
+};
+
 var showWhatsNewDialog = function() {
-	var whatsNew = $("<div class='whatsNewDialog' style='display: none;'></div>");
-	whatsNew.append($("<div class='title'>What's new in PWE Vanilla Enhancement v"+getFullVersion()+"<div class='close'>\u00D7</div></div>"));
-	whatsNew.append($(CHANGELOG));
-	$(".close", whatsNew).click(function(){
-		$(".whatsNewDialog").fadeOut();  
+	showDialog('whatsNewDialog', "What's new in PWE Vanilla Enhancement v"+getFullVersion(), CHANGELOG, 1000, function(){
 		pweEnhanceSettings.version = VERSION;
 		update();
 	});
-	$(".MeBoxContainer").append(whatsNew);
-	whatsNew.delay(1000).fadeIn();
 };
 
 var buildCSSThemeURL = function(theme) {
@@ -635,7 +639,7 @@ var applyTitles = function(page) {
 		titles[author].themeauthor = 'Theme Author';
 	}
 	
-	var promoLink = $('.Signature a[href^="http://perfectworld.vanillaforums.com/discussion/1195098"]');
+	var promoLink = $('.Signature a[href^="http://perfectworld.vanillaforums.com/discussion/1195098"], .Signature a[href^="http://www.arcgames.com/en/forums/arc/#/discussion/1195098"]');
 	promoLink.filter(function(){return $(this).text() == "Get the Forums Enhancement Extension!";}).each(function(){
 		var name = $(this).closest('.Item-BodyWrap').siblings('.Item-Header').find('.PhotoWrap').attr('title');
 		var customTitle = $(this).prev('a[href^="title-"]').attr('href');
@@ -660,6 +664,11 @@ var applyTitles = function(page) {
 		$(this).prev('a[href^="title-"]').prev('br').addClass('promoLink').toggle(visible);
 	});
 	
+	if ($('.ItemComment.Mine .Signature a[href^="http://perfectworld.vanillaforums.com/discussion/1195098"]').length > 0) {
+		showUpdatePromoterLinkNotification();
+	}
+	
+	
 	$(".Message", page).filter(function () { var text = $(this).text().trim();
 			return text.lastIndexOf(ENHANCE_IDENTIFIER) == (text.length - ENHANCE_IDENTIFIER.length);
 		}).closest(".Item-BodyWrap").siblings(".Item-Header").find('.PhotoWrap').each(function(){
@@ -676,7 +685,13 @@ var applyTitles = function(page) {
 			$('span[title="Arc User"]', container).remove();
 		}
 	}
-	
+};
+
+var showUpdatePromoterLinkNotification = function() {
+	var sigUrl = $('.MeButton[title="Account Options"]').attr('href').replace('edit', 'signature');
+	var message = "Due to PWE's new forum layout, the Promoter Link in your signature needs to be updated.<br><br> \
+		<a href='"+sigUrl+"'>Click here to update your signature.</a>";
+	showDialog('updatePromoterLink', "Your Promoter Link Needs Updating!", message, 500, null);
 };
 
 var insertPromotion = function(desiredTitle) {
@@ -686,14 +701,14 @@ var insertPromotion = function(desiredTitle) {
 	$('.editor-toggle-source').remove(); 
 	var text = $('#Form_Body').val();
 	
-	var htmlPromoBase = '<a href="title-'+desiredTitle+'"></a><a href="http://perfectworld.vanillaforums.com/discussion/1195098" target="_blank" rel="nofollow"><font color="#69CAFE">Get the Forums Enhancement Extension!</font></a>';
+	var htmlPromoBase = '<a href="title-'+desiredTitle+'"></a><a href="http://www.arcgames.com/en/forums/arc/#/discussion/1195098" target="_blank" rel="nofollow"><font color="#69CAFE">Get the Forums Enhancement Extension!</font></a>';
 	var promo = '\n' + htmlPromoBase;
-	text = text.replace(/\s?(?:<br>)?<a href=\"title-[^\"]*\"[^>]*><\/a><a href=\"http:\/\/perfectworld\.vanillaforums\.com\/discussion\/1195098\".*Get the Forums Enhancement.*<\/a>/mgi, ''); //remove existing promo
+	text = text.replace(/\s?(?:<br>)?<a href=\"title-[^\"]*\"[^>]*><\/a><a href=\"http:\/\/www\.arcgames\.com\/en\/forums\/arc\/\#\/discussion\/1195098\".*Get the Forums Enhancement.*<\/a>/mgi, ''); //remove existing promo
 	text = text.trim();
 	
 	if ($("#Form_Format").attr('value').toLowerCase() === 'bbcode') {
-		promo = '\n[url="title-'+desiredTitle+'"][/url][url="http://perfectworld.vanillaforums.com/discussion/1195098"][color="#69CAFE"]Get the Forums Enhancement Extension![/color][/url]';
-		text = text.replace(/\s?\[url=\"title-[^"]*\"\]\[\/url\]\[url=\"http:\/\/perfectworld\.vanillaforums\.com\/discussion\/1195098\"\]\[color=\"#69CAFE\"\]Get the Forums Enhancement Extension\!\[\/color\]\[\/url\]/mgi, '');
+		promo = '\n[url="title-'+desiredTitle+'"][/url][url="http://www.arcgames.com/en/forums/arc/#/discussion/1195098"][color="#69CAFE"]Get the Forums Enhancement Extension![/color][/url]';
+		text = text.replace(/\s?\[url=\"title-[^"]*\"\]\[\/url\]\[url=\"http:\/\/www\.arcgames\.com\/en\/forums\/arc\/\#\/discussion\/1195098\"\]\[color=\"#69CAFE\"\]Get the Forums Enhancement Extension\!\[\/color\]\[\/url\]/mgi, '');
 	} else if ($("#Form_Format").attr('value').toLowerCase() === 'wysiwyg') {
 		promo = '\n<br>'+htmlPromoBase;
 	}
@@ -715,7 +730,7 @@ var makePromotionControls = function() {
 	if ($('h1.H:contains(Signatures)').length == 0) 
 		return;
 	var container = $('<div></div>');
-	container.append("<h2 class='H'>Custom Enhance Title</h2><div>Custom User Titles are available for Enhance Promoters!<br>All you have to do is add a link promoting the Enhance Extension using the button below.<br>Promo links are only visible to non-Enhanced users so don't worry about it cluttering up your signature.<br><b>Note:</b> If you edit your signature you may have to link again with this button for it to work.</div>");
+	container.append("<h2 class='H'>Custom Enhance Title</h2><div>Custom User Titles are available for Enhance Promoters!<br>All you have to do is add a link promoting the Enhance Extension using the button below.<br>Promo links are only visible to non-Enhanced users so don't worry about it cluttering up your signature.<br>If you want to be able to see what the link looks like you can unhide the links from the Enhance Settings menu.<b>Note:</b> If you edit your signature you may have to link again with this button for it to work.</div>");
 	container.append("Desired Title: <input class='promoTitle' type='text' placeholder='up to 20 characters' maxlength='20'></input>");
 	var button = $("<div class='NavButton' style='margin-left: 10px'>Add Promo Link</div>");
 	var success = $("<span style='display: none; margin-left: 20px'>Promo link added!</span>");
@@ -730,10 +745,17 @@ var makePromotionControls = function() {
 	container.append(button);
 	container.append(success);
 	$('h1.H:contains(Signatures)').after(container);
+	
+	var curText = $('#Form_Body').val();
+	if (curText.includes("http://perfectworld.vanillaforums.com/discussion/1195098")) {
+		$('#Form_Body').val(curText.replace("http://perfectworld.vanillaforums.com/discussion/1195098", "http://www.arcgames.com/en/forums/arc/#/discussion/1195098"))
+		showDialog("success", "Updated", "The Promoter Link has been updated to the new URL!<br>Hit Save below when ready.", 300);
+	}
+	
 };
 
-var redirectUrls = function() {
-	$('a[href^="http://www.arcgames.com/en/forums"]').each(function(){	
+var redirectUrls = function(container) {
+	$('a[href^="http://www.arcgames.com/en/forums"]', container).each(function(){	
 		var url = $(this).attr('href');
 		var match = /http:\/\/www.arcgames.com\/en\/forums\/([^\/]+)\/#(.*)/.exec(url);
 		if (match)
@@ -966,7 +988,7 @@ var makeEnhancePreferencesMenu = function() {
 	var profileUrl = $('.MeButton[title="Account Options"]').attr('href');
 	if (profileUrl)
 		content.append($('<a href="'+profileUrl.replace('edit', 'signature')+'">Set Custom Promoter Title</a>'));
-	content.append($('<a href="http://www.arcgames.com/en/forums/arc/#/discussion/1195098">Discussion and Requests</a>'));
+	content.append($('<a href="http://www.arcgames.com/en/forums/arc/#/discussion/1195098" target="_top">Discussion and Requests</a>'));
 	preferencesMenu.append(content);
 	preferencesMenu.click(function(e){e.stopPropagation();}); // stop menu from autoclose on click
 	preferencesControl.append(preferencesMenu);
@@ -1722,7 +1744,7 @@ var getSettings = function() {
 preventEmbed();
 //loadJS("https://github.com/Eiledon/PWEVC/raw/master/PWE_Discussion_Manager.user.js");
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/182f727438a0fb36e42d692b601b4abe7b42c5f9/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/062d56e5f9d677864d52f7c220e76800bfb7ee29/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
 randomWallpaper();
@@ -1740,11 +1762,11 @@ var jQueryLoaded = function() {
 	installFeatures($('.Head'));
 	installFeatures($('.Item-BodyWrap'));
 	applyTitles($("#Body"));
+	redirectUrls($("#Body"));
 	makeThemeManager();
 	makeEmoteManager();
 	makeEnhancePreferencesMenu();
 	makePromotionControls();
-	redirectUrls();
 	forceBBCode();
 	hideBlockedUsers($("#Body"));
 	addPreviews();
@@ -1764,7 +1786,7 @@ var jQueryLoaded = function() {
 		}
 	});*/
 	$(document).on( "PageLoaded", function(event, container) {
-		redirectUrls();
+		redirectUrls(container);
 		installFeatures(container);
 		applyTitles(container);
 		hideBlockedUsers(container);
