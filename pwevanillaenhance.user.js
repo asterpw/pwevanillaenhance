@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.3.3
+// @version    1.3.3.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://forum.arcgames.com/*
@@ -685,7 +685,7 @@ var applyTitles = function(page) {
 	if ($('.ItemComment.Mine .Signature a[href^="http://perfectworld.vanillaforums.com/discussion/1195098"]').length > 0) {
 		showUpdatePromoterLinkNotification();
 	}
-	if ($('.ItemComment.Mine .Signature a[href^="http://www.arcgames.com/en/forums/arc/#/discussion/1195098"]').length > 0 &&
+	if ($('.ItemComment.Mine .Signature a[href^="http://www.arcgames.com/en/forums/arc/#/discussion/1195098"]:contains(Get the Forums Enhancement Extension!)').length > 0 &&
 		$('.ItemComment.Mine .Signature a[href^="http://www.arcgames.com/en/forums/arc/#/discussion/1195098"]:contains(Get the Forums Enhancement Extension!)').prev('a[href^="title-"], a[href^="http://title-"]').length == 0) {
 		showUpdatePromoterLinkNotification();
 	}
