@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.3.2
+// @version    1.3.3
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://forum.arcgames.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.3.2";  //what we store when we should display what's new dialog
+var VERSION = "1.3.3";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = " \
+	<div class='change-ver'>v1.3.3</div> - Fixed new issue with promoter titles not showing (needs sig update)\
 	<div class='change-ver'>v1.3.2</div> - Updated game links (now maintained by <a href='http://forum.arcgames.com/arc/profile/eiledon'>@eiledon</a>) \
 	<div class='change-ver'>v1.3.1</div> - Fixed broken editor when default format is not BBCode \
 	<div class='change-ver'>v1.3.0</div> - Help Promoters update their sigs to the new URL.\
@@ -659,9 +660,9 @@ var applyTitles = function(page) {
 	var promoLink = $('.Signature a[href^="http://perfectworld.vanillaforums.com/discussion/1195098"], .Signature a[href^="http://www.arcgames.com/en/forums/arc/#/discussion/1195098"]');
 	promoLink.filter(function(){return $(this).text() == "Get the Forums Enhancement Extension!";}).each(function(){
 		var name = $(this).closest('.Item-BodyWrap').siblings('.Item-Header').find('.PhotoWrap').attr('title');
-		var customTitle = $(this).prev('a[href^="title-"]').attr('href');
+		var customTitle = $(this).prev('a[href^="title-"], a[href^="http://title-"]').attr('href');
 		if (typeof customTitle != 'undefined')
-			customTitle = customTitle.substring("title-".length);
+			customTitle = customTitle.substring(customTitle.indexOf("title-") + "title-".length);
 		else
 			customTitle = '';
 		var sanitize = escapeHTML(customTitle.substring(0,20));
@@ -677,11 +678,15 @@ var applyTitles = function(page) {
 		}
 		var visible = pweEnhanceSettings.links.promoLink.enabled;
 		$(this).addClass('promoLink').toggle(visible);
-		$(this).prev('a[href^="title-"]').addClass('promoLink').toggle(visible);
-		$(this).prev('a[href^="title-"]').prev('br').addClass('promoLink').toggle(visible);
+		$(this).prev('a[href^="title-"], a[href^="http://title-"]').addClass('promoLink').toggle(visible);
+		$(this).prev('a[href^="title-"], a[href^="http://title-"]').prev('br').addClass('promoLink').toggle(visible);
 	});
 	
 	if ($('.ItemComment.Mine .Signature a[href^="http://perfectworld.vanillaforums.com/discussion/1195098"]').length > 0) {
+		showUpdatePromoterLinkNotification();
+	}
+	if ($('.ItemComment.Mine .Signature a[href^="http://www.arcgames.com/en/forums/arc/#/discussion/1195098"]').length > 0 &&
+		$('.ItemComment.Mine .Signature a[href^="http://www.arcgames.com/en/forums/arc/#/discussion/1195098"]:contains(Get the Forums Enhancement Extension!)').prev('a[href^="title-"], a[href^="http://title-"]').length == 0) {
 		showUpdatePromoterLinkNotification();
 	}
 	
@@ -718,13 +723,13 @@ var insertPromotion = function(desiredTitle) {
 	$('.editor-toggle-source').remove(); 
 	var text = $('#Form_Body').val();
 	
-	var htmlPromoBase = '<a href="title-'+desiredTitle+'"></a><a href="http://www.arcgames.com/en/forums/arc/#/discussion/1195098" target="_blank" rel="nofollow"><font color="#69CAFE">Get the Forums Enhancement Extension!</font></a>';
+	var htmlPromoBase = '<a href="http://title-'+desiredTitle+'"></a><a href="http://www.arcgames.com/en/forums/arc/#/discussion/1195098" target="_blank" rel="nofollow"><font color="#69CAFE">Get the Forums Enhancement Extension!</font></a>';
 	var promo = '\n' + htmlPromoBase;
 	text = text.replace(/\s?(?:<br>)?<a href=\"title-[^\"]*\"[^>]*><\/a><a href=\"http:\/\/www\.arcgames\.com\/en\/forums\/arc\/\#\/discussion\/1195098\".*Get the Forums Enhancement.*<\/a>/mgi, ''); //remove existing promo
 	text = text.trim();
 	
 	if ($("#Form_Format").attr('value').toLowerCase() === 'bbcode') {
-		promo = '\n[url="title-'+desiredTitle+'"][/url][url="http://www.arcgames.com/en/forums/arc/#/discussion/1195098"][color="#69CAFE"]Get the Forums Enhancement Extension![/color][/url]';
+		promo = '\n[url="http://title-'+desiredTitle+'"][/url][url="http://www.arcgames.com/en/forums/arc/#/discussion/1195098"][color="#69CAFE"]Get the Forums Enhancement Extension![/color][/url]';
 		text = text.replace(/\s?\[url=\"title-[^"]*\"\]\[\/url\]\[url=\"http:\/\/www\.arcgames\.com\/en\/forums\/arc\/\#\/discussion\/1195098\"\]\[color=\"#69CAFE\"\]Get the Forums Enhancement Extension\!\[\/color\]\[\/url\]/mgi, '');
 	} else if ($("#Form_Format").attr('value').toLowerCase() === 'wysiwyg') {
 		promo = '\n<br>'+htmlPromoBase;
@@ -764,9 +769,9 @@ var makePromotionControls = function() {
 	$('h1.H:contains(Signatures)').after(container);
 	
 	var curText = $('#Form_Body').val();
-	if (curText.includes("http://perfectworld.vanillaforums.com/discussion/1195098")) {
-		$('#Form_Body').val(curText.replace("http://perfectworld.vanillaforums.com/discussion/1195098", "http://www.arcgames.com/en/forums/arc/#/discussion/1195098"))
-		showDialog("success", "Updated", "The Promoter Link has been updated to the new URL!<br>Hit Save below when ready.", 300);
+	if (curText.includes("http://perfectworld.vanillaforums.com/discussion/1195098") || curText.includes('="title-')) {
+		$('#Form_Body').val(curText.replace("http://perfectworld.vanillaforums.com/discussion/1195098", "http://www.arcgames.com/en/forums/arc/#/discussion/1195098").replace('="title-', '="http://title-'));
+		showDialog("success", "Updated", "The Promoter Link has been updated!<br>Hit Save below when ready.", 300);
 	}
 	
 };
@@ -1774,9 +1779,9 @@ var jQueryLoaded = function() {
 		}
 	});*/
 	$(document).on( "PageLoaded", function(event, container) {
-		redirectUrls(container);
 		installFeatures(container);
 		applyTitles(container);
+		redirectUrls(container);
 		hideBlockedUsers(container);
 	});
 };
