@@ -1,6 +1,6 @@
 # pwevanillaenhance
 PWE Vanilla Forums Enhancement - Adds useful tools to the pwe vanilla forums<br>
-<a href="http://perfectworld.vanillaforums.com/discussion/1195098">Click here for Discussion and Feature requests.</a>
+<a href="http://www.arcgames.com/en/forums/arc/#/discussion/1195098">Click here for Discussion and Feature requests.</a>
 <br>
 <h1>Features</h1>
 <b>Full editor options</b>
