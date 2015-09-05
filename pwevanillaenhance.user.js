@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.3.3.3
+// @version    1.3.3.4
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://forum.arcgames.com/*
@@ -710,7 +710,7 @@ var applyTitles = function(page) {
 };
 
 var showUpdatePromoterLinkNotification = function() {
-	var sigUrl = $('.MeButton[title="Account Options"]').attr('href').replace('edit', 'signature');
+	var sigUrl = $('.MeButton[href$="profile/edit"]').attr('href').replace('edit', 'signature');
 	var message = "Due to PWE's new forum layout, the Promoter Link in your signature needs to be updated.<br><br> \
 		<a href='"+sigUrl+"'>Click here to update your signature.</a>";
 	showDialog('updatePromoterLink', "Your Promoter Link Needs Updating!", message, 500, null);
