@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.3.1
+// @version    1.3.2
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://forum.arcgames.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.3.1";  //what we store when we should display what's new dialog
+var VERSION = "1.3.2";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,8 +23,9 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = " \
+	<div class='change-ver'>v1.3.2</div> - Updated game links (now maintained by <a href='http://forum.arcgames.com/arc/profile/eiledon'>@eiledon</a>) \
 	<div class='change-ver'>v1.3.1</div> - Fixed broken editor when default format is not BBCode \
-	<div class='change-ver'>v1.3.0</div> - Help Promoters update their sigs now that the URL has changed.\
+	<div class='change-ver'>v1.3.0</div> - Help Promoters update their sigs to the new URL.\
 	<div class='change-ver'>v1.2.5</div> - Fix game specific links<br> - updated automatic URL redirects for browsing without arc frame\
 	<div class='change-ver'>v1.2.4</div> - Enable extension on new forum hubs\
 	<div class='change-ver'>v1.2.3</div> - Font Size Picker is back\
@@ -81,6 +82,10 @@ var pweEnhanceSettings = {
 	},
 	themes: { //autoadded from remote
 	},
+	lastThemeUpdateTime: 0,
+	games: { //from remote json
+	},
+	lastGamesUpdateTime: 0,
 	options: {
 		collapseThemes: true,
 		showEnhanceTitle: true
@@ -94,7 +99,7 @@ var pweEnhanceSettings = {
 		pageSize: 8,
 		random: false
 	},
-	lastThemeUpdateTime: 0,
+
 	version: "0"
 };
 
@@ -161,6 +166,17 @@ var handleThemes = function() {
 		});
 	} else {
 		applyThemes();
+	}
+};
+
+var handleGameInfoUpdate = function() {
+	var currentTime = new Date().getTime();
+	if (currentTime - pweEnhanceSettings.lastGamesUpdateTime > 24*3600*1000) {
+		$.getJSON('https://rawgit.com/Eiledon/PWEVC/master/PWE_games.json', function(json){
+			$.extend(true, pweEnhanceSettings, json);
+			pweEnhanceSettings.lastGamesUpdateTime = new Date().getTime();
+			update();
+		});
 	}
 };
 
@@ -1445,46 +1461,14 @@ var makeDraftsLink = function(container) {
 	return $('<li class="'+this.id+'"><a href="http://perfectworld.vanillaforums.com/drafts">Manage Drafts</a></li>');
 };
 
-var makeGameLinks = function(container) {
+var makeGameLinks = function() {
 	var links = "";
-	var gamelinks = ["arc-mobile|ARC|http://www.arcgames.com/en/games",
-		"apbreloaded|APB on ARC|http://www.arcgames.com/en/games/APB_Reloaded",
-		"battleoftheimmortals|BOI on ARC|http://www.arcgames.com/en/games/battle-of-the-immortals",
-		"blacklightretribution|BLR on ARC|http://www.arcgames.com/en/games/blacklight-retribution",
-		"championsonline|ARC|http://www.arcgames.com/en/games/champions-online",
-		"elsword|Elsword on ARC|http://www.arcgames.com/en/games/Elsword",
-		"ethersagaodyssey|ESO on ARC|http://www.arcgames.com/en/games/ether-saga-odyssey",
-		"forsakenworld|FW on ARC|http://www.arcgames.com/en/games/forsaken-world",
-		"jadedynasty|JD on ARC|http://www.arcgames.com/en/games/jade-dynasty",
-		"neverwinter|NW on ARC|http://www.arcgames.com/en/games/neverwinter",
-		"neverwinter|NWcalc|http://nwcalc.com",
-		"prime-world|PW on ARC|http://www.arcgames.com/en/games/Prime_World",
-		"pwi|PWI on ARC|http://www.arcgames.com/en/games/pwi",
-		"pwi|Calc|http://mypers.pw/1.9/",
-		"pwi|PWDB|http://pwdatabase.com",
-		"pwi|Aster Tools|http://aster.ohmydays.net/pw",
-		"raiderz|Raiderz on ARC|http://www.arcgames.com/en/games/raiderz",
-		"royal-quest|RQ on ARC|http://www.arcgames.com/en/games/Royal_Quest",
-		"star-conflict|SC on ARC|http://www.arcgames.com/en/games/Star_Conflict",
-		"startrekonline|STO on ARC|http://www.arcgames.com/en/games/star-trek-online",
-		"stronghold-kingdoms|SK on ARC|http://www.arcgames.com/en/games/Stronghold_Kingdoms",
-		"Swordsman|Swordsman on ARC|http://www.arcgames.com/en/games/swordsman",
-		"waroftheimmortals|WOI on ARC|http://www.arcgames.com/en/games/war-of-the-immortals",
-		"startrekonline|Admin Posts|http://perfectworld.vanillaforums.com/search?adv=1&search=&title=&author=tacofangs%2Cborticuscryptic%2Cpwlaughingtrendy%2Ccoldsnapped%2Cflyingtarg%2Ccrypticfrost%2Ccrypticjoejing%2Ccallevista&cat=all&tags=&discussion_d=1&discussion_question=1&discussion_poll=1&comment_c=1&comment_answer=1&within=1+year&date=",
-		"startrekonline|Wiki|http://sto.gamepedia.com/",
-		"startrekonline|Lore|http://sto.gamepedia.com/Lore",
-		"startrekonline|Commodities|http://sto.gamepedia.com/Commodities",
-		"championsonline|Admin Posts|http://perfectworld.vanillaforums.com/search?adv=1&search=&title=&author=jheinig%2Ccrypticarkayne%2Cladygadfly%2Ctrailturtle%2Csplosions&cat=all&tags=&discussion_d=1&discussion_question=1&discussion_poll=1&comment_c=1&comment_answer=1&within=1+year&date=",
-		"championsonline|PDB|http://primusdatabase.com",
-		"championsonline|Reddit|http://www.reddit.com/r/ChampionsOnlineFFA/",
-		"championsonline|Wiki|http://www.championswiki.com/index.php?title=Main_Page",
-		"championsonline|PowerHouse|http://powerhouse.nullware.com/powerhouse.html",
-		"startrekonline|Reddit|http://www.reddit.com/r/sto/"];
-		
-	for (var i=0; i < gamelinks.length; i++) {
-		linkdata = gamelinks[i].split("|");
-		if($(".CrumbLabel.Category-"+linkdata[0]).length > 0 || window.location.href.indexOf(linkdata[0]) > -1)
-			links += '<li class="'+this.id+'"><a href="'+linkdata[2]+'">'+linkdata[1]+'</a></li>';
+	for (var i=0; i < pweEnhanceSettings.games.length; i++) {
+		if($(".CrumbLabel.Category-"+pweEnhanceSettings.games[i].catname).length > 0 || window.location.href.indexOf("/"+pweEnhanceSettings.games[i].catname+"/") > -1)
+			for (var j = 0; j < pweEnhanceSettings.games[i].usefullinks.length; j++) {
+				links += '<li class="'+this.id+'"><a href="'+pweEnhanceSettings.games[i].usefullinks[j].link+'">' 
+					+ pweEnhanceSettings.games[i].usefullinks[j].linktext +'</a></li>';
+			}
 	}
 	return $(links);
 };
@@ -1761,6 +1745,7 @@ var jQueryLoaded = function() {
 		showWhatsNewDialog();
 	}
 	handleThemes();
+	handleGameInfoUpdate();
 	installFeatures($('.FormWrapper'));
 	installFeatures($('.Head'));
 	installFeatures($('.Item-BodyWrap'));
