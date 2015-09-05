@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.3.0
+// @version    1.3.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://forum.arcgames.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.3";  //what we store when we should display what's new dialog
+var VERSION = "1.3.1";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = " \
+	<div class='change-ver'>v1.3.1</div> - Fixed broken editor when default format is not BBCode \
 	<div class='change-ver'>v1.3.0</div> - Help Promoters update their sigs now that the URL has changed.\
 	<div class='change-ver'>v1.2.5</div> - Fix game specific links<br> - updated automatic URL redirects for browsing without arc frame\
 	<div class='change-ver'>v1.2.4</div> - Enable extension on new forum hubs\
@@ -1693,6 +1694,8 @@ var preventEmbed = function() {
 
 var forceBBCode = function() {
 	$('#Form_Comment #Form_Format').val('BBCode');
+	$('#Form_Comment .editor').addClass('editor-format-bbcode');
+	$('#Form_Comment #Form_Body').attr('format', 'BBCode');
 };
 
 /* loadCSS = function(href) {
