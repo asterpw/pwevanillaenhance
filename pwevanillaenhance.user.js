@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.3.5
+// @version    1.3.6
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://forum.arcgames.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.3.5";  //what we store when we should display what's new dialog
+var VERSION = "1.3.6";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = " \
+	<div class='change-ver'>v1.3.6</div> - Restored manage drafts link under account options<br>- Removed hide category toggle<br>- Fixed comment previews on notifications\
 	<div class='change-ver'>v1.3.5</div> - Comment previews have been resurrected!\
 	<div class='change-ver'>v1.3.4</div> - Another fix for promoter titles, hubs are bad \
 	<div class='change-ver'>v1.3.3</div> - Fixed new issue with promoter titles not showing\
@@ -946,10 +947,10 @@ var addPreviews = function() {
 		".DiscussionName .Title, .LatestPost .LatestPostTitle",
 		discussionPreview);
 	$('.MeMenu, .Notifications').on('mouseover', 
-		'.ItemContent.Activity a[href^="http://perfectworld.vanillaforums.com/discussion/comment/"]',
+		'.ItemContent.Activity a[href^="'+apiBaseUrl+'discussion/comment/"]',
 		commentPreview);
 	$('body').on('mouseover', 
-		'.InformMessages a[href^="http://perfectworld.vanillaforums.com/discussion/comment/"]',
+		'.InformMessages a[href^="'+apiBaseUrl+'discussion/comment/"]',
 		commentPreview);	
 
 };
@@ -1472,17 +1473,17 @@ var initSubmitButton = function(container) {
 	});
 };
 
-var makeShowHideAllCategories = function(container) {
+/*var makeShowHideAllCategories = function(container) {
 	this.target = ".MeMenu .link-preferences";  //override positioning
 	this.positionMethod = "after";
 	return $('<li class="'+this.id+'"><a href="http://perfectworld.vanillaforums.com/categories/?ShowAllCategories=false">My Categories</a></li>' +
 		'<li class="'+this.id+'"><a href="http://perfectworld.vanillaforums.com/categories/?ShowAllCategories=true">All Categories</a></li>');
-};
+};*/
 
 var makeDraftsLink = function(container) {
-	this.target = ".MeMenu .link-preferences";  //override positioning
-	this.positionMethod = "after";
-	return $('<li class="'+this.id+'"><a href="http://perfectworld.vanillaforums.com/drafts">Manage Drafts</a></li>');
+	this.target = ".MeMenu .MarkAllViewed";  //override positioning
+	this.positionMethod = "before";
+	return $('<li class="'+this.id+'"><a href="'+$('.HomeCrumb a').attr('href')+'drafts">Manage Drafts</a></li>');
 };
 
 var makeGameLinks = function() {
@@ -1665,7 +1666,7 @@ var features = [
 	new EmoteFeature("Star Trek Emotes", "trekEmotes", "\u00A9 irvinis.deviantart.com", makeStarTrekEmotes, {category: "trek"}, "http://i.imgur.com/vQTD03D.png"),
 	new EmoteFeature("Dino Emotes", "dinoEmotes", "Qoobee Agapi!", makeDinoEmotes, {category: "dino1", enabled: false}, "http://cdn.rawgit.com/asterpw/e/m/dino/dino1-1.gif"),
 	new EmoteFeature("Twitch Emotes", "twitchEmotes", "Kappa Kreygasm \u00A9 Twitch", makeTwitchEmotes, {category: "twitch", enabled: false}, "http://cdn.rawgit.com/asterpw/e/m/twitch/Kappa.png"),
-	new LinkFeature("Show/Hide All Categories", "showHideAllCategories", "Add show/hide all categories links to Account Options Menu", makeShowHideAllCategories),
+	//new LinkFeature("Show/Hide All Categories", "showHideAllCategories", "Add show/hide all categories links to Account Options Menu", makeShowHideAllCategories),
 	new LinkFeature("Show Draft Link", "draftLink", "Add manage drafts link to Account Options Menu", makeDraftsLink),
 	new LinkFeature("Show/Hide Game Links", "gameLinks", "Add Game-specific links", makeGameLinks, {enabled: false}),
 	new LinkFeature("Block User action", "blockUser", "Show block user action", makeBlockUser),
