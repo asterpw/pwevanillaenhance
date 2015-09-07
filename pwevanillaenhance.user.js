@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.3.4.1
+// @version    1.3.5
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://forum.arcgames.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.3.4";  //what we store when we should display what's new dialog
+var VERSION = "1.3.5";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,8 +23,9 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = " \
-	<div class='change-ver'>v1.3.4</div> - Another fix for promoter titles, hubs are bad (another sig update)\
-	<div class='change-ver'>v1.3.3</div> - Fixed new issue with promoter titles not showing (needs sig update)\
+	<div class='change-ver'>v1.3.5</div> - Comment previews have been resurrected!\
+	<div class='change-ver'>v1.3.4</div> - Another fix for promoter titles, hubs are bad \
+	<div class='change-ver'>v1.3.3</div> - Fixed new issue with promoter titles not showing\
 	<div class='change-ver'>v1.3.2</div> - Updated game links (now maintained by <a href='http://forum.arcgames.com/arc/profile/eiledon'>@eiledon</a>) \
 	<div class='change-ver'>v1.3.1</div> - Fixed broken editor when default format is not BBCode \
 	<div class='change-ver'>v1.3.0</div> - Help Promoters update their sigs to the new URL.\
@@ -842,8 +843,9 @@ var insertWrapping = function(text) {
 var addPreviews = function() {
 	var yql = 'https://query.yahooapis.com/v1/public/yql?format=json&q=';
 	var base = 'select * from json where url="';
-	var apiBaseUrlDiscussion = 'http://perfectworld.vanillaforums.com/api/v1/discussion.json?DiscussionId=';
-	var apiBaseUrlComment = 'http://perfectworld.vanillaforums.com/api/v1/discussion/comment.json?CommentId=';
+	var apiBaseUrl = $('.HomeCrumb a').attr('href')
+	var apiBaseUrlDiscussion = apiBaseUrl + 'api/v1/discussion.json?DiscussionId=';
+	var apiBaseUrlComment = apiBaseUrl + 'api/v1/discussion/comment.json?CommentId=';
 	
 	var truncate = function(text, limit) {
 		var regexp = new RegExp("([\\s\\S]{"+limit+"}[^\\s]*?)\\s");
@@ -894,30 +896,36 @@ var addPreviews = function() {
 							}
 						}
 					}
+					var html = '';
 					if (format == 'BBCode') {
 						var html = bbcodeToText(text).replace(/\n/g, "<p><p>");
-						link.attr('title', ' ');
-						link.tooltip({
-							content: html,
-							tooltipClass: "tooltip-comment",
-							options: {
-								autoShow: false, //some bug if i init tooltip during mouse over
-								autoHide: true
-							},
-							position: {
-								my: 'left top',
-								at: 'bottom',
-								collision: 'flipfit flipfit'
-							},
-							// The animations are really buggy :(
-							show: { effect: "fade", duration: 200, delay: 200 },
-							hide: { effect: "fade", duration: 200, delay: 0 }
-						});
-						
-						if (link.is(":hover")) 
-							link.tooltip( "open" );
-						link.tooltip({options: {autoShow: true}});
+					} else if (format == 'Html') {
+						var elem = $('<span>'+text+'</span>');
+						$('blockquote', elem).remove();
+						var html = elem.text().replace(/\n/g, "<p><p>");
 					}
+					link.attr('title', ' ');
+					link.tooltip({
+						content: html,
+						tooltipClass: "tooltip-comment",
+						options: {
+							autoShow: false, //some bug if i init tooltip during mouse over
+							autoHide: true
+						},
+						position: {
+							my: 'left top',
+							at: 'bottom',
+							collision: 'flipfit flipfit'
+						},
+						// The animations are really buggy :(
+						show: { effect: "fade", duration: 200, delay: 200 },
+						hide: { effect: "fade", duration: 200, delay: 0 }
+					});
+					
+					if (link.is(":hover")) 
+						link.tooltip( "open" );
+					link.tooltip({options: {autoShow: true}});
+				
 				} catch(err) {
 					link.data('call-issued', false);
 				}
