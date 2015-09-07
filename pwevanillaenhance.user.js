@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.3.4
+// @version    1.3.4.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://forum.arcgames.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.3.3";  //what we store when we should display what's new dialog
+var VERSION = "1.3.4";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -1480,8 +1480,11 @@ var makeDraftsLink = function(container) {
 var makeGameLinks = function() {
 	var links = "";
 	for (var i=0; i < pweEnhanceSettings.games.length; i++) {
-		if($(".CrumbLabel.Category-"+pweEnhanceSettings.games[i].catname).length > 0 
-			|| (new RegExp("arcgames\\.com\\/(en\\/forums\\/)?"+pweEnhanceSettings.games[i].catname)).exec(window.location.href) != null)
+		if( pweEnhanceSettings.games[i].usefullinks  
+			&& ( 
+				$(".CrumbLabel.Category-"+pweEnhanceSettings.games[i].catname).length > 0 
+				|| (new RegExp("arcgames\\.com\\/(en\\/forums\\/)?"+pweEnhanceSettings.games[i].catname)).exec(window.location.href) != null
+			))
 			for (var j = 0; j < pweEnhanceSettings.games[i].usefullinks.length; j++) {
 				links += '<li class="'+this.id+'"><a href="'+pweEnhanceSettings.games[i].usefullinks[j].link+'">' 
 					+ pweEnhanceSettings.games[i].usefullinks[j].linktext +'</a></li>';
