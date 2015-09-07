@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.3.3.4
+// @version    1.3.4
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://forum.arcgames.com/*
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = " \
+	<div class='change-ver'>v1.3.4</div> - Another fix for promoter titles, hubs are bad (another sig update)\
 	<div class='change-ver'>v1.3.3</div> - Fixed new issue with promoter titles not showing (needs sig update)\
 	<div class='change-ver'>v1.3.2</div> - Updated game links (now maintained by <a href='http://forum.arcgames.com/arc/profile/eiledon'>@eiledon</a>) \
 	<div class='change-ver'>v1.3.1</div> - Fixed broken editor when default format is not BBCode \
@@ -661,10 +662,16 @@ var applyTitles = function(page) {
 	promoLink.filter(function(){return $(this).text() == "Get the Forums Enhancement Extension!";}).each(function(){
 		var name = $(this).closest('.Item-BodyWrap').siblings('.Item-Header').find('.PhotoWrap').attr('title');
 		var customTitle = $(this).prev('a[href^="title-"], a[href^="http://title-"]').attr('href');
+		if (typeof customTitle == 'undefined') {
+			customTitle = $(this).prev('span[style^="font-family"]').attr('style');
+			if (customTitle) 
+				customTitle = /font-family:[ '"]+([^;]*)['";]+$/.exec(customTitle)[1];
+		}
 		if (typeof customTitle != 'undefined')
 			customTitle = customTitle.substring(customTitle.indexOf("title-") + "title-".length);
-		else
-			customTitle = '';
+		else 			
+			customTitle = '';		
+			
 		var sanitize = escapeHTML(customTitle.substring(0,20));
 		if (sanitize.length) {
 			if ( sanitize.toLowerCase().indexOf('admin') != -1 
@@ -686,7 +693,7 @@ var applyTitles = function(page) {
 		showUpdatePromoterLinkNotification();
 	}
 	if ($('.ItemComment.Mine .Signature a[href^="http://www.arcgames.com/en/forums/arc/#/discussion/1195098"]:contains(Get the Forums Enhancement Extension!)').length > 0 &&
-		$('.ItemComment.Mine .Signature a[href^="http://www.arcgames.com/en/forums/arc/#/discussion/1195098"]:contains(Get the Forums Enhancement Extension!)').prev('a[href^="title-"], a[href^="http://title-"]').length == 0) {
+		$('.ItemComment.Mine .Signature a[href^="http://www.arcgames.com/en/forums/arc/#/discussion/1195098"]:contains(Get the Forums Enhancement Extension!)').prev('span[style^="font-family"]').length == 0) {
 		showUpdatePromoterLinkNotification();
 	}
 	
@@ -723,14 +730,14 @@ var insertPromotion = function(desiredTitle) {
 	$('.editor-toggle-source').remove(); 
 	var text = $('#Form_Body').val();
 	
-	var htmlPromoBase = '<a href="http://title-'+desiredTitle+'"></a><a href="http://www.arcgames.com/en/forums/arc/#/discussion/1195098" target="_blank" rel="nofollow"><font color="#69CAFE">Get the Forums Enhancement Extension!</font></a>';
+	var htmlPromoBase = '<font face="title-'+desiredTitle+'"></font><a href="http://www.arcgames.com/en/forums/arc/#/discussion/1195098" target="_blank" rel="nofollow"><font color="#69CAFE">Get the Forums Enhancement Extension!</font></a>';
 	var promo = '\n' + htmlPromoBase;
-	text = text.replace(/\s?(?:<br>)?<a href=\"title-[^\"]*\"[^>]*><\/a><a href=\"http:\/\/www\.arcgames\.com\/en\/forums\/arc\/\#\/discussion\/1195098\".*Get the Forums Enhancement.*<\/a>/mgi, ''); //remove existing promo
+	text = text.replace(/\s?(?:<br>)?<font face=\"title-[^\"]*\"[^>]*><\/font><a href=\"http:\/\/www\.arcgames\.com\/en\/forums\/arc\/\#\/discussion\/1195098\".*Get the Forums Enhancement.*<\/a>/mgi, ''); //remove existing promo
 	text = text.trim();
 	
 	if ($("#Form_Format").attr('value').toLowerCase() === 'bbcode') {
-		promo = '\n[url="http://title-'+desiredTitle+'"][/url][url="http://www.arcgames.com/en/forums/arc/#/discussion/1195098"][color="#69CAFE"]Get the Forums Enhancement Extension![/color][/url]';
-		text = text.replace(/\s?\[url=\"title-[^"]*\"\]\[\/url\]\[url=\"http:\/\/www\.arcgames\.com\/en\/forums\/arc\/\#\/discussion\/1195098\"\]\[color=\"#69CAFE\"\]Get the Forums Enhancement Extension\!\[\/color\]\[\/url\]/mgi, '');
+		promo = '\n[font="title-'+desiredTitle+'"][/font][url="http://www.arcgames.com/en/forums/arc/#/discussion/1195098"][color="#69CAFE"]Get the Forums Enhancement Extension![/color][/url]';
+		text = text.replace(/\s?\[font=\"title-[^"]*\"\]\[\/font\]\[url=\"http:\/\/www\.arcgames\.com\/en\/forums\/arc\/\#\/discussion\/1195098\"\]\[color=\"#69CAFE\"\]Get the Forums Enhancement Extension\!\[\/color\]\[\/url\]/mgi, '');
 	} else if ($("#Form_Format").attr('value').toLowerCase() === 'wysiwyg') {
 		promo = '\n<br>'+htmlPromoBase;
 	}
@@ -752,7 +759,7 @@ var makePromotionControls = function() {
 	if ($('form[action$="profile/signature?"] h1.H').length == 0) 
 		return;
 	var container = $('<div></div>');
-	container.append("<h2 class='H'>Custom Enhance Title</h2><div>Custom User Titles are available for Enhance Promoters!<br>All you have to do is add a link promoting the Enhance Extension using the button below.<br>Promo links are only visible to non-Enhanced users so don't worry about it cluttering up your signature.<br>If you want to be able to see what the link looks like you can unhide the links from the Enhance Settings menu.<b>Note:</b> If you edit your signature you may have to link again with this button for it to work.</div>");
+	container.append("<h2 class='H'>Custom Enhance Title</h2><div>Custom User Titles are available for Enhance Promoters!<br>All you have to do is add a link promoting the Enhance Extension using the button below.<br>Promo links are only visible to non-Enhanced users so don't worry about it cluttering up your signature.<br>If you want to be able to see what the link looks like you can unhide the links from the Enhance Settings menu.<br><b>Note:</b> If you edit your signature you may have to link again with this button for it to work.</div>");
 	container.append("Desired Title: <input class='promoTitle' type='text' placeholder='up to 20 characters' maxlength='20'></input>");
 	var button = $("<div class='NavButton' style='margin-left: 10px'>Add Promo Link</div>");
 	var success = $("<span style='display: none; margin-left: 20px'>Promo link added!</span>");
@@ -769,11 +776,15 @@ var makePromotionControls = function() {
 	$('form[action$="profile/signature?"] h1.H').after(container);
 	
 	var curText = $('#Form_Body').val();
-	if (curText.includes("http://perfectworld.vanillaforums.com/discussion/1195098") || curText.includes('="title-')) {
-		$('#Form_Body').val(curText.replace("http://perfectworld.vanillaforums.com/discussion/1195098", "http://www.arcgames.com/en/forums/arc/#/discussion/1195098").replace('="title-', '="http://title-'));
+	curText = curText.replace("http://perfectworld.vanillaforums.com/discussion/1195098", "http://www.arcgames.com/en/forums/arc/#/discussion/1195098");
+	curText = curText.replace('="http://title-', '="title-');
+	curText = curText.replace(/\[url=\"title-([^"]*)\"\]\[\/url\]/i, '[font="title-$1"][/font]')
+	curText = curText.replace(/<a href=\"title-([^\"]*)\"[^>]*><\/a>/i, '<font face="title-$1"></font>')
+	
+	if (curText != $('#Form_Body').val()) {
+		$('#Form_Body').val(curText);
 		showDialog("success", "Updated", "The Promoter Link has been updated!<br>Hit Save below when ready.", 300);
 	}
-	
 };
 
 var redirectUrls = function(container) {
