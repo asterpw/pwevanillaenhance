@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.3.6.1
+// @version    1.3.7
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://forum.arcgames.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.3.6";  //what we store when we should display what's new dialog
+var VERSION = "1.3.7";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -24,6 +24,7 @@ var getFullVersion = function() { // For version display on the screen;
 /*jshint multistr: true */
 var CHANGELOG = " \
 	<!-- <div class='change-ver'>v1.4.0</div> - Added Discussion Filter / Navigation from <a href='http://forum.arcgames.com/arc/profile/eiledon'>@eiledon</a>! -->\
+	<div class='change-ver'>v1.3.7</div> - Titles now appear in a just-added comment\
 	<div class='change-ver'>v1.3.6</div> - Restored manage drafts link under account options<br>- Removed hide category toggle<br>- Fixed comment previews on notifications\
 	<div class='change-ver'>v1.3.5</div> - Comment previews have been resurrected!\
 	<div class='change-ver'>v1.3.4</div> - Another fix for promoter titles, hubs are bad \
@@ -1803,16 +1804,10 @@ var jQueryLoaded = function() {
 	$(document).on( "EditCommentFormLoaded", function(event, container) {
 		installFeatures(container);
 	});
-	/*$(document).on( "DOMNodeInserted", ".ItemComment", function(event) {
-		var container = $(event.target)
-		if (container.is(".ItemComment")) {
-			redirectUrls();
-			installFeatures(container);
-			applyTitles(container);
-			hideBlockedUsers(container);
+	$(document).on( "CommentAdded PageLoaded", function(event, container) {
+		if (typeof container  == 'undefined') {
+			container = $('.Mine:not(:has(.enhance-title))');
 		}
-	});*/
-	$(document).on( "PageLoaded", function(event, container) {
 		installFeatures(container);
 		applyTitles(container);
 		redirectUrls(container);
