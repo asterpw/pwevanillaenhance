@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.3.6
+// @version    1.3.6.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://forum.arcgames.com/*
@@ -23,6 +23,7 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = " \
+	<!-- <div class='change-ver'>v1.4.0</div> - Added Discussion Filter / Navigation from <a href='http://forum.arcgames.com/arc/profile/eiledon'>@eiledon</a>! -->\
 	<div class='change-ver'>v1.3.6</div> - Restored manage drafts link under account options<br>- Removed hide category toggle<br>- Fixed comment previews on notifications\
 	<div class='change-ver'>v1.3.5</div> - Comment previews have been resurrected!\
 	<div class='change-ver'>v1.3.4</div> - Another fix for promoter titles, hubs are bad \
@@ -617,9 +618,9 @@ var makeThemeManager = function() {
 
 	$(".SiteMenu").append(dialog);
 	
-	var button = $('<a href="#" class="MeButton FlyoutButton" title="Themes and Wallpapers"><span class="Sprite Sprite16 SpOptions"></span></a>');
+	var button = $('<a href="#" class="MeButton FlyoutButton" title="Themes and Wallpapers"><span class="icon icon-picture"></span></a>');
 
-	var themeControl = $("<span class='ToggleFlyout enhance-themes'></span>");
+	var themeControl = $("<span class='ToggleFlyout enhance-themes enhance-icon'></span>");
 	button.click(function(){$('.themeManager').slideToggle();
 		$('.themeManager').siblings('.enhanceDialog:visible').detach().insertAfter($('.themeManager')).slideToggle();});
 	$(".MeMenu").append(themeControl.append(button));
@@ -639,12 +640,20 @@ var makeEmoteManager = function() {
 	dialog.append(content);
 	$(".SiteMenu").append(dialog);
 	
-	var button = $('<a href="#" class="MeButton FlyoutButton" title="Emotes"><span class="Sprite Sprite16 SpOptions"></span></a>');
+	var button = $('<a href="#" class="MeButton FlyoutButton" title="Emotes"><span class="icon icon-agree"></span></a>');
 
-	var control = $("<span class='ToggleFlyout enhance-emotes'></span>");
+	var control = $("<span class='ToggleFlyout enhance-emotes enhance-icon'></span>");
 	button.click(function(){$('.emoteManager').slideToggle();
 		$('.emoteManager').siblings('.enhanceDialog:visible').detach().insertAfter($('.emoteManager')).slideToggle();});
 	$(".MeMenu").append(control.append(button));
+};
+
+var makePlaceholder = function() {
+	if ($('.enhance-discussion').length == 0) {
+		var button = $('<a href="#" class="MeButton FlyoutButton"><span class="icon icon-filter"></span></a>');
+		var control = $("<span class='ToggleFlyout enhance-discussion enhance-icon'></span>");
+		$(".MeMenu").append(control.append(button));
+	}
 };
 
 var ENHANCE_IDENTIFIER = '\u200B\u200B'; //It's invisible... spooky
@@ -1016,8 +1025,8 @@ var makeFeatureMenu = function() {
 
 var makeEnhancePreferencesMenu = function() {
 	$('.enhance-options').remove();
-	var preferencesControl = $("<span class='ToggleFlyout enhance-options'></span>");
-	var preferencesButton = $('<a href="#" class="MeButton FlyoutButton" title="Enhance Settings"><span class="Sprite Sprite16 SpOptions"></span><!-- span class="label">Enhance Options</span --></a>');
+	var preferencesControl = $("<span class='ToggleFlyout enhance-options enhance-icon' style='float: right;'></span>");
+	var preferencesButton = $('<a href="#" class="MeButton FlyoutButton" title="Enhance Settings"><span class="icon icon-cog"></span><!-- span class="label">Enhance Options</span --></a>');
 	preferencesControl.append(preferencesButton).append($('<span class="Arrow SpFlyoutHandle"></span>'));
 	
 	var preferencesMenu = $('<div class="Flyout MenuItems" ></div>');
@@ -1706,9 +1715,9 @@ var preventEmbed = function() {
 };
 
 var forceBBCode = function() {
-	$('#Form_Comment #Form_Format').val('BBCode');
-	$('#Form_Comment .editor').addClass('editor-format-bbcode');
-	$('#Form_Comment #Form_Body').attr('format', 'BBCode');
+	$('#Form_Format').val('BBCode');
+	$('.editor-desktop').addClass('editor-format-bbcode');
+	$('#Form_Body').attr('format', 'BBCode');
 };
 
 /* loadCSS = function(href) {
@@ -1746,7 +1755,7 @@ var getSettings = function() {
 	var savedSettingsJSON = localStorage["pweEnhancementSettings"];
 	if (savedSettingsJSON) {
 		var savedSettings = JSON.parse(savedSettingsJSON);
-		if (savedSettings.version && savedSettings.version >= "0.9.0") {
+		if (savedSettings.version && savedSettings.version >= "1.0.0") {
 			mergeData(pweEnhanceSettings, savedSettings, false); // dont merge in discarded features
 			mergeData(pweEnhanceSettings.blockedUsers, savedSettings.blockedUsers, true);
 			mergeData(pweEnhanceSettings.themes, savedSettings.themes, true);
@@ -1760,7 +1769,7 @@ var getSettings = function() {
 preventEmbed();
 //loadJS("https://github.com/Eiledon/PWEVC/raw/master/PWE_Discussion_Manager.user.js");
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/062d56e5f9d677864d52f7c220e76800bfb7ee29/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/813219b3798be2ef2d2cf69174cf67a5048ca656/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
 randomWallpaper();
@@ -1783,6 +1792,7 @@ var jQueryLoaded = function() {
 	makeThemeManager();
 	makeEmoteManager();
 	makeEnhancePreferencesMenu();
+	//makePlaceholder();
 	makePromotionControls();
 	forceBBCode();
 	hideBlockedUsers($("#Body"));
