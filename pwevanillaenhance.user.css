@@ -26,7 +26,7 @@
 	color: black !important;
 	font-weight: bold;
 }
-
+	
 .enhance-dialog .title {
 	 background: #69CAFE;
 	font-weight: bold;
@@ -79,8 +79,15 @@
 }
 
 
-.enhance-options .SpOptions::before {
+.enhance-icon .icon::before {
 	color: #69CAFE !important;
+}
+	
+.enhance-icon .icon {
+	height: 16px !important;
+	width: 16px !important;
+	vertical-align: top;
+	display: inline-block;
 }
 
 .enhance-options .Flyout .menu-content {
@@ -105,18 +112,8 @@
 	opacity: 0.0;
 }
 
-.enhance-options:hover .MeButton .label {
-	animation: slide 0.5s ease-in-out;
-	opacity: 1.0;
-}
-
-.enhance-options:hover .SpOptions::before {
+.enhance-options:hover .icon::before {
 	animation: spin 3s infinite linear;
-}
-
-@keyframes slide {
-	from {margin-left: 30px; opacity: 0.0}
-	to {margin-left: 5px; opacity: 1.0}
 }
 
 @-moz-keyframes spin {
@@ -348,10 +345,6 @@
 /************************
   Emote Manager Stuff
 ************************/
-.enhance-emotes  .SpOptions:before {
-	content: "\f167" !important;
-	color: #69CAFE !important;
-}
 
 .emoteManager .picker .image {
 	width: 50px;
@@ -388,11 +381,6 @@
 /************************
   Theme Manager Stuff
 ************************/
-
-.enhance-themes  .SpOptions:before {
-	content: "\f178" !important;
-	color: #69CAFE !important;
-}
 
 .close {
 	background-color: white;
