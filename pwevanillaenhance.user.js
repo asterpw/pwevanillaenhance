@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.3.8.3
+// @version    1.3.8.4
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://forum.arcgames.com/*
@@ -864,22 +864,21 @@ var getPageData = function() {
 		return;
 	var match = /categories\/([^\/]+)\/?p?([0-9]+)?/.exec(currentPageUrl);
 	var findLastCommentIDs = function(json) {	
-			if (json && json.Discussions) {
-				for (var i = 0; i < json.Discussions.length; i++) {
-					pageData.discussions[json.Discussions[i].DiscussionID] = json.Discussions[i].LastCommentID;
-				}
-			}
-			if (json && json.Announcements) {
-				for (var i = 0; i < json.Announcements.length; i++) {
-					pageData.discussions[json.Announcements[i].DiscussionID] = json.Announcements[i].LastCommentID;
+			var lists = ['Discussions', 'Announcements', 'AnnounceData'];
+			for (var j = 0; j < lists.length; j++) {
+				if (json && json[lists[j]]) {
+					for (var i = 0; i < json[lists[j]].length; i++) {
+						pageData.discussions[json[lists[j]][i].DiscussionID] = json[lists[j]][i].LastCommentID;
+					}
 				}
 			}
 		};
 	
 	if (match) {
 		var category = match[1];
-		var page = match[2] ? match[2] : "1";
-		var apiUrl = apiBaseUrl+ "api/v1/discussions/category.json?CategoryIdentifier=" + category + "&page=p" + page;
+		var page = match[2] ? "&page=p" + match[2] : "";
+		var apiUrl = apiBaseUrl+ "api/v1/discussions/category.json?CategoryIdentifier=" + category + page;
+		console.log(apiUrl);
 		$.getJSON(apiUrl, findLastCommentIDs);
 		return;
 	} 
