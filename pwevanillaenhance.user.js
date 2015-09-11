@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.3.8.5
+// @version    1.3.8.6
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://forum.arcgames.com/*
@@ -878,7 +878,6 @@ var getPageData = function() {
 		var category = match[1];
 		var page = match[2] ? "&page=p" + match[2] : "";
 		var apiUrl = apiBaseUrl+ "api/v1/discussions/category.json?CategoryIdentifier=" + category + page;
-		console.log(apiUrl);
 		$.getJSON(apiUrl, findLastCommentIDs);
 		return;
 	} 
