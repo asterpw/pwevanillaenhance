@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.3.8.4
+// @version    1.3.8.5
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://forum.arcgames.com/*
@@ -922,12 +922,16 @@ var addPreviews = function() {
 				}
 			}
 			
-			$.getJSON(apiCall + "?format=BBCode", function(data) {	
+			$.getJSON(apiCall + "?format=Html", function(data) {	
 				try {
 					var json = data;
 					var text = json.Quote.body;
-					text = text.substring(text.indexOf("]")+1, text.lastIndexOf("["));
-					var html = bbcodeToText(text).replace(/\n/g, "<p><p>");
+					text = text.substring(text.indexOf(">")+1, text.lastIndexOf("<"));
+					//var html = bbcodeToText(text).replace(/\n/g, "<p><p>");
+					var elem = $('<span>'+text+'</span>');
+					$('blockquote', elem).remove();
+					var html = elem.text().replace(/\n/g, "<p><p>");
+						
 					link.attr('title', ' ');
 					link.tooltip({
 						content: html,
