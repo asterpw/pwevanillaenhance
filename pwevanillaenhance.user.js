@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.3.8.1
+// @version    1.3.8.2
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://forum.arcgames.com/*
@@ -863,19 +863,32 @@ var getPageData = function() {
 	if (typeof currentPageUrl == 'undefined')
 		return;
 	var match = /categories\/([^\/]+)\/?p?([0-9]+)?/.exec(currentPageUrl);
-	if (!match) 
-		return;
-	var category = match[1];
-	var page = match[2] ? match[2] : "1";
-	var apiUrl = apiBaseUrl+ "api/v1/discussions/category.json?CategoryIdentifier=" + category + "&page=p" + page;
-	console.log(apiUrl);
-	$.getJSON(apiUrl, function(json) {	
-		if (json && json.Discussions) {
-			for (var i = 0; i < json.Discussions.length; i++) {
-				pageData.discussions[json.Discussions[i].DiscussionID] = json.Discussions[i].LastCommentID;
+	if (match) {
+		var category = match[1];
+		var page = match[2] ? match[2] : "1";
+		var apiUrl = apiBaseUrl+ "api/v1/discussions/category.json?CategoryIdentifier=" + category + "&page=p" + page;
+		$.getJSON(apiUrl, function(json) {	
+			if (json && json.Discussions) {
+				for (var i = 0; i < json.Discussions.length; i++) {
+					pageData.discussions[json.Discussions[i].DiscussionID] = json.Discussions[i].LastCommentID;
+				}
 			}
-		}
-	});
+		});
+		return;
+	} 
+	match = /discussions\/?p?([0-9]+)?/.exec(currentPageUrl);
+	if (match) {
+		var page = match[1] ? match[1] : "1";
+		var apiUrl = apiBaseUrl+ "api/v1/discussions.json?page=p" + page;
+		$.getJSON(apiUrl, function(json) {	
+			if (json && json.Discussions) {
+				for (var i = 0; i < json.Discussions.length; i++) {
+					pageData.discussions[json.Discussions[i].DiscussionID] = json.Discussions[i].LastCommentID;
+				}
+			}
+		});
+		return;
+	}
 };
 
 var addPreviews = function() {
