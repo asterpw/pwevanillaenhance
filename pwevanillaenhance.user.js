@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.3.8
+// @version    1.3.8.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://forum.arcgames.com/*
@@ -108,6 +108,11 @@ var pweEnhanceSettings = {
 	},
 
 	version: "0"
+};
+
+var pageData = {
+	discussions: {},
+	categories: {}
 };
 
 var showDialog = function(classname, titleText, content, delay, closeHandler) {
@@ -852,8 +857,29 @@ var insertWrapping = function(text) {
 	return text;
 };
 
+var getPageData = function() {
+	var apiBaseUrl = $('.HomeCrumb a').attr('href');
+	var currentPageUrl = $(".NumberedPager a.Highlight").attr('href');
+	if (typeof currentPageUrl == 'undefined')
+		return;
+	var match = /categories\/([^\/]+)\/?p?([0-9]+)?/.exec(currentPageUrl);
+	if (!match) 
+		return;
+	var category = match[1];
+	var page = match[2] ? match[2] : "1";
+	var apiUrl = apiBaseUrl+ "api/v1/discussions/category.json?CategoryIdentifier=" + category + "&page=p" + page;
+	console.log(apiUrl);
+	$.getJSON(apiUrl, function(json) {	
+		if (json && json.Discussions) {
+			for (var i = 0; i < json.Discussions.length; i++) {
+				pageData.discussions[json.Discussions[i].DiscussionID] = json.Discussions[i].LastCommentID;
+			}
+		}
+	});
+};
+
 var addPreviews = function() {
-	var apiBaseUrl = $('.HomeCrumb a').attr('href')
+	var apiBaseUrl = $('.HomeCrumb a').attr('href');
 	var apiBaseUrlDiscussion = apiBaseUrl + 'discussion/getquote/Discussion_';
 	var apiBaseUrlComment = apiBaseUrl + 'discussion/getquote/Comment_'; 
 	
@@ -876,9 +902,10 @@ var addPreviews = function() {
 				apiCall = apiBaseUrlComment + match[1];
 			} else {
 				match = /discussion\/([0-9]+)\/[^\/]*(?:\/p([0-9]+))?/.exec(url);
-				apiCall = apiBaseUrlDiscussion + match[1];
-				if (typeof match[2] != 'undefined') {
-					apiCall += "&Page=p" + match[2];
+				if (type == 'lastcomment' && match[1] in pageData.discussions) {
+					apiCall = apiBaseUrlComment + pageData.discussions[match[1]];
+				} else {
+					apiCall = apiBaseUrlDiscussion + match[1];
 				}
 			}
 			
@@ -1758,6 +1785,7 @@ var jQueryLoaded = function() {
 	}
 	handleThemes();
 	handleGameInfoUpdate();
+	getPageData();
 	installFeatures($('.FormWrapper'));
 	installFeatures($('.Head'));
 	installFeatures($('.Item-BodyWrap'));
