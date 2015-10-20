@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.3.8.6
+// @version    1.4.0
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://forum.arcgames.com/*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.3.8";  //what we store when we should display what's new dialog
+var VERSION = "1.4.0";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -23,6 +23,8 @@ var getFullVersion = function() { // For version display on the screen;
 };
 /*jshint multistr: true */
 var CHANGELOG = " \
+	<div class='change-ver'>v1.4.0</div> - Fixed menus on PWE's new forum theme<br> - Added new 'hat' emotes to FW Emotes <br>\
+	- Enhance Theme Makers Need to Update their Themes! \
 	<!-- <div class='change-ver'>v1.4.0</div> - Added Discussion Filter / Navigation from <a href='http://forum.arcgames.com/arc/profile/eiledon'>@eiledon</a>! -->\
 	<div class='change-ver'>v1.3.8</div> - Comment previews are now much more reliable and responsive\
 	<div class='change-ver'>v1.3.7</div> - Titles now appear in a just-added comment\
@@ -623,7 +625,7 @@ var makeThemeManager = function() {
 	dialog.append(makeWallpaperMenu());
 	dialog.append(makeAddonMenu());
 
-	$(".SiteMenu").append(dialog);
+	$(".SiteMenu").after(dialog);
 	
 	var button = $('<a href="#" class="MeButton FlyoutButton" title="Themes and Wallpapers"><span class="icon icon-picture"></span></a>');
 
@@ -645,7 +647,7 @@ var makeEmoteManager = function() {
 		content.append(features[i].optionPicker());
 	}
 	dialog.append(content);
-	$(".SiteMenu").append(dialog);
+	$(".SiteMenu").after(dialog);
 	
 	var button = $('<a href="#" class="MeButton FlyoutButton" title="Emotes"><span class="icon icon-agree"></span></a>');
 
@@ -1241,7 +1243,7 @@ var makePWIEmotes = function() {
 };
 
 var makeFWEmotes = function() {
-	var categories = ["samurai", "jellyfish", "raven", "greenmonkey", "baby", "monkey2", "tiger2"]; 
+	var categories = ["samurai", "jellyfish", "raven", "greenmonkey", "baby", "monkey2", "tiger2", "hat"]; 
 	var emotes = {};
 	for (var i = 0; i < categories.length; i++) {
 		emotes[categories[i]] = generateEmoteArray(categories[i], 10, 50, 1, '.gif');
@@ -1786,7 +1788,7 @@ var getSettings = function() {
 preventEmbed();
 //loadJS("https://github.com/Eiledon/PWEVC/raw/master/PWE_Discussion_Manager.user.js");
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/813219b3798be2ef2d2cf69174cf67a5048ca656/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/bc23b65af6594eea090be643a3ee7cb262ad58b8/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
 randomWallpaper();
