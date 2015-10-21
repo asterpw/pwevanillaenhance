@@ -516,10 +516,10 @@
   Titles
 ************************/
 
-.enhance-title {
+/*.enhance-title {
 	display: block;
 	overflow: hidden;
-}
+}*/
 
 .enhance-title.developer {
 	color: #69CAFE !important; 
