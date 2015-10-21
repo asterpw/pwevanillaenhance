@@ -4,7 +4,7 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.4.0
+// @version    1.4.0.1
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
 // @match      http://forum.arcgames.com/*
@@ -730,7 +730,7 @@ var applyTitles = function(page) {
 	for (var name in titles) {
 		var container = $('.Username[href$="'+name+'"]', page).closest(".AuthorWrap").find(".AuthorInfo");
 		for (var title in titles[name]) {
-			container.append($('<span class="Rank enhance-title '+title+'">'+titles[name][title]+'</span>'));
+			container.append($('<span class="Rank MItem enhance-title '+title+'">'+titles[name][title]+'</span>'));
 			$('span[title="Arc User"]', container).remove();
 		}
 	}
@@ -1788,7 +1788,7 @@ var getSettings = function() {
 preventEmbed();
 //loadJS("https://github.com/Eiledon/PWEVC/raw/master/PWE_Discussion_Manager.user.js");
 loadCSS("https://cdn.rawgit.com/asterpw/spectrum/master/spectrum.css");
-loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/bc23b65af6594eea090be643a3ee7cb262ad58b8/pwevanillaenhance.user.css");
+loadCSS("https://rawgit.com/asterpw/pwevanillaenhance/a7c2fe8fdf2db33058970479d24f05a531edc99d/pwevanillaenhance.user.css");
 getSettings();
 preloadThemes();
 randomWallpaper();
