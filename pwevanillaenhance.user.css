@@ -522,15 +522,15 @@
 }
 
 .enhance-title.developer {
-	color: #69CAFE; 
+	color: #69CAFE !important; 
 }
 	
 .enhance-title.themeauthor {
-	color: #69FECA; 
+	color: #69FECA !important; 
 }
 
 .enhance-title.promoter {
-	color: #FFEE88;
+	color: #FFEE88 !important;
 }
 
 /************************
