@@ -4,16 +4,16 @@
 // @downloadURL https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @updateURL  https://github.com/asterpw/pwevanillaenhance/raw/master/pwevanillaenhance.user.js
 // @icon http://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.r23.cf1.rackcdn.com/perfectworld.vanillaforums.com/favicon_2b888861142269ff.ico
-// @version    1.4.0.2
+// @version    1.4.0.3
 // @run-at     document-start
 // @description  Adds useful tools to the pwe vanilla forums
-// @match      http://forum.arcgames.com/*
+// @match      htt*://forum.arcgames.com/*
 // @grant       none
-// @copyright  2015, Asterelle 
+// @copyright  2016, Asterelle 
 // ==/UserScript==
 
 (function() {	
-var VERSION = "1.4.0.2";  //what we store when we should display what's new dialog
+var VERSION = "1.4.0.3";  //what we store when we should display what's new dialog
 var getFullVersion = function() { // For version display on the screen;
 	try {
 		return GM_info.script.version;  //causes error if not supported
@@ -22,8 +22,11 @@ var getFullVersion = function() { // For version display on the screen;
 	}
 };
 /*jshint multistr: true */
+
+/*https://cdn.rawgit.com/asterpw/pwevanillaenhance/master/adblock.txt
+<a href="abp:subscribe?location=https%3A%2F%2Fcdn.rawgit.com%2Fasterpw%2Fpwevanillaenhance%2Fmaster%2Fadblock.txt&amp;title=Block%20PWE%20Vanilla%20Forums%20Embed">Subscribe</a>
+*/
 var CHANGELOG = " \
-	Hi Enhance users!  I'm aware of the new redirect issue when browsing natively and am working on a fix.  For now you may want to use the embedded version of the forums.<br><br>\
 	<div class='change-ver'>v1.4.0</div> - Fixed menus on PWE's new forum theme<br> - Added new 'hat' emotes to FW Emotes <br>\
 	- Enhance Theme Makers Need to Update their Themes! \
 	<!-- <div class='change-ver'>v1.4.0</div> - Added Discussion Filter / Navigation from <a href='http://forum.arcgames.com/arc/profile/eiledon'>@eiledon</a>! -->\
@@ -710,13 +713,13 @@ var applyTitles = function(page) {
 		$(this).prev('a[href^="title-"], a[href^="http://title-"]').prev('br').addClass('promoLink').toggle(visible);
 	});
 	
-	if ($('.ItemComment.Mine .Signature a[href^="http://perfectworld.vanillaforums.com/discussion/1195098"]').length > 0) {
+	/*if ($('.ItemComment.Mine .Signature a[href^="http://perfectworld.vanillaforums.com/discussion/1195098"]').length > 0) {
 		showUpdatePromoterLinkNotification();
 	}
 	if ($('.ItemComment.Mine .Signature a[href^="http://www.arcgames.com/en/forums/arc/#/discussion/1195098"]:contains(Get the Forums Enhancement Extension!)').length > 0 &&
 		$('.ItemComment.Mine .Signature a[href^="http://www.arcgames.com/en/forums/arc/#/discussion/1195098"]:contains(Get the Forums Enhancement Extension!)').prev('span[style^="font-family"]').length == 0) {
 		showUpdatePromoterLinkNotification();
-	}
+	}*/
 	
 	
 	$(".Message", page).filter(function () { var text = $(this).text().trim();
@@ -1731,7 +1734,7 @@ var preventEmbed = function() {
 			scripts[i].defer = true;
 		}
 	}
-	window.onbeforeunload = function(){ return "The page is attempting to redirect to arc despite my best efforts to stop it, are you ok with that?";};
+	//window.onbeforeunload = function(){ return "The page is attempting to redirect to arc despite my best efforts to stop it, are you ok with that?";};
 };
 
 var forceBBCode = function() {

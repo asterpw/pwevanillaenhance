@@ -1,0 +1,2 @@
+http://forum.arcgames.com/*/js/embed_local.js
+http://forum.arcgames.com/*/themes/Arc/js/custom.js
